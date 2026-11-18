@@ -1,0 +1,9 @@
+{
+  "name": "buontavolo-demo",
+  "private": true,
+  "version": "0.4.0",
+  "description": "BuonTavolo demo mobile-first; no personal data",
+  "scripts": {
+    "test": "node test-rating.cjs"
+  }
+}

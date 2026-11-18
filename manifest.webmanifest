@@ -1,0 +1,18 @@
+{
+  "name": "BuonTavolo · Demo",
+  "short_name": "BuonTavolo",
+  "description": "Anteprima dimostrativa della piattaforma BuonTavolo. Nessun dato reale.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8f3ea",
+  "theme_color": "#28331b",
+  "lang": "it",
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
