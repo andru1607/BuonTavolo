@@ -1,3 +1,15 @@
+# GoodDiner V7.9 · Studio di personalizzazione
+
+La personalizzazione visiva ora è interattiva nella demo: il **cliente** può selezionare tre finiture del proprio DinerPass (con anteprima e selezione distinta per codice cliente); il **ristoratore** può selezionare tre accenti per la scheda locale, mantenendo esclusivamente logo e foto caricati dal gestore. Tutti possono scegliere fra tre temi dell'interfaccia e densità Aria/Compatta, senza aggiungere nuove voci alla navigazione.
+
+**Dove:** Cliente → Profilo → Studio DinerPass; Ristoratore → Gestione → Studio locale. Entrambe le home offrono una scorciatoia. Si applicano subito e restano salvate nel browser, con possibilità di ripristinare la configurazione originale. L'anteprima del locale riprende il nome inserito nell'onboarding e il suo eventuale logo.
+
+**Privacy:** le sole preferenze sono nel localStorage `gooddiner-demo-appearance-v79`. La personalizzazione non cambia ID, recensioni, voto, premi, QR o stato di verifica. Backend/autenticazione reali restano disattivati; nessuna immagine stock. Rispetta `prefers-reduced-motion`.
+
+**Collaudo:** 12 suite `npm test` superate. Rendering e interazione browser verificati a 320, 375, 390, 430, 740, 1024 e 1280 px: nessuno scorrimento orizzontale o errore JavaScript; scelte persistenti anche dopo riapertura, ripristino e gestione dei due ruoli. Test fisici su iOS/Android ancora da effettuare.
+
+---
+
 # GoodDiner V7.8 · Zoom corretto e transizioni più fluide
 
 - **Zoom involontario su iPhone:** campi di registrazione, scanner, area demo e account predisposto con caratteri di almeno 16 px, senza bloccare lo zoom manuale dell'utente.

@@ -8,7 +8,7 @@ assert.ok(v76.includes("const id='GD-'+rand(9)")&&v76.includes("localStorage.rem
 assert.ok(v76.includes("data-gd-entry=\"signin\"")&&v76.includes('data-gd-entry="signup"'));
 assert.ok(!v76.includes('Data stored on server')&&!v76.includes('verifyRestaurantAutomatically'));
 assert.ok(css.includes('safe-area-inset-top')&&css.includes('max-width:480px'));
-assert.ok(read('sw.js').includes('gooddiner-demo-v78'));
+assert.ok(read('sw.js').includes('gooddiner-demo-v79'));
 let storage={},events={},nodes={app:{innerHTML:''},toast:{textContent:'',classList:{add(){},remove(){}}}};
 const root={console,localStorage:{getItem:k=>storage[k]||null,setItem:(k,v)=>storage[k]=v,removeItem:k=>delete storage[k]},document:{getElementById:k=>nodes[k]||null,querySelector:()=>null,addEventListener:(n,f)=>{(events[n]??=[]).push(f)},hidden:false},crypto:require('crypto').webcrypto,Date,setTimeout:()=>0,clearTimeout:()=>{},setInterval:()=>0,confirm:()=>true,window:{scrollTo:()=>{},matchMedia:()=>({matches:true}),setInterval:()=>0,addEventListener:()=>{},GoodDinerQR:null},location:{protocol:'file:'},navigator:{},Intl};
 let tick;

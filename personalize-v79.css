@@ -1,0 +1,169 @@
+/* GoodDiner V7.9 | Studio personale. Intentional contrast, no external photos. */
+:root{
+  --gd9-ease:cubic-bezier(.22,1,.36,1);
+  --gd9-marine:#0F3D3E;
+  --gd9-coral:#D35F45;
+  --gd9-copper:#C9A86A;
+}
+/* Curated global atmospheres. The default preserves the approved V7.7 palette. */
+html[data-gd-theme="sunset"]{
+  --olive:#603A43;--olive2:#88515A;--wine:#B94736;--wine2:#993D31;
+  --cream:#FCF1E8;--paper:#FFFBF7;--line:#EBCFC4;--gold:#CF9A62;
+  --ink:#603A43;--metal:#CF9A62;--v77-coral:#E37559;
+}
+html[data-gd-theme="night"]{
+  --olive:#242F53;--olive2:#3B4C7A;--wine:#A95440;--wine2:#913D31;
+  --cream:#F2F1F5;--paper:#FFFDFD;--line:#D9D9E5;--gold:#CCAA78;
+  --ink:#242F53;--metal:#CCAA78;--v77-coral:#DD826C;
+}
+html[data-gd-theme="sunset"],html[data-gd-theme="sunset"] body{background:#FCF1E8}
+html[data-gd-theme="night"],html[data-gd-theme="night"] body{background:#F2F1F5}
+html[data-gd-theme="sunset"] .app,html[data-gd-theme="sunset"] .main{background:linear-gradient(165deg,#FCEBE0,#FFF9F3 52%,#FCF1E8)}
+html[data-gd-theme="night"] .app,html[data-gd-theme="night"] .main{background:linear-gradient(160deg,#EEEDF5,#FAF9FD 56%,#F2F1F5)}
+html[data-gd-theme="sunset"] .v73-app .sidebar{background:linear-gradient(160deg,#79434B,#603A43 62%,#412831)}
+html[data-gd-theme="night"] .v73-app .sidebar{background:linear-gradient(160deg,#394A76,#242F53 62%,#1B2647)}
+html[data-gd-theme="sunset"] .v73-app .masthead{background:linear-gradient(110deg,#82505B,#603A43);color:#FFF9F5}
+html[data-gd-theme="night"] .v73-app .masthead{background:linear-gradient(110deg,#3B4D7A,#242F53);color:#FFF9F5}
+html[data-gd-theme="sunset"] .v73-app .mobile-bottom button.active,html[data-gd-theme="sunset"] .v73-app .section-intro h1{color:#603A43}
+html[data-gd-theme="night"] .v73-app .mobile-bottom button.active,html[data-gd-theme="night"] .v73-app .section-intro h1{color:#242F53}
+html[data-gd-theme="sunset"] .v73-app .mobile-bottom button.active .nav-icon{background:#603A43;color:#FFF9F2}
+html[data-gd-theme="sunset"] .v73-app .mini-stat strong{color:#603A43}
+html[data-gd-theme="night"] .v73-app .mobile-bottom button.active .nav-icon{background:#242F53;color:#FFF9F2}
+html[data-gd-theme="night"] .v73-app .mini-stat strong{color:#242F53}
+html[data-gd-theme="sunset"] .v73-app .side-nav button.active{color:#603A43}
+html[data-gd-theme="night"] .v73-app .side-nav button.active{color:#242F53}
+html[data-gd-theme="sunset"] .gd-gate{background:radial-gradient(circle at 90% 3%,rgba(255,174,115,.26),transparent 43%),linear-gradient(150deg,#88505A,#603A43 60%,#422832)}
+html[data-gd-theme="night"] .gd-gate{background:radial-gradient(circle at 88% 4%,rgba(226,134,150,.18),transparent 44%),linear-gradient(150deg,#415585,#263356 61%,#151F3A)}
+html[data-gd-theme="sunset"] .gd-kicker{color:#FFE0BA}
+html[data-gd-theme="night"] .gd-kicker{color:#ECD1B6}
+html[data-gd-theme="sunset"] .gd-opening h1 em{color:#FFC39A}
+html[data-gd-theme="night"] .gd-opening h1 em{color:#D6B3F0}
+html[data-gd-theme="sunset"] .gd-pick{background:rgba(122,65,75,.65)}
+html[data-gd-theme="night"] .gd-pick{background:rgba(47,69,110,.7)}
+html[data-gd-theme="sunset"] .gd-qr-section{background:linear-gradient(135deg,#A45954,#75414C 60%,#56343D)}
+html[data-gd-theme="night"] .gd-qr-section{background:linear-gradient(135deg,#536494,#2D3A63 60%,#1C2747)}
+html[data-gd-theme="sunset"] .v73-app .experience-cover{background:linear-gradient(125deg,#AF5744,#D76D51 60%,#EC9C70)}
+html[data-gd-theme="night"] .v73-app .experience-cover{background:linear-gradient(125deg,#374B83,#4E6196 60%,#9A729E)}
+html[data-gd-theme="sunset"] .v73-app .review-score.positive{color:#2A6459}
+html[data-gd-theme="night"] .v73-app .review-score.positive{color:#355C6E}
+/* Preserve the user's chosen theme on the dormant account page. */
+html[data-gd-theme="sunset"] .shell .top{background:linear-gradient(120deg,#86505B,#603A43)}
+html[data-gd-theme="night"] .shell .top{background:linear-gradient(120deg,#425682,#242F53)}
+html[data-gd-theme="sunset"] .shell .account-visual{background:linear-gradient(125deg,#AF665F,#75434C)}
+html[data-gd-theme="night"] .shell .account-visual{background:linear-gradient(125deg,#576797,#2B385E)}
+/* Compact = space reduction only, never shrinking text inputs or touch targets. */
+html[data-gd-density="compact"] .v73-app .inner{max-width:1020px}
+html[data-gd-density="compact"] .v73-app .section-intro{margin-bottom:16px}
+html[data-gd-density="compact"] .v73-app .section-heading{margin-top:18px;margin-bottom:11px}
+html[data-gd-density="compact"] .v73-app .panel{padding:15px}
+html[data-gd-density="compact"] .v73-app .experience-cover{min-height:180px}
+html[data-gd-density="compact"] .v73-app .reward-feature{padding:18px}
+html[data-gd-density="compact"] .v73-app .merchant-feature{min-height:200px}
+html[data-gd-density="compact"] .v73-app .main{padding-top:13px}
+html[data-gd-density="compact"] .v73-app .mobile-bottom button{min-height:47px}
+/* DinerPass has its own finish, regardless of the app's theme. */
+html[data-gd-pass="coral"] .v73-app .passport-front{
+  background:radial-gradient(circle at 89% 3%,rgba(255,221,171,.22),transparent 49%),linear-gradient(133deg,#C6614D,#964345 61%,#6B3847)!important;
+}
+html[data-gd-pass="coral"] .v73-app .passport-back{
+  background:radial-gradient(circle at 15% 7%,#D57862,#9B4851 58%,#65374A)!important;
+}
+html[data-gd-pass="coral"] .v73-app .passport-seal,html[data-gd-pass="coral"] .v73-app .passport-flower{color:#FFE5B0}
+html[data-gd-pass="coral"] .gd-qr-section{background:radial-gradient(circle at 96% 4%,rgba(255,210,143,.22),transparent 45%),linear-gradient(139deg,#BC624F,#934551 61%,#6C394A)}
+html[data-gd-pass="night"] .v73-app .passport-front{
+  background:radial-gradient(circle at 94% 5%,rgba(199,181,234,.2),transparent 45%),linear-gradient(133deg,#425A85,#263957 58%,#19283F)!important;
+}
+html[data-gd-pass="night"] .v73-app .passport-back{
+  background:radial-gradient(circle at 20% 8%,#506B8E,#283953 60%,#18263B)!important;
+}
+html[data-gd-pass="night"] .v73-app .passport-seal,html[data-gd-pass="night"] .v73-app .passport-flower{color:#E8C598}
+html[data-gd-pass="night"] .gd-qr-section{background:radial-gradient(circle at 95% 4%,rgba(196,171,230,.19),transparent 45%),linear-gradient(140deg,#425780,#2C3C5C 62%,#1C2941)}
+/* Owner-selected accent on venue presentation, not on uploaded images. */
+html[data-gd-venue="coral"] .v73-app .merchant-feature.no-photo{background:linear-gradient(135deg,#FFF0E6,#FAD9C7);border-color:#E9B9A4}
+html[data-gd-venue="coral"] .v73-app .restaurant-preview-cover:not(:has(img)){background:linear-gradient(135deg,#BE6353,#813F45)}
+html[data-gd-venue="coral"] .v73-app .venue-story-preview{border-left:4px solid #C6624D}
+html[data-gd-venue="night"] .v73-app .merchant-feature.no-photo{background:linear-gradient(135deg,#EDF0FA,#D9E3F3);border-color:#CBD4EB}
+html[data-gd-venue="night"] .v73-app .restaurant-preview-cover:not(:has(img)){background:linear-gradient(135deg,#4C6086,#263755)}
+html[data-gd-venue="night"] .v73-app .venue-story-preview{border-left:4px solid #5A73A6}
+html[data-gd-venue="coral"] .v73-app .merchant-feature:not(.has-photo) .merchant-lineart{color:#B85A4B}
+html[data-gd-venue="night"] .v73-app .merchant-feature:not(.has-photo) .merchant-lineart{color:#435C83}
+/* Studio components: tactile, compact, editorial and unmistakably branded. */
+.gd9-studio{display:grid;gap:16px;margin:18px 0 32px;min-width:0}
+.gd9-studio-section{position:relative;isolation:isolate;overflow:hidden;padding:clamp(18px,3vw,27px);border-radius:22px;background:#FFFCF7;border:1px solid #E5D8CA;box-shadow:0 12px 35px rgba(13,61,62,.055);min-width:0}
+.gd9-studio-header{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:20px}
+.gd9-studio-header h3{font:500 clamp(23px,4.8vw,31px)/1.08 Georgia,'Times New Roman',serif;letter-spacing:-.7px;color:#203A38;margin:8px 0 8px}
+.gd9-studio-header p{font-size:13px;line-height:1.55;max-width:500px;color:#6B6864}
+.gd9-kicker{display:block;color:#A6583D;letter-spacing:1.5px;font-size:10px;font-weight:800}
+.gd9-studio-symbol img{width:39px;height:39px;display:block;object-fit:contain}
+.gd9-studio-symbol{flex:0 0 58px;width:58px;height:58px;display:grid;place-items:center;color:#F9EEE1;background:#0F3D3E;border-radius:17px;font:600 18px/1 system-ui,sans-serif;letter-spacing:-2px;box-shadow:0 5px 0 #C9A86A}
+.gd9-studio-group+.gd9-studio-group{margin-top:22px;padding-top:19px;border-top:1px solid #EFE4D8}
+.gd9-studio-group h4{font-size:13px;color:#33413D;margin:0 0 11px;font-weight:760;letter-spacing:-.15px}
+.gd9-options{display:grid;gap:9px;grid-template-columns:repeat(3,minmax(0,1fr))}
+.gd9-options.gd9-two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.gd9-option{position:relative;min-width:0;min-height:106px;border:1.5px solid #E5DAD1;border-radius:15px;background:#FFFDFC;color:#26362F;text-align:left;display:flex;flex-direction:column;align-items:flex-start;gap:9px;padding:12px;cursor:pointer;transition:border-color .18s ease,background .18s ease,box-shadow .2s ease,transform .2s var(--gd9-ease)}
+.gd9-option:hover{border-color:#CDAF94;transform:translateY(-1px)}
+.gd9-option:active{transform:translateY(0)}
+.gd9-option:focus-visible{outline:3px solid #C65F45;outline-offset:3px}
+.gd9-option.is-selected{background:#FFF6EE;border-color:#C45E43;box-shadow:0 0 0 2px rgba(196,94,67,.16)}
+.gd9-option-art{width:100%;height:30px;border-radius:8px;background:linear-gradient(130deg,#0F3D3E,#2A807A);color:#FBEEDD;display:grid;place-items:center}
+.gd9-option-art svg{width:18px!important;height:18px!important;stroke:currentColor;stroke-width:1.8;fill:none}
+.gd9-choice-sunset .gd9-option-art,.gd9-choice-coral .gd9-option-art{background:linear-gradient(120deg,#BC604F,#8C4550);color:#FFF1D8}
+.gd9-choice-night .gd9-option-art{background:linear-gradient(120deg,#475D8C,#263754);color:#F4E5D2}
+.gd9-choice-compact .gd9-option-art{background:#50605D;color:#F7F1E8}
+.gd9-choice-comfortable .gd9-option-art{background:#E6F1EA;color:#1C564D}
+.gd9-option-copy{display:grid;gap:2px;min-width:0}
+.gd9-option-copy strong{font-size:13px;font-weight:750;line-height:1.25;overflow-wrap:anywhere}
+.gd9-option-copy small{font-size:11px;color:#786D65;line-height:1.3;overflow-wrap:anywhere}
+.gd9-selected-indicator{position:absolute;top:8px;right:8px;width:16px;height:16px;border:2px solid #D1C6BC;border-radius:50%;background:#FFF}
+.gd9-option.is-selected .gd9-selected-indicator{border:5px solid #B74B35}
+.gd9-pass-section{background:#FBF8F3}
+.gd9-pass-preview{display:flex;flex-direction:column;justify-content:space-between;gap:19px;min-height:172px;padding:20px;border-radius:15px;background:linear-gradient(137deg,#176568,#0E4348 64%,#0B3035);color:#FFF7EE;box-shadow:0 12px 28px rgba(13,49,49,.16);margin-bottom:16px;transition:background .25s ease}
+.gd9-pass-top{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:9px;letter-spacing:1.6px;font-weight:850;color:#F5DFB9}
+.gd9-pass-dot{width:11px;height:11px;background:#C9A86A;border-radius:50%;flex:0 0 auto}
+.gd9-pass-preview-mid{display:flex;gap:15px;align-items:center;min-width:0}
+.gd9-initial{width:57px;height:57px;display:grid;place-items:center;border:1px solid rgba(253,230,198,.48);border-radius:17px;font:500 29px/1 Georgia,'Times New Roman',serif;flex:0 0 57px;color:#FFE2B9}
+.gd9-pass-preview-mid>div{display:grid;gap:5px;min-width:0}
+.gd9-pass-preview-mid strong{font:500 clamp(20px,3.8vw,25px)/1.1 Georgia,'Times New Roman',serif;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
+.gd9-pass-preview-mid small{color:#E4D6C7;font-size:10px;overflow-wrap:anywhere}
+.gd9-pass-bottom{font-size:9px;font-weight:700;letter-spacing:2px;color:#E6CB9E}
+html[data-gd-pass="coral"] .gd9-pass-preview{background:linear-gradient(135deg,#C6614D,#974553 67%,#66384B)}
+html[data-gd-pass="night"] .gd9-pass-preview{background:linear-gradient(135deg,#48608C,#2B3D5E 64%,#1C2942)}
+.gd9-venue-preview{display:flex;align-items:center;gap:17px;min-height:112px;padding:18px;border-radius:15px;margin-bottom:16px;background:linear-gradient(130deg,#EAF2ED,#DCECE7);color:#18443F;border:1px solid #D3E2D8;transition:background .25s ease}
+.gd9-venue-logo{width:62px;height:62px;flex:0 0 62px;display:grid;place-items:center;border-radius:16px;background:#0F3D3E;color:#F6E9D4;font:700 22px system-ui,sans-serif;letter-spacing:-3px}
+.gd9-venue-logo img{display:block;width:100%;height:100%;object-fit:cover;border-radius:16px}
+.gd9-venue-preview>div{display:flex;flex-direction:column;gap:5px;min-width:0}
+.gd9-venue-preview small{font-size:9px;font-weight:750;letter-spacing:1.3px;opacity:.7}
+.gd9-venue-preview strong{font:500 clamp(20px,3.7vw,26px)/1.06 Georgia,'Times New Roman',serif;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
+.gd9-venue-preview span:not(.gd9-venue-logo){font-size:11px;opacity:.7;overflow-wrap:anywhere}
+html[data-gd-venue="coral"] .gd9-venue-preview{background:linear-gradient(130deg,#FDEFE5,#F8D8C6);color:#864638;border-color:#F3C8B6}
+html[data-gd-venue="coral"] .gd9-venue-logo{background:#A64D43}
+html[data-gd-venue="night"] .gd9-venue-preview{background:linear-gradient(130deg,#EFF0F7,#DBE2F0);color:#2B3B62;border-color:#CFD7EA}
+html[data-gd-venue="night"] .gd9-venue-logo{background:#35476F}
+.gd9-footnote{display:flex;justify-content:space-between;gap:18px;align-items:center;padding:2px 4px 0}
+.gd9-footnote span{font-size:11px;color:#736C66;line-height:1.4}
+.gd9-footnote button{font-size:12px;font-weight:750;color:#934635;border:0;background:transparent;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:4px;min-height:44px;flex-shrink:0}
+.gd9-footnote button:focus-visible{outline:3px solid #C45E43}
+.gd9-quick{display:flex;justify-content:space-between;align-items:center;gap:14px;margin:0 0 16px;padding:10px 15px;border:1px solid #E8D2C3;border-left:3px solid #C76049;background:linear-gradient(95deg,#FFF9F2,#FFF4ED);border-radius:12px}
+.gd9-quick span{font-size:12px;color:#705C52;font-weight:650}
+.gd9-quick button{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:44px;padding:6px 9px;border:0;background:transparent;color:#A24935;font-size:12px;font-weight:800;text-align:right;flex-shrink:0}
+.gd9-quick button svg{width:16px!important;height:16px!important}
+.gd9-quick button:focus-visible{outline:3px solid #B64E35;outline-offset:2px;border-radius:8px}
+.gd9-live-message{position:fixed;bottom:calc(97px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:#183E3F;color:#FFF8EE;font-size:12px;border-radius:25px;padding:10px 18px;z-index:120;box-shadow:0 8px 30px #173D3D25;pointer-events:none;white-space:nowrap;max-width:calc(100% - 24px)}
+@media(max-width:500px){
+  .gd9-studio{gap:13px;margin:15px 0 28px}
+  .gd9-studio-section{border-radius:18px;padding:17px 15px}
+  .gd9-studio-header{gap:9px}
+  .gd9-studio-symbol img{width:32px;height:32px}
+  .gd9-studio-symbol{width:44px;height:44px;flex-basis:44px;border-radius:12px;font-size:15px}
+  .gd9-options{gap:7px}
+  .gd9-option{padding:9px 8px;min-height:104px;border-radius:12px}
+  .gd9-option-copy strong{font-size:12px}
+  .gd9-option-copy small{font-size:10px}
+  .gd9-studio-header h3{font-size:24px}
+  .gd9-pass-preview{padding:16px}
+  .gd9-quick{padding:8px 11px;gap:8px}
+  .gd9-quick span,.gd9-quick button{font-size:11px}
+  .gd9-footnote{flex-direction:column;align-items:flex-start;gap:2px}
+}
+@media(max-width:355px){.gd9-options{grid-template-columns:1fr}.gd9-options.gd9-two{grid-template-columns:1fr 1fr}.gd9-option{min-height:68px;flex-direction:row;align-items:center}.gd9-option-art{width:34px;flex:0 0 34px;height:34px}.gd9-option-copy{padding-right:10px}.gd9-option.is-selected .gd9-selected-indicator{top:7px;right:7px}}
+@media(prefers-reduced-motion:reduce){.gd9-option,.gd9-pass-preview,.gd9-venue-preview{transition:none!important}.gd9-quick button{scroll-behavior:auto}}
