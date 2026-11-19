@@ -1,57 +1,36 @@
-# BuonTavolo · V5
+# BuonTavolo · V6
 
-**Stato:** demo pubblicabile, più area multiutente *predisposta ma disattivata*. Non è un prodotto operativo e non raccoglie credenziali finché non viene collegato a un database Supabase **dedicato**.
+**Stato:** anteprima web **mobile-first** con dati **interamente dimostrativi**. La versione V6 non utilizza database né raccoglie registrazioni reali. Le funzioni che simulano recensioni, premi e note sono salvate nel browser di chi prova la demo; non hanno effetti su altre persone.
 
-## Apri dal tuo iPhone
+## Cosa cambia rispetto alla V5
 
-- `/` mostra la demo locale, senza dati reali; funziona su Safari e come PWA.
-- `/account.html` mostra la nuova area di accesso. Finché `/config.js` è vuoto **non compaiono form di registrazione**.
-- L'app cliente include un ID, il nickname, le proprie recensioni e il codice monouso per verificare la presenza al ristorante.
-- L'app ristoratore richiede un'attività **verificata manualmente** per poter registrare visite o pubblicare valutazioni.
+- **Identità editoriale originale:** passaporto ospite verde bottiglia con sigillo e identificativo, interfaccia su carta avorio, dettagli terracotta e tipografia calda.
+- **Esperienza cliente:** tessera centrale con copia ID, media e livello indicativo; dieci timbri di progressione verso il buono; recensioni in formato diario e premi con codice dimostrativo.
+- **Esperienza ristoratore:** Home come registro di sala, ricerca rapida per nickname o ID, dati essenziali in evidenza, scheda ospite con media/recensioni, "salva ospite" per ritrovarlo.
+- **Recensioni:** rimane un percorso guidato in 3 passaggi. La valutazione va da **1 a 10 stelle** e soltanto 8/9/10 sono positive. Commento e caratteristiche della visita; nota facoltativa **solo nella simulazione**.
+- **Esperienza iPhone:** barra con quattro sezioni, pulsanti raggiungibili con una mano, nessuno scorrimento orizzontale ai formati 320/393 px, responsive desktop.
+- **Piccoli dettagli:** sigillo illustrato, timbri animati (rispettano "Riduci movimento"), scheda a biglietto per il buono, indicatori di stato e testi in linguaggio naturale.
 
-## Regola di reputazione confermata
+## Come provarla
 
-- Valutazioni da **1 a 10 stelle**.
-- **Da 8 a 10 = positiva**. Da 1 a 7 non è positiva.
-- Il traguardo è ogni 10 recensioni positive su visite verificate. La generazione dei *buoni reali* è volutamente disattivata fino alla definizione dell'offerta, degli accordi con i ristoratori e dei controlli antiabuso.
-- Nel prototipo storico (`/`) i buoni restano soltanto simulati nel browser.
+1. Aprire il sito pubblicato e scegliere **Cliente** o **Ristoratore**.
+2. In **Cliente** si può consultare il passaporto di LunaBlu (9 recensioni positive) e vedere il traguardo 9/10.
+3. In **Ristoratore**, scegliere LunaBlu e compilare una recensione da **8 stelle** con data e visita simulata valide. Il cliente riceverà un buono dimostrativo alla decima recensione positiva.
+4. Nella scheda cliente del ristoratore, premere **☆ Salva** per ritrovarlo nella Home; il salvataggio vale soltanto in questo browser.
+5. I dati possono essere ripristinati da **Gestione → Ripristina i dati dimostrativi**.
 
-## Backend: non condividere il database con EasyGart
+## Sicurezza e limiti
 
-`database/schema.sql` è una bozza di schema da revisionare e applicare **una volta sola**, esclusivamente al futuro progetto Supabase BuonTavolo (mai a EasyGart, SINDRU o altri database). **Non è una migration già applicata.**
+- Questa è una **demo locale**, non una piattaforma funzionante per persone vere.
+- `account.html` è una **predisposizione disattivata**: senza un progetto Supabase dedicato non consente la registrazione. **Non inserire dati personali o credenziali reali.**
+- Il database non è stato creato, configurato né collegato; `database/schema.sql` è solo una bozza da riesaminare in futuro. Non applicarla a EasyGart, SINDRU o altri progetti.
+- Le note non sono condivise tra ristoranti e non vanno considerate riservate nella demo: sono dati locali del browser. Un'eventuale funzione reale dovrà avere permessi server, moderazione, diritti privacy e revisione giuridica prima del lancio.
+- I buoni non hanno valore economico. I termini commerciali del programma saranno definiti più avanti.
 
-Prevede tabelle `profiles`, `restaurants`, `visit_tokens`, `visits`, `reviews`, `disputes`, privilegi minimi, RLS per ogni tabella e una RPC `claim_visit` che richiede un ristorante verificato e un codice UUID monouso valido 15 minuti.
+## Test
 
-### Attivazione, dopo la creazione del nuovo progetto
+`npm test` esegue test automatici della scala 1–10, della soglia positiva 8/10, dei buoni demo, della navigazione a quattro voci e degli elementi UX. In aggiunta, il flusso completo è stato provato su Chromium con viewport 393 × 852, 320 × 720 e desktop; nessuno scorrimento laterale rilevato. Questi controlli non costituiscono un audit di sicurezza né un test diretto su Safari iOS.
 
-1. Creare un progetto Supabase **dedicato** scegliendo esplicitamente l'organizzazione, verificando eventuali costi.
-2. Rivedere lo schema con attenzione; applicarlo al nuovo database e **testare RLS con due account separati** (cliente e ristoratore). Verificare che l'account ristoratore non possa modificare `verified_at`, né leggere profili non collegati.
-3. Configurare l'autenticazione email/password e le URL consentite di redirect (`https://<dominio>/account.html`) nel dashboard Supabase.
-4. Aggiornare `config.js` con il **project URL** e la sola chiave `sb_publishable_...`. Il publishable key è pubblicabile; non copiare MAI `secret`, `service_role`, credenziali SQL o password nel repository.
-5. Verificare login, conferma email, creazione profili, registrazione ristoratore, verifica amministrativa, codice visita e recensione 8/10.
-6. Definire privacy/GDPR, informativa, gestione accessi, cancellazioni e rettifiche, abbonamenti e regole dei premi **prima** di invitare utenti reali.
+## GitHub → Vercel
 
-**Nota GDPR:** note visibili ad altri ristoratori e consultazione indiscriminata delle valutazioni **non sono attive**. Occorrono una progettazione giuridica e regole rigorose prima di condividere valutazioni riferite a persone identificabili.
-
-### Protezioni essenziali
-
-- Ogni nuovo account ha un record `profiles` con ruolo cliente oppure ristoratore. **Scegliere il ruolo nel form non equivale a essere ristoratore verificato.**
-- I titolari non possono approvare da soli il proprio ristorante.
-- Un ristoratore può scrivere una recensione soltanto per una propria visita collegata a un codice temporaneo e se il suo ristorante è verificato.
-- Un cliente vede soltanto recensioni e contestazioni proprie.
-- Non esiste ricerca globale dei clienti o delle note tra ristoranti.
-- L'area autenticata non viene salvata nella cache PWA offline.
-
-## Verifica del codice prima dei push
-
-```sh
-npm test
-node --check account.js
-node --check sw.js
-```
-
-I test automatici controllano la scala 1–10, 7 stelle non positive, 8 stelle positive, il buono demo al decimo feedback positivo e il blocco della registrazione quando manca il backend. **Non sostituiscono i test di sicurezza sul database reale.**
-
-## Deployment
-
-GitHub: `andru1607/BuonTavolo`, branch `main`, importazione in Vercel **Framework Other**. Non sono richiesti build command, ambiente server o segreti finché il nuovo database non è configurato. Controllare eventuali progetti Vercel duplicati collegati allo stesso repository.
+Repository: `andru1607/BuonTavolo`, branch `main`. Progetto statico con framework **Other**, senza comando di build. Il push su `main` avvia il deploy nei progetti Vercel già collegati, da verificare attraverso lo stato del commit. Se vi sono due progetti collegati allo stesso repository, scegliere uno come destinazione definitiva in seguito.
