@@ -25,3 +25,12 @@ check(run('db.vouchers.length')===1,'8 stars should issue voucher at 10');
 check(run('db.vouchers[0].status')==='disponibile','voucher should be available');
 run('switchRole("customer");changeTab("rewards")');check(app.innerHTML.includes('BT-'),'voucher shown');
 console.log('PASS: 1–10 scale, 7 not positive, 8/9/10 positive, voucher only at tenth positive, 10 clickable rating inputs');
+
+// With ten positives only one reward is earned, even if the second ticket was redeemed first.
+run(`db.vouchers = [
+  {customerId:'CL-10482', code:'BT-FIRST', status:'disponibile'},
+  {customerId:'CL-10482', code:'BT-SECOND', status:'riscattato'}
+]; reconcileVouchers('CL-10482')`);
+check(run("db.vouchers[0].status")==='sospeso','no second spend after a contestation');
+check(run("db.vouchers[1].status")==='riscattato','redemption history preserved');
+console.log('PASS: redeemed voucher deducted regardless of issue order');
