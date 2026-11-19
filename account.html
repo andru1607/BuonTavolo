@@ -22,12 +22,16 @@
 :root{--olive:#21372e;--olive2:#365246;--cream:#f6f1e8;--paper:#fcf9f3;--line:#e1d7c7;--text:#272b25;--muted:#777468;--wine:#a1433e;--gold:#be9157;--shadow:none}
 body{background-image:linear-gradient(90deg,#c8b59409 1px,transparent 1px);background-size:26px 26px}.top{background:#203c30;border-radius:0}.brand{letter-spacing:-.6px}.brand-icon{border:1px solid #c8ac77;border-radius:50%;color:#f0dbab;background:transparent}.back{border-radius:3px}.panel,.notice,.role-card,.btn,.auth-tabs,.auth-tabs button,.member,.field input,.field textarea,.code,.compact,.rating{border-radius:4px;box-shadow:none}.member{background:#254438;min-height:190px}.member:after{border-color:#c2a56c50}.member h2{font-size:34px}.member .status{color:#e6cfa6}.headline{font-size:clamp(33px,8vw,44px);letter-spacing:-1.2px}.panel h2{font-size:24px}.btn.primary{background:#a1433e;border-color:#a1433e}.btn.olive{background:#254438;border-color:#254438}.eyebrow{color:#986648;letter-spacing:2px}.role-card{background:#fdfbf5}.role-card[aria-pressed=true]{background:#ebeee4}.toast{border-radius:4px}.bottom{background:#fcf9f3}.bottom button[aria-current=page]{color:#315743}.notice{background:#eee9de}
 
+
+.account-visual{height:135px;border:1px solid #d9c7ab;margin:0 0 22px;background:#223c31 url('/media/sala.webp') center 50%/cover no-repeat;border-radius:5px;box-shadow:0 8px 18px #15281e18}
+@media(max-width:420px){.account-visual{height:108px}}
+@media(prefers-reduced-motion:no-preference){.account-visual{animation:accReveal .34s ease-out both}@keyframes accReveal{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}}
 </style>
 </head>
 <body>
 <div class="shell">
   <header class="top"><a href="/" class="brand" aria-label="BuonTavolo, torna alla demo"><span class="brand-icon">BT</span>BuonTavolo</a><a class="back" href="/">Demo</a></header>
-  <main id="view" aria-live="polite"><div class="loading"><span class="spinner"></span>Preparazione del tuo spazio…</div></main>
+  <div class="account-visual" role="img" aria-label="Tavolo apparecchiato in un ristorante italiano"></div><main id="view" aria-live="polite"><div class="loading"><span class="spinner"></span>Preparazione del tuo spazio…</div></main>
 </div>
 <div id="nav" class="bottom hidden" aria-label="Menu principale"></div>
 <div role="status" aria-live="polite" class="toast" id="toast"></div>

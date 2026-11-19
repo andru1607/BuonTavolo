@@ -1,6 +1,14 @@
-# BuonTavolo · V6
+# BuonTavolo · V7
 
 **Stato:** anteprima web **mobile-first** con dati **interamente dimostrativi**. La versione V6 non utilizza database né raccoglie registrazioni reali. Le funzioni che simulano recensioni, premi e note sono salvate nel browser di chi prova la demo; non hanno effetti su altre persone.
+
+## V7 — fotografie originali e transizioni tra schermate
+
+- Home cliente con copertina fotografica originale e passaporto reputazionale; Home ristoratore con sala fotografica e recensione subito accessibile; sezione Premi con immagini del mondo della tavola.
+- Due fotografie WebP locali ottimizzate (`media/sala.webp`, `media/tavola.webp`), solo **illustrative**; nessun ristorante fittizio è presentato come un luogo reale.
+- Transizioni brevi tra le sezioni con View Transitions API ove supportata e animazione alternativa altrove; rispetto automatico della preferenza **Riduci movimento**.
+- Impostazione Android/iPhone e pieghevoli invariata, adattabile da 320 px a schermi aperti. Nessun database, login o pagamento attivo.
+- `npm test` ora verifica anche asset, cache PWA e presenza delle transizioni.
 
 ## Cosa cambia rispetto alla V5
 
