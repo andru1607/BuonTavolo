@@ -14,9 +14,9 @@ for(const image of ['sala','tavola']){
 }
 assert.ok(index.includes('experience-cover')&&index.includes('merchant-image-label')&&index.includes('reward-story'), 'Photos in customer/restaurant/rewards');
 assert.ok(account.includes('account-visual'),'Account editorial photo');
-assert.ok(index.includes('document.startViewTransition'),'View Transition API available');
+assert.ok(index.includes('animation:btScreenIn'), 'Screen change has an entrance animation');
 assert.ok(index.includes('screenFallbackMotion'),'Transition fallback available');
 assert.ok(index.includes('prefers-reduced-motion:reduce'),'Accessible reduced motion');
 assert.ok(index.includes('POSITIVE_MIN=8'),'Positive reviews still require eight stars');
-assert.ok(index.includes('window.matchMedia'),'Reduced motion detected via media query');
+assert.match(index, /@media\(prefers-reduced-motion:reduce\)\{\.screen-enter[^}]*animation:none!important/, 'Reduced motion disables screen entrance');
 console.log('PASS: V7 photos, optimized delivery, transitions, reduced-motion, mobile PWA');
