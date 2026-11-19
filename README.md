@@ -1,4 +1,4 @@
-# BuonTavolo V7.1 · Identità visiva e foto del titolare
+# BuonTavolo V7.2 · Identità visiva e foto del titolare
 
 **Demo frontend, senza database.** I file e le fotografie selezionati nella demo rimangono nel localStorage del browser corrente. Non c’è un caricamento su server o condivisione con altri dispositivi. Non inserire foto con dati personali.
 
@@ -31,3 +31,14 @@ Eseguire `npm test`; inoltre test manuali con Chrome Android, Safari iPhone e di
 ## GitHub → Vercel
 
 Repository: `andru1607/BuonTavolo`, branch `main`. Progetto statico con framework **Other**, senza comando di build. Il push su `main` avvia il deploy nei progetti Vercel già collegati, da verificare attraverso lo stato del commit. Se vi sono due progetti collegati allo stesso repository, scegliere uno come destinazione definitiva in seguito.
+
+## Dettagli vivi della V7.2
+
+- **Home cliente:** messaggio contestuale calcolato dal progresso dei timbri; piccoli suggerimenti illustrati, stati vuoti editoriali e feedback quando si compiono azioni.
+- **Home ristoratore:** segnalazione dell’ultimo ospite aperto e accesso rapido agli ultimi quattro profili consultati; informazioni salvate soltanto nel browser demo.
+- **Identità del locale:** breve frase personalizzabile e scelta dell’atmosfera (accogliente, tradizionale, contemporaneo o informale) da Gestione; mostrate anche nell’anteprima cliente. Le immagini restano solo quelle caricate dal ristoratore.
+- **Motion:** ingressi rapidi e delicati, risposta dei bottoni e toast visivamente distinti; preferenza Riduci movimento sempre rispettata.
+- **Compatibilità:** layout fluidi per iPhone, Android e pieghevoli aperti/chiusi; la verifica fisica sui dispositivi resta da eseguire.
+- **Protezione dei dati:** funzione dimostrativa, senza database, senza autenticazione e senza informazioni reali. I dati delle foto, della frase del locale e degli ospiti recenti rimangono nel browser.
+
+Eseguire `npm test` per i controlli JavaScript della V7.2.
