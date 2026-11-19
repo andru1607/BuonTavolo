@@ -1,9 +1,9 @@
 {
   "name": "gooddiner-demo",
-  "version": "0.7.8",
+  "version": "0.7.9",
   "private": true,
-  "description": "GoodDiner V7.8: controlli di zoom iOS e nuove transizioni mobile-first accessibili",
+  "description": "GoodDiner V7.9: personalizzazione DinerPass, palette, layout e identità visiva del locale",
   "scripts": {
-    "test": "node tests/test-rating.cjs && node tests/test-account.cjs && node tests/test-ux.cjs && node tests/test-v71.cjs && node tests/test-v72.cjs && node tests/test-v73.cjs && node tests/test-v74.cjs && node tests/test-v75.cjs && node tests/test-v76.cjs && node tests/test-v77.cjs && node tests/test-v78.cjs"
+    "test": "node tests/test-rating.cjs && node tests/test-account.cjs && node tests/test-ux.cjs && node tests/test-v71.cjs && node tests/test-v72.cjs && node tests/test-v73.cjs && node tests/test-v74.cjs && node tests/test-v75.cjs && node tests/test-v76.cjs && node tests/test-v77.cjs && node tests/test-v78.cjs && node tests/test-v79.cjs"
   }
 }
