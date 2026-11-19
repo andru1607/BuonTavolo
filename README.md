@@ -1,3 +1,15 @@
+# GoodDiner V7.8 · Zoom corretto e transizioni più fluide
+
+- **Zoom involontario su iPhone:** campi di registrazione, scanner, area demo e account predisposto con caratteri di almeno 16 px, senza bloccare lo zoom manuale dell'utente.
+- **Schermi adattivi:** titoli responsivi, contenuti lunghi spezzati, QR nel DinerPass senza debordamenti, modali compatibili con safe area e schermi corti.
+- **Transizioni:** ingresso/registrazione con piccolo movimento verticale e dissolvenza, navigazione con View Transitions e fallback, scanner con entrata/uscita animata, tasti e dock più fluidi; niente zoom o ingrandimenti decorativi.
+- **Scanner:** quando si apre, focus sul pulsante di chiusura anziché sul campo manuale, per non aprire la tastiera subito; tasto Esc per chiudere.
+- **Accessibilità:** mantiene il pinch-to-zoom, non imposta `maximum-scale`, rispetta `prefers-reduced-motion`.
+- **Verifiche:** 11 suite `npm test` superate; browser Chromium a 320, 375, 390, 430, 740, 1024, 1280 px senza scorrimento orizzontale, input >=16px, scanner chiudibile e nessun errore JS nei flussi controllati. Test sui dispositivi fisici ancora da completare.
+- **Nessun backend attivato:** logica demo locale, 8–10/10 positivi e voucher ogni dieci positive rimangono invariati.
+
+---
+
 # GoodDiner V7.7 · Petrolio e corallo
 
 La versione V7.7 applica una nuova palette vivace ma raffinata a tutte le aree della demo, mantenendo il logo GD, i flussi e i dati.

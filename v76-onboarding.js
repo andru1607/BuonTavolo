@@ -137,7 +137,14 @@
     <form id="gd-scan-manual" class="gd-manual-form"><label for="gd-manual-token">Codice QR demo (alternativa)</label><div><input id="gd-manual-token" name="token" placeholder="GDDEMO1:..." required autocapitalize="off" autocomplete="off" spellcheck="false"><button class="gd-primary" type="submit">Verifica</button></div></form>
     <p class="gd-privacy-line">La lettura non equivale a una verifica reale. Il check-in sicuro richiederà un server.</p></div></div>`;
   }
-  function closeScanner(){stopCamera();document.querySelector('.gd-scan-overlay')?.remove();}
+  function closeScanner(){
+    stopCamera();
+    const overlay=document.querySelector('.gd-scan-overlay');
+    if(!overlay)return;
+    const reduced=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    if(reduced){overlay.remove();}else{overlay.classList.add('gd-leaving');window.setTimeout(()=>overlay.remove(),170);}
+    document.querySelector('.gd-scan-launch')?.focus({preventScroll:true});
+  }
   function stopCamera(){scannerRunning=false;if(cameraStream){cameraStream.getTracks().forEach(t=>t.stop());cameraStream=null;}qrDetector=null;}
   async function startCamera(){
     const box=document.getElementById('gd-camera-box');if(!box)return;
@@ -201,11 +208,12 @@
       case 'maps':openGoogleMaps();break;
       case 'logout':localStorage.removeItem(SESSION_KEY);renderGate('landing');break;
       case 'copy-qr':{const t=tokenData();if(t&&navigator.clipboard?.writeText)navigator.clipboard.writeText(t.token).then(()=>notify('Codice demo copiato.')).catch(()=>notify('Seleziona il codice dal tuo dispositivo.'));else notify('Copia non supportata su questo browser.');break;}
-      case 'scan':{document.body.insertAdjacentHTML('beforeend',scanPanel());document.getElementById('gd-manual-token')?.focus();break;}
+      case 'scan':{if(document.querySelector('.gd-scan-overlay'))break;document.body.insertAdjacentHTML('beforeend',scanPanel());document.querySelector('.gd-scan-overlay .gd-icon-close')?.focus({preventScroll:true});break;}
       case 'close-scan':closeScanner();break;
       case 'camera':startCamera();break;
     }
   });
+  document.addEventListener('keydown',event=>{if(event.key==='Escape'&&document.querySelector('.gd-scan-overlay')){event.preventDefault();closeScanner();}});
   document.addEventListener('submit',event=>{
     const form=event.target;
     if(form.id==='gd-create-customer'){
