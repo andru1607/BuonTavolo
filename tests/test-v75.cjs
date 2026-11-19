@@ -12,7 +12,7 @@ for(const n of [180,192,512]){
  assert.equal(b.subarray(0,8).toString('hex'),'89504e470d0a1a0a');
  assert.equal(b.readUInt32BE(16),n);assert.equal(b.readUInt32BE(20),n);
 }
-assert.ok(read('sw.js').includes('gooddiner-demo-logo-v75'));
+assert.ok(read('sw.js').includes('gooddiner-demo-v76'));
 assert.ok(h.includes('const MAX_STARS=10, POSITIVE_MIN=8'));
 assert.ok(h.includes("const KEY='buontavolo-preview-v4'"));
 console.log('PASS V7.5: scelto GD intrecciato SVG, tre PNG PWA, app mark, cache, dati/8-10 invariati');

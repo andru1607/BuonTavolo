@@ -1,9 +1,9 @@
 {
   "name": "gooddiner-demo",
-  "version": "0.7.5",
+  "version": "0.7.6",
   "private": true,
-  "description": "GoodDiner V7.5: simbolo GD intrecciato dalla terza proposta, vettoriale e icone PWA aggiornate",
+  "description": "GoodDiner V7.6: accesso unificato, QR DinerPass e check-in demo locale",
   "scripts": {
-    "test": "node tests/test-rating.cjs && node tests/test-account.cjs && node tests/test-ux.cjs && node tests/test-v71.cjs && node tests/test-v72.cjs && node tests/test-v73.cjs && node tests/test-v74.cjs && node tests/test-v75.cjs"
+    "test": "node tests/test-rating.cjs && node tests/test-account.cjs && node tests/test-ux.cjs && node tests/test-v71.cjs && node tests/test-v72.cjs && node tests/test-v73.cjs && node tests/test-v74.cjs && node tests/test-v75.cjs && node tests/test-v76.cjs"
   }
 }
