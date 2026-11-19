@@ -1,9 +1,9 @@
 {
   "name": "buontavolo-demo",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "private": true,
-  "description": "BuonTavolo V7: immagini originali, transizioni fluide, mobile e pieghevoli; demo senza database",
+  "description": "Demo BuonTavolo V7.1: senza immagini stock, con immagini proprie del ristoratore e transizioni inclusive",
   "scripts": {
-    "test": "node tests/test-rating.cjs && node tests/test-account.cjs && node tests/test-ux.cjs && node tests/test-v7.cjs"
+    "test": "node tests/test-rating.cjs && node tests/test-account.cjs && node tests/test-ux.cjs && node tests/test-v71.cjs"
   }
 }

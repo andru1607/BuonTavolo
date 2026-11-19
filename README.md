@@ -1,31 +1,20 @@
-# BuonTavolo · V7
+# BuonTavolo V7.1 · Identità visiva e foto del titolare
 
-**Stato:** anteprima web **mobile-first** con dati **interamente dimostrativi**. La versione V6 non utilizza database né raccoglie registrazioni reali. Le funzioni che simulano recensioni, premi e note sono salvate nel browser di chi prova la demo; non hanno effetti su altre persone.
+**Demo frontend, senza database.** I file e le fotografie selezionati nella demo rimangono nel localStorage del browser corrente. Non c’è un caricamento su server o condivisione con altri dispositivi. Non inserire foto con dati personali.
 
-## V7 — fotografie originali e transizioni tra schermate
+## Aggiornamenti
 
-- Home cliente con copertina fotografica originale e passaporto reputazionale; Home ristoratore con sala fotografica e recensione subito accessibile; sezione Premi con immagini del mondo della tavola.
-- Due fotografie WebP locali ottimizzate (`media/sala.webp`, `media/tavola.webp`), solo **illustrative**; nessun ristorante fittizio è presentato come un luogo reale.
-- Transizioni brevi tra le sezioni con View Transitions API ove supportata e animazione alternativa altrove; rispetto automatico della preferenza **Riduci movimento**.
-- Impostazione Android/iPhone e pieghevoli invariata, adattabile da 320 px a schermi aperti. Nessun database, login o pagamento attivo.
-- `npm test` ora verifica anche asset, cache PWA e presenza delle transizioni.
+- Rimosse **tutte** le immagini illustrative di ristoranti e piatti. Nessun asset stock o generato viene mostrato nel prodotto.
+- Nuovi hero grafici con monogrammi, sigilli, pattern originali, palette verde bottiglia, avorio, terracotta e oro sobrio.
+- Transizioni tra aree e sezioni con View Transitions quando disponibili e fallback breve; rispettano «Riduci movimento».
+- Area ristoratore → **Gestione**: caricamento facoltativo della propria copertina, logo e tre foto della galleria. Solo JPG/PNG/WebP, fino a 6 MB per sorgente, poi ridimensionate prima di salvarle localmente. Pulsanti per sostituire/rimuovere.
+- L'anteprima del ristorante nelle schermate mostra soltanto foto scelte dal titolare; quando assenti, usa un elegante placeholder illustrativo tipografico.
+- Layout per iPhone, Android e pieghevoli con griglie responsive, senza imporre fotografie o banner.
+- Nessuna modifica alla regola: **positivo soltanto da 8 stelle su 10**; buono demo ogni 10 recensioni positive.
 
-## Cosa cambia rispetto alla V5
+## Test
 
-- **Identità editoriale originale:** passaporto ospite verde bottiglia con sigillo e identificativo, interfaccia su carta avorio, dettagli terracotta e tipografia calda.
-- **Esperienza cliente:** tessera centrale con copia ID, media e livello indicativo; dieci timbri di progressione verso il buono; recensioni in formato diario e premi con codice dimostrativo.
-- **Esperienza ristoratore:** Home come registro di sala, ricerca rapida per nickname o ID, dati essenziali in evidenza, scheda ospite con media/recensioni, "salva ospite" per ritrovarlo.
-- **Recensioni:** rimane un percorso guidato in 3 passaggi. La valutazione va da **1 a 10 stelle** e soltanto 8/9/10 sono positive. Commento e caratteristiche della visita; nota facoltativa **solo nella simulazione**.
-- **Esperienza mobile-first (prima verifica su iPhone):** barra con quattro sezioni, pulsanti raggiungibili con una mano, nessuno scorrimento orizzontale ai formati 320/393 px, responsive desktop.
-- **Piccoli dettagli:** sigillo illustrato, timbri animati (rispettano "Riduci movimento"), scheda a biglietto per il buono, indicatori di stato e testi in linguaggio naturale.
-
-## Come provarla
-
-1. Aprire il sito pubblicato e scegliere **Cliente** o **Ristoratore**.
-2. In **Cliente** si può consultare il passaporto di LunaBlu (9 recensioni positive) e vedere il traguardo 9/10.
-3. In **Ristoratore**, scegliere LunaBlu e compilare una recensione da **8 stelle** con data e visita simulata valide. Il cliente riceverà un buono dimostrativo alla decima recensione positiva.
-4. Nella scheda cliente del ristoratore, premere **☆ Salva** per ritrovarlo nella Home; il salvataggio vale soltanto in questo browser.
-5. I dati possono essere ripristinati da **Gestione → Ripristina i dati dimostrativi**.
+Eseguire `npm test`; inoltre test manuali con Chrome Android, Safari iPhone e dispositivi pieghevoli (chiuso/aperto) prima di offrire la versione reale. Le foto non sono dati condivisi: per questo servirà un backend dedicato, non ancora attivo.
 
 ## Sicurezza e limiti
 
@@ -34,18 +23,6 @@
 - Il database non è stato creato, configurato né collegato; `database/schema.sql` è solo una bozza da riesaminare in futuro. Non applicarla a EasyGart, SINDRU o altri progetti.
 - Le note non sono condivise tra ristoranti e non vanno considerate riservate nella demo: sono dati locali del browser. Un'eventuale funzione reale dovrà avere permessi server, moderazione, diritti privacy e revisione giuridica prima del lancio.
 - I buoni non hanno valore economico. I termini commerciali del programma saranno definiti più avanti.
-
-## Compatibilità dispositivi e telefoni pieghevoli (requisito permanente)
-
-BuonTavolo deve funzionare **sia su iPhone sia su Android**, con particolare attenzione ai telefoni pieghevoli e a eventuali futuri modelli di iPhone pieghevoli. Il supporto non si limita a una risoluzione fissa: ogni schermata deve adattarsi allo spazio realmente disponibile.
-
-- **Browser:** Safari su iOS e Chrome su Android; verificare anche Samsung Internet e le installazioni PWA.
-- **Schermi:** telefoni piccoli e grandi, pieghevoli chiusi e aperti, tablet e desktop; layout fluido che sfrutta la larghezza aggiuntiva quando disponibile, anziché ingrandire semplicemente tutte le card.
-- **Piegatura:** mantenere una schermata utilizzabile prima, durante e dopo apertura/chiusura; preservare il contenuto dei moduli quando cambiano dimensioni e orientamento; non collocare pulsanti importanti nella cerniera o in aree tagliate.
-- **Interazione:** pulsanti facili da toccare (dimensione consigliata almeno 44 × 44 CSS px), navigazione coerente, tastiera virtuale che non nasconde i campi, rispetto delle safe area, contrasto leggibile e preferenza «Riduci movimento».
-- **Test obbligatori prima del lancio:** viewport stretti (320, 360 e 393 px), intermedi (430–768 px), aperti (oltre 768 px), orientamento verticale/orizzontale, ridimensionamento dinamico e almeno un test manuale su Android e uno su Safari iOS; aggiungere test sui pieghevoli reali quando disponibili.
-
-**Stato:** questi sono criteri di progettazione e collaudo da applicare alle prossime versioni; non equivalgono a una compatibilità già verificata su tutti i modelli. I test V6 documentati sopra coprono soprattutto viewport iPhone e Chromium.
 
 ## Test
 
