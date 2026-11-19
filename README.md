@@ -1,6 +1,19 @@
-# BuonTavolo V7.2 · Identità visiva e foto del titolare
+# BuonTavolo V7.3 · Signature Edition · Identità visiva e foto del titolare
 
 **Demo frontend, senza database.** I file e le fotografie selezionati nella demo rimangono nel localStorage del browser corrente. Non c’è un caricamento su server o condivisione con altri dispositivi. Non inserire foto con dati personali.
+
+
+## Novità V7.3 · Signature Edition
+
+- **Tessera reputazionale a due facce:** vista principale e retro con ID, media e conteggio delle recensioni positive. Pulsante "Girala" accessibile e animazione breve; su mouse è presente un riflesso che segue il puntatore (non obbligatorio sui touch). La preferenza Riduci movimento disabilita tutte le animazioni decorative.
+- **Navigazione inferiore:** dock con icona attiva evidenziata e feedback al tocco, mantenendo solo quattro voci per ruolo e le aree sicure di iOS/Android.
+- **Timbri collezionabili:** disegno a sigillo e animazione soltanto per l'ultimo timbro. Un effetto breve annuncia il buono demo ogni 10 valutazioni positive.
+- **Riconoscimenti fedeli ai dati:** vengono mostrati *solo* per le caratteristiche presenti nei tag delle recensioni pubblicate da almeno 8/10, senza classificazioni automatiche di persone.
+- **Profilo ristorante:** eventuali foto della galleria caricate dal titolare compaiono nell'anteprima del locale. Nessuna foto stock o generata è usata nell'interfaccia.
+- **Tipografia e superfici:** gerarchia editoriale più nitida, pannelli con profondità leggera, dettagli metallici discreti e miglioramenti per stati vuoti e premi.
+- **Compatibilità:** layout fluido per Android, iPhone e schermi pieghevoli aperti/chiusi. Verifica su dispositivo fisico ancora necessaria.
+
+**Limiti invariati:** demo senza database e autenticazione reale. Foto e dati demo salvati solo sul dispositivo; nessuna condivisione o nota riservata realmente protetta.
 
 ## Aggiornamenti
 
