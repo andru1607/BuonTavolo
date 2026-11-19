@@ -2,7 +2,7 @@ const fs=require('fs'),assert=require('node:assert/strict'),path=require('path')
 const root=path.resolve(__dirname,'..'), html=fs.readFileSync(path.join(root,'index.html'),'utf8');
 for(const key of ['friendlyInsight','recentGuests','rememberGuest','venue-story-form','merchantStory','merchantStory.style','STYLES','emptyScene','living-hint','recent-rail','venue-story-preview','prefers-reduced-motion:reduce','POSITIVE_MIN=8']) assert.ok(html.includes(key),'Missing V7.2 feature: '+key);
 assert.ok(!html.includes('/media/sala.webp')&&!html.includes('/media/tavola.webp'),'Stock imagery regression');
-assert.ok(fs.readFileSync(path.join(root,'sw.js'),'utf8').includes('v74'),'Service worker cache version');
+assert.ok(fs.readFileSync(path.join(root,'sw.js'),'utf8').includes('v75'),'Service worker cache version');
 const vm=require('vm');const js=html.match(/<script>([\s\S]*?)<\/script>/)[1];let memory={};const element={innerHTML:'',classList:{add(){},remove(){}}};
 const ctx={console,localStorage:{getItem:k=>memory[k]||null,setItem:(k,v)=>memory[k]=v,removeItem:k=>delete memory[k]},document:{getElementById:()=>element,addEventListener:()=>{}},navigator:{},location:{protocol:'file:'},window:{scrollTo:()=>{}},crypto:require('crypto').webcrypto,setTimeout,clearTimeout,confirm:()=>true};vm.createContext(ctx);vm.runInContext(js,ctx,{timeout:3000});
 const run=s=>vm.runInContext(s,ctx,{timeout:3000});

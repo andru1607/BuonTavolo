@@ -1,9 +1,9 @@
 {
   "name": "gooddiner-demo",
-  "version": "0.7.4",
+  "version": "0.7.5",
   "private": true,
-  "description": "GoodDiner V7.4: rebranding mobile-first, DinerPass, DinerBadge, DinerRewards e icone vettoriali senza emoji",
+  "description": "GoodDiner V7.5: simbolo GD intrecciato dalla terza proposta, vettoriale e icone PWA aggiornate",
   "scripts": {
-    "test": "node tests/test-rating.cjs && node tests/test-account.cjs && node tests/test-ux.cjs && node tests/test-v71.cjs && node tests/test-v72.cjs && node tests/test-v73.cjs && node tests/test-v74.cjs"
+    "test": "node tests/test-rating.cjs && node tests/test-account.cjs && node tests/test-ux.cjs && node tests/test-v71.cjs && node tests/test-v72.cjs && node tests/test-v73.cjs && node tests/test-v74.cjs && node tests/test-v75.cjs"
   }
 }

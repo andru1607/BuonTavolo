@@ -1,4 +1,4 @@
-const CACHE='gooddiner-demo-v74';
+const CACHE='gooddiner-demo-logo-v75';
 const ASSETS=['/','/index.html','/manifest.webmanifest','/icons/icon.svg'];
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)));

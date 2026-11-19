@@ -8,7 +8,7 @@ assert.ok(!html.includes('BuonTavolo')&&!account.includes('BuonTavolo'));
 assert.ok(!/[\u2605\u2606\u2733\u2736\u2726]/u.test(html),'No emoji-like glyphs in main app');
 assert.ok(!/[\u2605\u2606\u2733\u2736\u2726]/u.test(script),'No emoji-like glyphs in account');
 assert.ok(read('icons/icon.svg').includes('GoodDiner'));
-assert.ok(read('sw.js').includes('gooddiner-demo-v74'));
+assert.ok(read('sw.js').includes('gooddiner-demo-'));
 assert.ok(html.includes("const KEY='buontavolo-preview-v4'"),'Keep existing localStorage key for continuity');
 const js=html.match(/<script>([\s\S]*?)<\/script>/)[1];let memory={};const element={innerHTML:'',classList:{add(){},remove(){}}};
 const ctx={console,localStorage:{getItem:k=>memory[k]||null,setItem:(k,v)=>memory[k]=v,removeItem:k=>delete memory[k]},document:{getElementById:()=>element,addEventListener:()=>{},querySelector:()=>null},navigator:{},location:{protocol:'file:'},window:{scrollTo:()=>{},matchMedia:()=>({matches:true})},crypto:require('crypto').webcrypto,setTimeout,clearTimeout,confirm:()=>true};

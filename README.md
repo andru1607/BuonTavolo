@@ -1,3 +1,9 @@
+# GoodDiner V7.5 · Nuovo simbolo GD
+
+Il marchio provvisorio è stato sostituito dalla **terza proposta scelta dall'utente**: due forme GD intrecciate con un piccolo accento oro. I file SVG `icons/mark.svg` e `icons/mark-light.svg` sono vettoriali a colori piatti, adattabili allo sfondo. `icons/icon.svg`, le icone PNG 180/192/512, l'intestazione desktop/mobile, l'onboarding e l'Apple Touch Icon sono coerenti col nuovo segno. La cache offline è aggiornata e i test coprono il marchio.
+
+**Solo demo**, senza backend e senza autenticazione reale. La disponibilità legale di GoodDiner come marchio resta da verificare.
+
 # GoodDiner V7.4 · Nuova identità
 
 **Nome scelto:** GoodDiner. **Stato:** demo frontend; nessun database o autenticazione reale. **Verifica legale:** il nome non è ancora stato definitivamente liberato da un controllo professionale sui marchi; non presentarlo come registrato o esclusivo.
