@@ -1,9 +1,20 @@
-# BuonTavolo V7.3 · Signature Edition · Identità visiva e foto del titolare
+# GoodDiner V7.4 · Nuova identità
 
-**Demo frontend, senza database.** I file e le fotografie selezionati nella demo rimangono nel localStorage del browser corrente. Non c’è un caricamento su server o condivisione con altri dispositivi. Non inserire foto con dati personali.
+**Nome scelto:** GoodDiner. **Stato:** demo frontend; nessun database o autenticazione reale. **Verifica legale:** il nome non è ancora stato definitivamente liberato da un controllo professionale sui marchi; non presentarlo come registrato o esclusivo.
+
+## Cosa cambia
+
+- Nome e testi aggiornati in home cliente, area ristoratore, onboarding, account, manifest PWA e schermate premi.
+- Logo vettoriale provvisorio **GD**, minimal, senza posate, piatti o emoji; icone PWA 180/192/512 rigenerate.
+- Funzioni riconoscibili: **DinerPass** (tessera), **DinerBadge** (riconoscimenti), **DinerRewards** (premi), con identità del cliente al centro.
+- Nessuna emoji o stella testuale nei flussi UI: valutazioni e simboli sono resi con SVG; la scala resta da 1 a 10.
+- Nuovi buoni demo con prefisso `GD-`; i buoni `BT-` già presenti nella memoria locale restano leggibili e riscattabili.
+- Le chiavi di `localStorage` precedenti restano volutamente immutate per preservare dati, fotografie e preferenze demo esistenti.
+- La bozza SQL non è stata eseguita né collegata. I nomi tecnici `bt_*` rimangono come identificatori storici nel file di schema, che dovrà essere revisionato prima di un backend reale.
+- Il repository GitHub resta temporaneamente `andru1607/BuonTavolo` per non rompere il deploy automatico Vercel esistente.
+- Il rebranding non cambia il funzionamento: **positive solo recensioni 8–10/10**, un buono demo ogni 10 positive.
 
 
-## Novità V7.3 · Signature Edition
 
 - **Tessera reputazionale a due facce:** vista principale e retro con ID, media e conteggio delle recensioni positive. Pulsante "Girala" accessibile e animazione breve; su mouse è presente un riflesso che segue il puntatore (non obbligatorio sui touch). La preferenza Riduci movimento disabilita tutte le animazioni decorative.
 - **Navigazione inferiore:** dock con icona attiva evidenziata e feedback al tocco, mantenendo solo quattro voci per ruolo e le aree sicure di iOS/Android.

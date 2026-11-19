@@ -1,7 +1,7 @@
 {
-  "name": "BuonTavolo · Anteprima V6",
-  "short_name": "BuonTavolo",
-  "description": "Anteprima dimostrativa della piattaforma BuonTavolo. Nessun dato reale.",
+  "name": "GoodDiner · Anteprima",
+  "short_name": "GoodDiner",
+  "description": "GoodDiner: la tua reputazione come ospite. Demo senza dati reali.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f6f1e8",

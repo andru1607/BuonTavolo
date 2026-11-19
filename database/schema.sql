@@ -1,5 +1,5 @@
--- BuonTavolo V5 · preparazione database dedicato (NON eseguito su EasyGart)
--- Applicare soltanto a un nuovo progetto Supabase BuonTavolo.
+-- GoodDiner (ex BuonTavolo) V5 · preparazione database dedicato (NON eseguito su EasyGart)
+-- Applicare soltanto a un nuovo progetto Supabase GoodDiner.
 -- I privilegi sono restrittivi: nessun utente può darsi il ruolo di ristoratore verificato.
 
 create extension if not exists pgcrypto;
@@ -8,7 +8,7 @@ create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   role text not null check (role in ('customer','merchant')),
   nickname text not null check (char_length(trim(nickname)) between 3 and 30),
-  customer_code text not null unique default ('BT-' || upper(substr(replace(gen_random_uuid()::text, '-', ''), 1, 10))),
+  customer_code text not null unique default ('GD-' || upper(substr(replace(gen_random_uuid()::text, '-', ''), 1, 10))),
   created_at timestamptz not null default now()
 );
 create unique index if not exists buontavolo_nickname_unique on public.profiles (lower(nickname));

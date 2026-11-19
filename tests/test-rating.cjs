@@ -23,5 +23,5 @@ run('resetDraft("CL-10482");state.draft.confirmed=true;state.draft.date=today(1)
 check(run('stats("CL-10482").positive')===10,'8-star review must count');
 check(run('db.vouchers.length')===1,'8 stars should issue voucher at 10');
 check(run('db.vouchers[0].status')==='disponibile','voucher should be available');
-run('switchRole("customer");changeTab("rewards")');check(app.innerHTML.includes('BT-'),'voucher shown');
+run('switchRole("customer");changeTab("rewards")');check(app.innerHTML.includes('GD-'),'voucher shown');
 console.log('PASS: 1–10 scale, 7 not positive, 8/9/10 positive, voucher only at tenth positive, 10 clickable rating inputs');

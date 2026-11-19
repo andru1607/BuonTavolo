@@ -1,1 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512"><rect width="512" height="512" rx="118" fill="#21372e"/><circle cx="256" cy="256" r="185" fill="none" stroke="#d8bc83" stroke-width="5"/><circle cx="256" cy="256" r="169" fill="none" stroke="#d8bc83" stroke-width="1.2" opacity=".55"/><g stroke="#f0ddae" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M187 149L326 361M326 149L187 361"/><path d="M157 154v70c0 24 17 39 36 39s36-15 36-39v-70"/><path d="M181 151v71M205 151v71"/><path d="M333 153v61c0 22-9 40-30 51"/></g><circle cx="256" cy="256" r="11" fill="#ba8d64"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="GoodDiner">
+<rect width="512" height="512" rx="118" fill="#203B31"/>
+<g fill="none" stroke="#F7F2E8" stroke-width="28" stroke-linecap="round" stroke-linejoin="round">
+<path d="M242 190C218 167 185 158 156 172C123 187 106 220 106 257C106 294 124 327 156 343C187 358 222 347 243 326V265H185"/>
+<path d="M290 169H325C383 169 417 206 417 256C417 306 383 343 325 343H290Z"/>
+</g>
+</svg>

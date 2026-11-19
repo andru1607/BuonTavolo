@@ -6,9 +6,9 @@ const context={console,crypto:crypto.webcrypto,localStorage:{getItem:k=>storage[
 vm.createContext(context);vm.runInContext(js,context,{timeout:4000});
 const run=code=>vm.runInContext(code,context,{timeout:4000});
 const check=(condition,message)=>{if(!condition)throw Error(message)};
-check(ui.innerHTML.includes('C\'è una storia'),'welcome editorial UX missing');
+check(ui.innerHTML.includes('Ogni ospite'),'welcome editorial UX missing');
 check((run('nav()')||[]).length===4,'client menu must have four tabs');
-run('switchRole("customer")');check(ui.innerHTML.includes('passaporto')||ui.innerHTML.includes('PASSAPORTO'),'passport missing');
+run('switchRole("customer")');check(ui.innerHTML.includes('DINERPASS')||ui.innerHTML.includes('DinerPass'),'passport missing');
 check(ui.innerHTML.includes('stamp-rail'),'reward stamps missing');
 check((ui.innerHTML.match(/class="stamp stamped"/g)||[]).length===9,'9 stamped reviews expected');
 run('switchRole("restaurant")');check(run('nav().length')===4,'restaurant menu must have four tabs');

@@ -1,6 +1,6 @@
-// BuonTavolo V5 · Area reale predisposta, attiva solo con un database dedicato.
+// GoodDiner V5 · Area reale predisposta, attiva solo con un database dedicato.
 // La chiave pubblicabile Supabase è sicura da usare in frontend CON le policy RLS.
-const cfg = window.BUONTAVOLO_PUBLIC_CONFIG || {};
+const cfg = window.GOODDINER_PUBLIC_CONFIG || window.BUONTAVOLO_PUBLIC_CONFIG || {};
 const $ = id => document.getElementById(id);
 const html = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const shortDate = value => new Date(value).toLocaleDateString('it-IT',{day:'numeric',month:'short',year:'numeric'});
@@ -51,12 +51,12 @@ function errorText(error) {
   if(m.includes('permission denied')||m.includes('row-level security')) return 'Operazione non autorizzata. Controlla lo stato del profilo.';
   return (error?.message || 'Si è verificato un problema. Riprova.').slice(0,250);
 }
-function intro(title,subtitle,eyebrow='BuonTavolo'){
+function intro(title,subtitle,eyebrow='GoodDiner'){
   return `<div class="eyebrow">${html(eyebrow)}</div><h1 class="headline">${html(title)}</h1><p class="small" style="margin-bottom:21px">${html(subtitle)}</p>`;
 }
 function renderNoBackend() {
   $('nav').classList.add('hidden');
-  $('view').innerHTML = `${intro('Il tuo spazio sta prendendo forma.','L’area account è pronta nel codice, ma non accetta ancora registrazioni. Dobbiamo collegare il database separato di BuonTavolo.','Prossimo passo')}<div class="panel"><h2>Account e dati protetti</h2><p class="small">Abbiamo predisposto accesso, profili, visite verificate e recensioni. Fino al collegamento del database restano disattivati: non raccogliamo email e password.</p><div style="margin-top:19px"><a class="btn olive fill" href="/">Continua con la demo</a></div></div><div class="notice">Non inserire dati personali veri nella demo. Le informazioni che vedi lì sono inventate e salvate soltanto sul tuo dispositivo.</div>`;
+  $('view').innerHTML = `${intro('Il tuo spazio sta prendendo forma.','L’area account è pronta nel codice, ma non accetta ancora registrazioni. Dobbiamo collegare il database separato di GoodDiner.','Prossimo passo')}<div class="panel"><h2>Account e dati protetti</h2><p class="small">Abbiamo predisposto accesso, profili, visite verificate e recensioni. Fino al collegamento del database restano disattivati: non raccogliamo email e password.</p><div style="margin-top:19px"><a class="btn olive fill" href="/">Continua con la demo</a></div></div><div class="notice">Non inserire dati personali veri nella demo. Le informazioni che vedi lì sono inventate e salvate soltanto sul tuo dispositivo.</div>`;
 }
 function renderAuth() {
   $('nav').classList.add('hidden');
@@ -65,7 +65,7 @@ function renderAuth() {
     return;
   }
   let modeUI = `<div class="auth-tabs" role="tablist" aria-label="Accesso"><button data-mode="signup" role="tab" aria-selected="${authMode==='signup'}">Crea account</button><button data-mode="signin" role="tab" aria-selected="${authMode==='signin'}">Accedi</button></div>`;
-  const roles = `<div class="field"><label>Scegli come usare BuonTavolo</label><div class="role-grid"><button type="button" class="role-card" data-role="customer" aria-pressed="${chosenRole==='customer'}"><strong>Cliente</strong><small>Ricevi recensioni e segui la reputazione</small></button><button type="button" class="role-card" data-role="merchant" aria-pressed="${chosenRole==='merchant'}"><strong>Ristoratore</strong><small>Registra visite e valuta i clienti</small></button></div></div>`;
+  const roles = `<div class="field"><label>Scegli come usare GoodDiner</label><div class="role-grid"><button type="button" class="role-card" data-role="customer" aria-pressed="${chosenRole==='customer'}"><strong>Cliente</strong><small>Ricevi recensioni e segui la reputazione</small></button><button type="button" class="role-card" data-role="merchant" aria-pressed="${chosenRole==='merchant'}"><strong>Ristoratore</strong><small>Registra visite e valuta i clienti</small></button></div></div>`;
   $('view').innerHTML = `${intro(authMode==='signup'?'Benvenuto a tavola.':'Bentornato.','Uno spazio personale, pensato per clienti e ristoratori. Pochi passaggi, tutto chiaro.')}
   <div class="panel">${modeUI}<form id="auth-form" class="stack">
   ${authMode==='signup'?roles+`<div class="field"><label for="nickname">Nickname</label><input id="nickname" name="nickname" minlength="3" maxlength="30" autocomplete="nickname" required placeholder="Come vuoi essere chiamato?"><span class="hint">Sarà visibile nelle recensioni collegate alle tue visite.</span></div>`:''}
@@ -83,7 +83,7 @@ function renderNav() {
 function positiveReviews() { const claimed=new Set(disputes.filter(d=>d.status!=='rejected').map(d=>d.review_id));return reviews.filter(r=>r.status==='published'&&r.rating>=8&&!claimed.has(r.id)); }
 function customerReviews() {
   const claimed=new Map(disputes.map(d=>[d.review_id,d]));
-  return reviews.length?reviews.map(r=>`<div class="review"><div class="row between"><div class="grow"><h3>${html(r.restaurants?.name||'Ristorante')}</h3><div class="date">${shortDate(r.created_at)}</div></div><strong class="score">${r.rating}/10 ★</strong></div><p>${html(r.comment)}</p><div class="row between" style="margin-top:11px">${badge(r.rating>=8?'Positiva':'Non positiva',r.rating>=8?'':'wait')}${claimed.has(r.id)?badge('Contestazione inviata','warn'):`<button class="btn sm" data-dispute="${r.id}">Contesta</button>`}</div></div>`).join(''):'<p class="small">Non hai ancora recensioni. Il primo passo è creare un codice visita quando sei al ristorante.</p>';
+  return reviews.length?reviews.map(r=>`<div class="review"><div class="row between"><div class="grow"><h3>${html(r.restaurants?.name||'Ristorante')}</h3><div class="date">${shortDate(r.created_at)}</div></div><strong class="score">${r.rating}/10</strong></div><p>${html(r.comment)}</p><div class="row between" style="margin-top:11px">${badge(r.rating>=8?'Positiva':'Non positiva',r.rating>=8?'':'wait')}${claimed.has(r.id)?badge('Contestazione inviata','warn'):`<button class="btn sm" data-dispute="${r.id}">Contesta</button>`}</div></div>`).join(''):'<p class="small">Non hai ancora recensioni. Il primo passo è creare un codice visita quando sei al ristorante.</p>';
 }
 function clientHome() {
   const positive=positiveReviews().length, remain=positive%10, progress=Math.round(remain*10);
@@ -122,12 +122,12 @@ function merchantVisitRows() {
 }
 function merchantReviewForm(visitId){
   const v=visits.find(v=>v.id===visitId);if(!v)return '';
-  return `<div class="panel stack" id="review-editor"><div class="row between"><h2>Nuova recensione</h2><button class="btn sm" data-action="close-review">Chiudi</button></div><p class="small">Cliente: <strong>${html(v.customer_nickname)}</strong><br>Visita: ${shortDate(v.created_at)}</p><form id="review-form" class="stack"><input type="hidden" name="visitId" value="${v.id}"><div class="field"><label>Valutazione da 1 a 10</label><div class="rating-grid">${Array.from({length:10},(_,i)=>`<button type="button" class="rating" data-rating="${i+1}" aria-pressed="${selectedRating===i+1}">${i+1} ★</button>`).join('')}</div><div class="rating-note">${selectedRating?selectedRating>=8?'Valutazione positiva: conta per il traguardo.':'Valutazione non positiva: non conta per il traguardo.':'Scegli il voto. Sono positive solo le valutazioni da 8 a 10.'}</div></div><div class="field"><label for="review-text">Descrivi il comportamento durante la visita</label><textarea id="review-text" name="comment" minlength="10" maxlength="1200" required placeholder="Usa soltanto fatti osservabili e un linguaggio rispettoso."></textarea></div><button class="btn primary fill" type="submit">Pubblica recensione</button></form><div class="notice">Non inserire dati sanitari, accuse non verificate o caratteristiche personali sensibili.</div></div>`;
+  return `<div class="panel stack" id="review-editor"><div class="row between"><h2>Nuova recensione</h2><button class="btn sm" data-action="close-review">Chiudi</button></div><p class="small">Cliente: <strong>${html(v.customer_nickname)}</strong><br>Visita: ${shortDate(v.created_at)}</p><form id="review-form" class="stack"><input type="hidden" name="visitId" value="${v.id}"><div class="field"><label>Valutazione da 1 a 10</label><div class="rating-grid">${Array.from({length:10},(_,i)=>`<button type="button" class="rating" data-rating="${i+1}" aria-pressed="${selectedRating===i+1}">${i+1} / 10</button>`).join('')}</div><div class="rating-note">${selectedRating?selectedRating>=8?'Valutazione positiva: conta per il traguardo.':'Valutazione non positiva: non conta per il traguardo.':'Scegli il voto. Sono positive solo le valutazioni da 8 a 10.'}</div></div><div class="field"><label for="review-text">Descrivi il comportamento durante la visita</label><textarea id="review-text" name="comment" minlength="10" maxlength="1200" required placeholder="Usa soltanto fatti osservabili e un linguaggio rispettoso."></textarea></div><button class="btn primary fill" type="submit">Pubblica recensione</button></form><div class="notice">Non inserire dati sanitari, accuse non verificate o caratteristiche personali sensibili.</div></div>`;
 }
 let editingVisitId = null;
 function merchantReviews() {
   return `${intro('Recensioni ai clienti.','Recensisci soltanto visite collegate a un codice verificato.','Area ristoratore')}${editingVisitId?merchantReviewForm(editingVisitId):''}<h2 class="section-title">Visite da recensire</h2><div class="panel">${merchantVisitRows()}</div>
-  <h2 class="section-title">Recensioni pubblicate</h2><div class="panel">${reviews.length?reviews.map(r=>`<div class="review"><div class="row between"><div><strong>${html(visits.find(v=>v.id===r.visit_id)?.customer_nickname||'Cliente')}</strong><div class="date">${shortDate(r.created_at)}</div></div><strong class="score">${r.rating}/10 ★</strong></div><p>${html(r.comment)}</p>${badge(r.rating>=8?'Positiva':'Non positiva',r.rating>=8?'':'wait')}</div>`).join(''):'<p class="small">Le valutazioni effettuate compariranno qui.</p>'}</div>`;
+  <h2 class="section-title">Recensioni pubblicate</h2><div class="panel">${reviews.length?reviews.map(r=>`<div class="review"><div class="row between"><div><strong>${html(visits.find(v=>v.id===r.visit_id)?.customer_nickname||'Cliente')}</strong><div class="date">${shortDate(r.created_at)}</div></div><strong class="score">${r.rating}/10</strong></div><p>${html(r.comment)}</p>${badge(r.rating>=8?'Positiva':'Non positiva',r.rating>=8?'':'wait')}</div>`).join(''):'<p class="small">Le valutazioni effettuate compariranno qui.</p>'}</div>`;
 }
 function merchantSettings() {
   return `${intro('Il tuo ristorante.','Stato della verifica e informazioni professionali.','Gestione')}
@@ -201,7 +201,7 @@ async function handleAuth(form){
       const result=await sb.auth.signUp({email,password,options:{emailRedirectTo:location.origin+'/account.html',data:{nickname,role:chosenRole}}});
       if(result.error)throw result.error;
       if(result.data.session){session=result.data.session;await loadData();}
-      else {$('view').innerHTML=`${intro('Controlla la tua email.','Per completare la registrazione apri il collegamento che ti abbiamo inviato.')}<div class="panel stack"><p class="small">Se non arriva, controlla anche lo spam. Dopo la conferma torna su BuonTavolo ed effettua l’accesso.</p><button class="btn olive fill" data-mode="signin">Vai all’accesso</button></div>`;}
+      else {$('view').innerHTML=`${intro('Controlla la tua email.','Per completare la registrazione apri il collegamento che ti abbiamo inviato.')}<div class="panel stack"><p class="small">Se non arriva, controlla anche lo spam. Dopo la conferma torna su GoodDiner ed effettua l’accesso.</p><button class="btn olive fill" data-mode="signin">Vai all’accesso</button></div>`;}
     }else{
       const result=await sb.auth.signInWithPassword({email,password});
       if(result.error)throw result.error;
