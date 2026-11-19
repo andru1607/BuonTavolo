@@ -27,8 +27,8 @@
 - L'ID pubblico del cliente è stabile; il QR visualizzato nel suo badge è invece un **token opaco, firmato, a vita breve** (es. 60-120 secondi), rinnovabile, vincolato all'utente, con anti-replay e nessun dato personale in chiaro. Non usare il codice pubblico come unica prova della presenza.
 - DinerPass presenta un QR leggibile, un codice manuale di fallback accessibile, livello di zoom, testo esplicativo “Mostralo al ristoratore per registrare la visita”. Evitare QR permanenti facilmente fotografabili e riutilizzabili.
 - Home ristoratore verificato: azione principale “Scansiona DinerPass”; l'app richiede il permesso camera soltanto quando serve; fallback manuale e compatibilità Safari iOS/Android. `BarcodeDetector` ha compatibilità limitata, prevedere decoder con fallback e controllo camera `getUserMedia` su HTTPS.
-- Alla scansione, il server verifica token, utente, ristorante, autorizzazione operatore e limiti anti-duplicazione. Mostrare soltanto nickname, codice parziale e conferma di visita, non email/telefono. Il ristoratore conferma “Registra presenza”.
-- Stato visita: `pending_customer_confirmation` -> `confirmed` oppure `declined`/ `expired`; il cliente riceve una notifica contestuale e può confermare/rifiutare. L'associazione recensione deve essere permessa soltanto da una visita `confirmed`.
+- Alla scansione, il server verifica token, utente, ristorante, autorizzazione operatore e limiti anti-duplicazione e **registra immediatamente la presenza**, con feedback “Presenza registrata”. Mostrare soltanto nickname e codice parziale, non email/telefono. Prevedere correzione motivata per scansione errata.
+- La scansione intenzionale del QR mostrato dal cliente costituisce l'azione di check-in. Stato visita: `confirmed`, oppure `voided` dopo correzione motivata/contestazione. Il cliente riceve una notifica con nome del locale, data e possibilità di segnalare una presenza non riconosciuta. Non imporre un secondo tap di conferma al cliente nel flusso normale; l'associazione recensione è permessa solo da una visita `confirmed`.
 - La visita registra `customer_id`, `restaurant_id`, `checked_in_at`, `status`, `merchant_actor_id`; niente posizione GPS precisa. Log audit per dispute, retention limitata e cancellazione secondo policy approvate.
 - Ristoratore: dopo conferma visita, mostrala in “Presenti oggi / Visite registrate” e poi “Da recensire”. Non assegnare recensione automaticamente.
 
@@ -51,7 +51,7 @@
 - Registrazione cliente senza email e telefono ammessa, ma non senza autenticazione sicura e metodo di recupero spiegato.
 - Ogni cliente ha nickname, ID stabile e QR opaco a scadenza in DinerPass.
 - Un ristorante trovato online non ottiene automaticamente privilegi di ristoratore verificato.
-- Scansione QR fallita/scaduta/duplicata non crea visite; check-in confermato appare nella home del solo locale autorizzato e nello storico del cliente.
+- Scansione QR valida e autorizzata salva la presenza subito, senza secondo consenso manuale; QR fallito/scaduto/duplicato non crea visite. Il check-in appare nella home del solo locale autorizzato e nello storico del cliente, con contestazione disponibile.
 - Nessuna recensione senza visita confermata; nessun dato sensibile nel payload QR; supporto scanner iOS/Android con fallback.
 - Backend non collegato: tutto ciò rimane documentazione/preview, non viene presentato come operativo.
 
