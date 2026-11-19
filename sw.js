@@ -1,5 +1,5 @@
-const CACHE='buontavolo-demo-v73';
-const ASSETS=['/','/index.html','/manifest.webmanifest','/icons/icon.svg'];
+const CACHE='buontavolo-demo-v73-bistrot';
+const ASSETS=['/','/index.html','/manifest.webmanifest','/icons/icon.svg','/icons/icon-180.png','/icons/icon-192.png','/icons/icon-512.png'];
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)));
   self.skipWaiting();
