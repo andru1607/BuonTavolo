@@ -4,8 +4,8 @@
   "description": "GoodDiner: la tua reputazione come ospite. Demo senza dati reali.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f6f1e8",
-  "theme_color": "#21372e",
+  "background_color": "#F7F1E8",
+  "theme_color": "#0F3D3E",
   "lang": "it",
   "icons": [
     {

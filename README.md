@@ -1,3 +1,15 @@
+# GoodDiner V7.7 · Petrolio e corallo
+
+La versione V7.7 applica una nuova palette vivace ma raffinata a tutte le aree della demo, mantenendo il logo GD, i flussi e i dati.
+
+**Palette:** petrolio `#0F3D3E` per navigazione e DinerPass, corallo `#E06B4F` per il pulsante iniziale con testo scuro e dettagli, corallo accessibile `#C45337` per pulsanti con testo bianco, crema `#F7F1E8` per le superfici, grafite `#1E2423` per i testi e oro sabbia `#C9A86A` per riconoscimenti.
+
+Il tema è isolato in `theme-v77.css` e include la schermata Accedi/Crea account, intestazioni, sidebar, navigazione mobile, manifesto del cliente, tessera reputazionale, scanner, QR DinerPass e area account predisposta. Nessuna fotografia stock aggiunta. `manifest.webmanifest`, meta theme-color e service worker aggiornati per distribuire la palette anche come web app installata.
+
+**QA:** dieci suite con `npm test`; controlli di contrasto delle CTA e rendering browser su iPhone, schermi piccoli, pieghevoli e desktop. Le recensioni positive restano esclusivamente i voti 8–10/10, premio ogni 10 positive. **Backend e autenticazione reale rimangono disattivati.**
+
+---
+
 # GoodDiner V7.6 · Ingresso unificato e DinerPass QR
 
 ## Nuovo funzionamento della demo
