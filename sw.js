@@ -1,4 +1,4 @@
-const CACHE='gooddiner-demo-v710';
+const CACHE='gooddiner-demo-v710-venue';
 const ASSETS=['/','/index.html','/manifest.webmanifest','/icons/icon.svg','/icons/mark-light.svg','/v76-onboarding.css','/theme-v77.css','/ux-v78.css','/v79-boot.js','/personalize-v79.css','/v79-customize.js','/visit-core-v710.js','/v710-visits.js','/visits-v710.css','/qr-core.js','/v76-onboarding.js'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)));self.skipWaiting();});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)))));self.clients.claim();});

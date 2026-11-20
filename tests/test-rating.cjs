@@ -44,3 +44,15 @@ run(`resetDraft('CL-10482');
 check(run("state.draft.customer === 'secondo-ospite' && state.draft.date === '2026-10-12'"),'guest changes and visit date survives');
 check(run("!state.draft.confirmed && state.draft.rating === 0 && !state.draft.text && !state.draft.note && !state.draft.tags.includes('Puntualità')"),'previous guest feedback must be cleared');
 console.log('PASS: changing guest clears feedback and requires a new confirmation');
+
+ctx.GoodDinerVisitsV710=require('../visit-core-v710.js');
+const venues=ctx.GoodDinerVisitsV710;
+ctx.localStorage.setItem(venues.VENUE_KEY,JSON.stringify({name:'Osteria Demo'}));
+check(run('merchantHome()').includes('REGISTRO DI SALA / OSTERIA DEMO'),'home uses the registered venue');
+check(run('restaurantPreview()').includes('<span>OD</span>'),'venue monogram follows its name');
+run(`resetDraft('CL-10482');Object.assign(state.draft,{confirmed:true,rating:8,tags:['Cortesia'],text:'Visita dimostrativa completata con puntualità.',note:'Nota riservata al locale demo.'});state.wizard=3;doPublish()`);
+check(run("db.reviews.some(r=>r.restaurant==='Osteria Demo'&&r.date===today())"),'a different venue can review the same day');
+check(run("merchantClients().includes('Nota riservata al locale demo.')"),'venue can read its own note');
+ctx.localStorage.setItem(venues.VENUE_KEY,JSON.stringify({name:'La Quercia'}));
+check(!run("merchantClients().includes('Nota riservata al locale demo.')"),'other venue cannot see the note');
+console.log('PASS: venue identity, same-day review attribution and venue-specific notes');
