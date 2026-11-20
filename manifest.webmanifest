@@ -1,24 +1,14 @@
 {
-  "name": "GoodDiner · Anteprima",
+  "name": "GoodDiner",
   "short_name": "GoodDiner",
-  "description": "GoodDiner: la tua reputazione come ospite. Demo senza dati reali.",
+  "description": "Il tuo DinerPass e le esperienze registrate nei ristoranti.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#F7F1E8",
   "theme_color": "#0F3D3E",
   "lang": "it",
   "icons": [
-    {
-      "src": "/icons/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/icons/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
+    {"src":"/icons/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},
+    {"src":"/icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}
   ]
 }
