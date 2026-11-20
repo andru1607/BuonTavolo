@@ -12,6 +12,6 @@ assert.ok(css.includes('::view-transition-new(bt-screen)'),'Screen transitions b
 assert.ok(css.includes('gdStepIn')&&css.includes('gdModalIn'),'Onboarding and scanner transitions');
 assert.ok(onboarding.includes(".gd-icon-close')?.focus({preventScroll:true})"),'Scanner no longer automatically focuses a 13px field');
 assert.ok(!onboarding.includes("getElementById('gd-manual-token')?.focus()"),'No keyboard auto-launch on scan');
-assert.ok(sw.includes("gooddiner-demo-v79")&&sw.includes("'/ux-v78.css'"),'Cache refresh includes UX');
+assert.ok(sw.includes("gooddiner-demo-v710")&&sw.includes("'/ux-v78.css'"),'Cache refresh includes UX');
 assert.ok(html.includes('POSITIVE_MIN=8'),'Positive threshold unchanged');
 console.log('PASS V7.8: no Safari input zoom, fluid layouts, motion accessibility, scanner focus, cache and 8/10');

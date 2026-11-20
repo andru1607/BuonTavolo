@@ -16,7 +16,7 @@ assert.match(css,/\.v73-app \.mobile-bottom/);
 assert.match(css,/@media\(max-width:770px\)/);
 assert.match(css,/@media\(prefers-reduced-motion:reduce\)/);
 assert.ok(!css.includes('!important') || css.includes('--'), 'Avoid broadly forced declarations');
-assert.ok(sw.includes('gooddiner-demo-v79')&&sw.includes("'/theme-v77.css'"));
+assert.ok(sw.includes('gooddiner-demo-v710')&&sw.includes("'/theme-v77.css'"));
 assert.equal(manifest.theme_color,'#0F3D3E');
 assert.equal(manifest.background_color,'#F7F1E8');
 assert.match(html,/POSITIVE_MIN=8/);

@@ -312,6 +312,7 @@ button,a{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 <link rel="stylesheet" href="/ux-v78.css">
 <script src="/v79-boot.js"></script>
 <link rel="stylesheet" href="/personalize-v79.css">
+<link rel="stylesheet" href="/visits-v710.css">
 </head>
 <body>
 <div id="app" class="app"></div><div id="toast" class="toast" role="status" aria-live="polite"></div>
@@ -513,7 +514,9 @@ db.customers.forEach(c=>reconcileVouchers(c.id));
 render();save();if('serviceWorker' in navigator&&location.protocol==='https:')window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));
 </script>
 <script src="/qr-core.js"></script>
+<script src="/visit-core-v710.js"></script>
 <script src="/v76-onboarding.js"></script>
 <script src="/v79-customize.js"></script>
+<script src="/v710-visits.js"></script>
 </body>
 </html>

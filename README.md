@@ -1,3 +1,25 @@
+# GoodDiner V7.10 · Storico e registro presenze
+
+## Cosa è cambiato
+- **Cliente:** storico delle presenze nella home e nel profilo, riferito soltanto al codice cliente attivo. Mostra nome del locale, momento del check-in e stato. La demo non scambia dati tra telefoni.
+- **Ristoratore:** registro presenze nella home, con riepiloghi Oggi / ultimi 7 giorni / Totale, filtri temporali, ricerca per nickname/ID e scheda dettagliata.
+- **Correzioni:** il ristoratore può annullare una scansione locale errata. La presenza non viene cancellata dal registro: resta con stato `annullata` e `voidedAt`. Una visita annullata non blocca un nuovo check-in valido nello stesso locale e giorno.
+- **Luogo corretto:** il check-in registra il nome del locale scelto nell'onboarding demo, invece di usare sempre “La Quercia”. Duplicati valutati per cliente + locale + giorno; i registri non mostrano presenze di locali con nome differente.
+- **Feedback immediato:** nell'area ristoratore appare una ricevuta discreta quando una presenza è stata registrata da meno di due minuti.
+- **Accessibilità:** focus e pulsanti nel dettaglio, supporto Escape, dimensioni minime dei controlli e `prefers-reduced-motion`. Nessuna nuova voce nella navigazione.
+
+## Limiti
+Sono solo **registrazioni simulate nel localStorage dello stesso browser**. La verifica del ristorante, la lettura QR fra dispositivi, l'identità personale e un registro attendibile richiedono autenticazione reale e backend autorizzato. Il nome del locale e lo storico locale non costituiscono prove di presenza reale. Non usare dati di persone vere nella demo.
+
+Rimangono invariati logo GD, personalizzazione V7.9, accesso unico, valutazioni positive solo **8–10/10** e premio ogni dieci positive. Nessun servizio esterno o database attivato.
+
+## Test
+- Suite V7.10: ordinamento, visibilità per cliente/locale, conteggi, duplicati, annullamento tracciato, sicurezza dei dati locali e integrazione delle schermate attraverso VM.
+- Suite storiche invariate salvo il controllo della nuova cache service worker.
+- Il browser automatizzato disponibile nell'ambiente ha bloccato l'apertura di pagine locali (`ERR_BLOCKED_BY_ADMINISTRATOR`): non dichiarare un test visuale completo. Restano da verificare manualmente comportamento touch, scansione su iOS/Android e layout su dispositivi fisici.
+
+---
+
 # GoodDiner V7.9 · Studio di personalizzazione
 
 La personalizzazione visiva ora è interattiva nella demo: il **cliente** può selezionare tre finiture del proprio DinerPass (con anteprima e selezione distinta per codice cliente); il **ristoratore** può selezionare tre accenti per la scheda locale, mantenendo esclusivamente logo e foto caricati dal gestore. Tutti possono scegliere fra tre temi dell'interfaccia e densità Aria/Compatta, senza aggiungere nuove voci alla navigazione.
