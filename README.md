@@ -1,6 +1,6 @@
-# GoodDiner · Database Supabase (predisposto, non attivato)
+# GoodDiner · Database Supabase dedicato installato
 
-La prima versione del database sicuro è nella cartella [database](database/README.md). La migrazione [gooddiner_initial.sql](database/gooddiner_initial.sql) è stata preparata e sottoposta a controlli statici, **non applicata**: il progetto Supabase dedicato GoodDiner non esiste ancora nell'account connesso. **Non applicare nulla a easygart.** Il backend resta volutamente spento fino alla scelta dell'organizzazione Supabase, alla verifica del costo di un nuovo progetto e ai collaudi RLS su ambiente isolato.
+Il progetto Supabase **GoodDiner** (`ixczkhmvbjszgmlqznlk`) è attivo in `andru1607's Org` nella regione `eu-central-1`. Sono state applicate [la migrazione iniziale](database/gooddiner_initial.sql) e [l'ottimizzazione RLS/indici](database/gooddiner_policy_performance.sql). Le nove tabelle sono vuote e hanno RLS abilitata. Il frontend resta intenzionalmente demo e non è ancora collegato ai nuovi account: [stato delle verifiche e prossimi passi](database/README.md). Non usare o modificare il database easygart.
 
 ---
 

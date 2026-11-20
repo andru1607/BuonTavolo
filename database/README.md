@@ -1,6 +1,10 @@
-# GoodDiner · Database dedicato (staging)
+# GoodDiner · Database dedicato (installato, frontend non collegato)
 
-**Stato: schema pronto, NON applicato a Supabase.** Attualmente l'unico progetto accessibile è `easygart`: non eseguire SQL lì. Occorre creare un **progetto Supabase separato**, dopo aver confermato l'organizzazione e gli eventuali costi.
+**Stato verificato il 20 novembre 2026:** progetto Supabase **GoodDiner** creato e attivo nell'organizzazione **andru1607's Org**, regione `eu-central-1` (Francoforte), project ref `ixczkhmvbjszgmlqznlk`. Confermato costo mensile di creazione pari a 0. **Non è il progetto easygart.**
+
+Sono state applicate in Supabase le migrazioni `gooddiner_initial_secure_schema` (`20261120163135`) e `gooddiner_policy_performance_baseline` (`20261120163247`). Nove tabelle risultano create con RLS attiva e zero record; testati i privilegi di tabella e funzione: ruoli anonimi senza accesso ai dati, `gd_private` non leggibile da client, funzioni critiche eseguibili solo da `authenticated` e con controlli interni. Gli advisor segnalano come attese due tabelle private deny-all senza policy e quattro funzioni `SECURITY DEFINER` pubbliche per autenticati. Le prove con utenti distinti, moderazione, autenticazione e letture/scritture end-to-end **non sono ancora eseguite**.
+
+**Il frontend GoodDiner continua in modalità demo locale**; `config.js` non deve essere impostato finché `account.js` non è stato allineato alle nuove RPC e finché i test RLS multiutente non sono superati. EasyGart non è stato modificato.
 
 ## Contenuto
 
