@@ -1,6 +1,6 @@
 // GoodDiner V5 · Area reale predisposta, attiva solo con un database dedicato.
 // La chiave pubblicabile Supabase è sicura da usare in frontend CON le policy RLS.
-const cfg = window.GOODDINER_PUBLIC_CONFIG || window.BUONTAVOLO_PUBLIC_CONFIG || {};
+const cfg = {}; // Legacy auth is disabled. Real GoodDiner authentication runs at / with official.js.
 const $ = id => document.getElementById(id);
 const html = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const shortDate = value => new Date(value).toLocaleDateString('it-IT',{day:'numeric',month:'short',year:'numeric'});

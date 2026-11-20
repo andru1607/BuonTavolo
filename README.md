@@ -1,3 +1,13 @@
+# GoodDiner 1.0 · Accesso reale (rilascio controllato)
+
+**La home principale `/` non è più una demo.** Profili, DinerPass e storico consultano il database Supabase GoodDiner dedicato `ixczkhmvbjszgmlqznlk`; nessun utente, visita o recensione viene inventato. La vecchia demo è mantenuta in [demo.html](demo.html) solo per test. Il vecchio `account.html` è disabilitato.
+
+**Non è ancora il lancio pubblico:** vanno completati impostazioni Auth Supabase (accessi anonimi, URL di reindirizzamento, conferma email), protezione bot, collaudo multiutente, verifica documentale dei locali e documentazione GDPR/reclami. Nessun locale è approvato automaticamente.
+
+Leggi [le note ufficiali di rilascio](docs/official-release-v1.md) e [il database](database/README.md).
+
+---
+
 # GoodDiner · Database Supabase dedicato installato
 
 Il progetto Supabase **GoodDiner** (`ixczkhmvbjszgmlqznlk`) è attivo in `andru1607's Org` nella regione `eu-central-1`. Sono state applicate [la migrazione iniziale](database/gooddiner_initial.sql) e [l'ottimizzazione RLS/indici](database/gooddiner_policy_performance.sql). Le nove tabelle sono vuote e hanno RLS abilitata. Il frontend resta intenzionalmente demo e non è ancora collegato ai nuovi account: [stato delle verifiche e prossimi passi](database/README.md). Non usare o modificare il database easygart.
