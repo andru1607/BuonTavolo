@@ -15,13 +15,13 @@ const GD = (() => {
   const isAnon=()=>!!state.user?.is_anonymous;
   const verifiedRestaurant=()=>state.restaurants.find(r=>r.owner_id===state.user?.id&&r.verified_at&&!r.suspended_at)||null;
   const currentVenue=()=>verifiedRestaurant()||state.restaurants.find(r=>r.owner_id===state.user?.id)||null;
-  let sb=null,toastTimer=null,qrTimer=null,scanStream=null,scanTimer=null,detector=null,lockedScan=false,scannerOpen=false;
+  let sb=null,toastTimer=null,qrTimer=null,scanStream=null,scanTimer=null,detector=null,lockedScan=false,scannerOpen=false,cameraGeneration=0;
   let sdkError='';
   function toast(message){dom.toast.textContent=message;dom.toast.className='toast show';clearTimeout(toastTimer);toastTimer=setTimeout(()=>dom.toast.className='toast',3800);}
   function notice(text,kind=''){return `<div class="notice ${kind?'notice-'+kind:''}">${svg(kind==='alert'?'info':'shield',17)} ${e(text)}</div>`;}
   function button(label,action,cls='btn-dark',extra=''){return `<button type="button" class="btn ${cls}" data-action="${e(action)}" ${extra}>${label}</button>`;}
   function busy(flag){state.busy=flag;dom.app.classList.toggle('loading',flag);}
-  function resetScanner(){scannerOpen=false;lockedScan=false;detector=null;if(scanTimer){clearTimeout(scanTimer);scanTimer=null;}if(scanStream){scanStream.getTracks().forEach(t=>t.stop());scanStream=null;}document.getElementById('scanner')?.remove();}
+  function resetScanner(){cameraGeneration++;scannerOpen=false;lockedScan=false;detector=null;resetCameraStream();document.getElementById('scanner')?.remove();}
   function layout(main){const logged=Boolean(state.user),merchant=state.side==='merchant';const links=logged?merchant?[['merchant','Panoramica'],['visits','Presenze'],['profile','Account']]:[['pass','DinerPass'],['visits','Visite'],['reviews','Recensioni'],['profile','Profilo']]:[];
     return `<div class="site"><header class="topbar"><div class="container top-in"><a href="/" class="brand" data-action="home"><img src="/icons/mark.svg" alt=""><strong>GoodDiner<i>.</i></strong></a>
       ${logged?`<nav class="top-nav" aria-label="Navigazione">${links.map(([s,label])=>`<button class="nav-link ${state.section===s?'active':''}" data-section="${s}" ${state.section===s?'aria-current="page"':''}>${label}</button>`).join('')}</nav>`:''}
@@ -96,15 +96,74 @@ const GD = (() => {
   async function publishReview(form){const rating=Number(form.elements.rating.value),comment=form.elements.comment.value.trim();if(!Number.isInteger(rating)||rating<1||rating>10||comment.length<10||comment.length>1200)throw Error('Seleziona il voto e descrivi il comportamento (10–1200 caratteri).');if(!state.reviewVisit)throw Error('Visita non selezionata.');const {error}=await sb.rpc('publish_guest_review',{p_visit_id:state.reviewVisit,p_rating:rating,p_comment:comment});if(error)throw Error(error.message);state.reviewVisit=null;state.view='app';state.section='visits';await refresh();toast('Recensione salvata e associata alla visita.');}
   async function createDispute(id){const reason=window.prompt('Spiega perché contesti questa recensione (almeno 10 caratteri):');if(reason===null)return;if(reason.trim().length<10)throw Error('Descrivi il motivo con almeno 10 caratteri.');const {error}=await sb.from('disputes').insert({review_id:id,customer_id:state.user.id,reason:reason.trim()});if(error)throw Error(error.message);toast('Contestazione ricevuta e registrata.');}
   async function signOut(){if(isAnon()&&!window.confirm('Il tuo profilo senza recapito potrebbe non essere più recuperabile dopo la disconnessione. Vuoi uscire comunque?'))return;const {error}=await sb.auth.signOut();if(error)throw Error(error.message);state.user=null;state.profile=null;state.applications=[];state.restaurants=[];state.visits=[];state.reviews=[];state.vouchers=[];state.qr=null;state.view='landing';state.side='customer';render();}
-  async function startCamera(){const camera=document.getElementById('camera');if(!camera)return;if(!navigator.mediaDevices?.getUserMedia)throw Error('Fotocamera non disponibile. Puoi inserire il codice QR manualmente.');try{scanStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false});if(!scannerOpen){resetScanner();return;}camera.innerHTML='<video autoplay playsinline muted aria-label="Inquadratura del DinerPass"></video><span class="scanner-frame" aria-hidden="true"></span>';const video=camera.querySelector('video');video.srcObject=scanStream;await video.play();if('BarcodeDetector' in window){try{detector=new BarcodeDetector({formats:['qr_code']});}catch{detector=null;}}lockedScan=false;
-    const frame=async()=>{if(!scannerOpen||!scanStream||lockedScan)return;try{if(detector){const codes=await detector.detect(video);if(codes.length){lockedScan=true;await claim(codes[0].rawValue);return;}}}catch(err){if(lockedScan){toast(err.message);lockedScan=false;}}scanTimer=setTimeout(frame,250);};frame();
-    if(!detector){const fallback=document.getElementById('camera-help');if(fallback)fallback.textContent='La scansione automatica non è disponibile in questo browser. Inserisci il codice manualmente.';}
-  }catch(error){resetCameraStream();throw Error('Non riesco ad accedere alla fotocamera. Usa il campo manuale.');}}
+  async function startCamera(){
+    const camera=document.getElementById('camera');
+    if(!camera||!scannerOpen)return;
+    if(!navigator.mediaDevices?.getUserMedia)throw Error('Fotocamera non disponibile. Inserisci il codice QR manualmente.');
+    const generation=++cameraGeneration;
+    resetCameraStream();
+    let acquired=null;
+    try{
+      const help=document.getElementById('camera-help');
+      if(help)help.textContent='Preparazione del lettore QR…';
+      let native=null,jsDecoder=null;
+      if('BarcodeDetector' in window){try{native=new window.BarcodeDetector({formats:['qr_code']});}catch{native=null;}}
+      // Safari iOS does not expose BarcodeDetector by default; decode pixels locally instead.
+      if(!native){const module=await import('https://cdn.jsdelivr.net/npm/jsqr@1.4.0/+esm');jsDecoder=module.default;if(typeof jsDecoder!=='function')throw Error('Decoder QR non disponibile.');}
+      if(!scannerOpen||generation!==cameraGeneration||document.hidden)return;
+      acquired=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false});
+      if(!scannerOpen||generation!==cameraGeneration||document.hidden||!document.getElementById('camera')){
+        acquired.getTracks().forEach(t=>t.stop());return;
+      }
+      scanStream=acquired;
+      detector=native;
+      camera.innerHTML='<video autoplay playsinline muted aria-label="Inquadratura del DinerPass"></video><span class="scanner-frame" aria-hidden="true"></span>';
+      const video=camera.querySelector('video');
+      video.srcObject=scanStream;
+      await video.play();
+      if(!scannerOpen||generation!==cameraGeneration||document.hidden){resetCameraStream();return;}
+      if(help)help.textContent='Inquadra il QR del cliente oppure inserisci il codice manualmente.';
+      const canvas=jsDecoder?document.createElement('canvas'):null;
+      const context=canvas?.getContext('2d',{willReadFrequently:true});
+      if(jsDecoder&&!context)throw Error('Lettore immagini non disponibile.');
+      lockedScan=false;
+      const frame=async()=>{
+        if(!scannerOpen||generation!==cameraGeneration||!scanStream||lockedScan||document.hidden)return;
+        try{
+          let codes=[];
+          if(detector){codes=await detector.detect(video);}
+          else if(video.readyState>=2&&video.videoWidth&&video.videoHeight){
+            const scale=Math.min(1,560/video.videoWidth);
+            canvas.width=Math.max(1,Math.round(video.videoWidth*scale));
+            canvas.height=Math.max(1,Math.round(video.videoHeight*scale));
+            context.drawImage(video,0,0,canvas.width,canvas.height);
+            const pixels=context.getImageData(0,0,canvas.width,canvas.height);
+            const qr=jsDecoder(pixels.data,pixels.width,pixels.height,{inversionAttempts:'dontInvert'});
+            if(qr?.data)codes=[{rawValue:qr.data}];
+          }
+          if(!scannerOpen||generation!==cameraGeneration||!scanStream)return;
+          if(codes.length){
+            const value=String(codes[0].rawValue||'').trim();
+            if(value.startsWith('GD1:')){lockedScan=true;await claim(value);return;}
+          }
+        }catch(err){if(lockedScan){toast(err.message||'Lettura non riuscita.');lockedScan=false;}}
+        if(scannerOpen&&generation===cameraGeneration&&scanStream&&!document.hidden)scanTimer=setTimeout(frame,300);
+      };
+      frame();
+    }catch(error){
+      if(acquired&&acquired!==scanStream)acquired.getTracks().forEach(t=>t.stop());
+      if(generation!==cameraGeneration||!scannerOpen)return;
+      resetCameraStream();
+      const help=document.getElementById('camera-help');
+      if(help)help.textContent='Non è possibile leggere il QR con la fotocamera. Inserisci il codice manualmente.';
+      throw Error('Scanner non disponibile. Usa il campo manuale. '+(error.message||''));
+    }
+  }
   function resetCameraStream(){if(scanStream){scanStream.getTracks().forEach(t=>t.stop());scanStream=null;}if(scanTimer){clearTimeout(scanTimer);scanTimer=null;}}
   function openScanner(){if(!verifiedRestaurant()){toast('Serve un ristorante verificato.');return;}if(scannerOpen)return;scannerOpen=true;const d=document.createElement('div');d.id='scanner';d.className='scanner-modal';d.setAttribute('role','dialog');d.setAttribute('aria-modal','true');d.setAttribute('aria-labelledby','scanner-title');d.innerHTML=`<div class="scanner-inner"><div class="scanner-head"><div><span class="label">PRESENZA · SICURA</span><h2 id="scanner-title">Scansiona DinerPass</h2></div>${button(svg('close'),'close-scanner','btn-ghost btn-small','aria-label="Chiudi scanner"')}</div><p class="scanner-content">Inquadra il codice temporaneo del cliente. La presenza sarà registrata direttamente nel database GoodDiner.</p><div id="camera" class="scanner-video">${svg('scan',44)}<p>Fotocamera disattivata</p></div><p id="camera-help" class="small muted">La fotocamera viene attivata solo su richiesta.</p>${button(svg('scan')+' Attiva fotocamera','start-camera','btn-outline btn-block')}<form id="scan-form" class="stack" style="margin-top:18px"><div class="field"><label>Codice QR (alternativa manuale)</label><input name="token" autocapitalize="off" autocomplete="off" spellcheck="false" placeholder="GD1:..." required></div><button type="submit" class="btn btn-dark btn-block">Registra presenza</button></form></div>`;document.body.appendChild(d);d.querySelector('[data-action="close-scanner"]')?.focus({preventScroll:true});}
   async function action(name,el){if(name==='home'){if(state.user){goSection(state.side==='merchant'?'merchant':'pass');}else setView('landing');return;}if(name==='privacy'){setView('privacy');return;}if(name==='help'){setView('help');return;}if(name==='switch-side'){state.side=state.side==='merchant'?'customer':'merchant';state.section=state.side==='merchant'?'merchant':'pass';setView('app');return;}if(name==='reload'){location.reload();return;}if(name==='retry'){await refresh();return;}if(['landing','signin','signup','signup-customer','signup-merchant','forgot','reset'].includes(name)){setView(name);return;}if(name==='close-scanner'){resetScanner();return;}
     if(name==='start-camera'){await startCamera();return;}if(name==='scanner'){openScanner();return;}if(name==='signout'){await signOut();return;}if(name==='issue-qr'){await issueQR();return;}if(name==='review'){state.reviewVisit=el.dataset.id;setView('review-compose');return;}if(name==='void'){await voidVisit(el.dataset.id);return;}if(name==='dispute'){await createDispute(el.dataset.id);return;}if(['pass','visits','reviews','profile','merchant'].includes(name)){goSection(name);return;}}
-  function events(){document.addEventListener('click',async ev=>{const btn=ev.target.closest('[data-section],[data-action]');if(!btn)return;ev.preventDefault();if(state.busy)return;const name=btn.dataset.action||btn.dataset.section;try{await action(name,btn);}catch(error){toast(error.message||'Operazione non riuscita.');}});
+  function events(){document.addEventListener('visibilitychange',()=>{if(document.hidden){if(scannerOpen){cameraGeneration++;resetCameraStream();const camera=document.getElementById('camera');if(camera)camera.innerHTML='<p>Fotocamera sospesa</p>';const help=document.getElementById('camera-help');if(help)help.textContent='Torna in primo piano e riattiva la fotocamera, oppure inserisci il codice manualmente.';}}else if(state.qr&&Date.parse(state.qr.expires_at)<=Date.now()){state.qr=null;render();}else if(state.qr&&state.side==='customer'&&state.section==='pass'){tickQr();}});document.addEventListener('click',async ev=>{const btn=ev.target.closest('[data-section],[data-action]');if(!btn)return;ev.preventDefault();if(state.busy)return;const name=btn.dataset.action||btn.dataset.section;try{await action(name,btn);}catch(error){toast(error.message||'Operazione non riuscita.');}});
     document.addEventListener('input',ev=>{if(ev.target.id==='customer-email'){const wrap=document.getElementById('customer-password-wrap'),pw=document.getElementById('customer-password');const hasEmail=!!ev.target.value.trim();wrap.hidden=!hasEmail;pw.required=hasEmail;}});
     document.addEventListener('keydown',ev=>{if(ev.key==='Escape'&&scannerOpen)resetScanner();});
     document.addEventListener('submit',async ev=>{const form=ev.target;if(!form?.id)return;ev.preventDefault();if(state.busy)return;busy(true);try{switch(form.id){case 'signup-customer-form':await signupCustomer(form);break;case 'signup-merchant-form':await signupMerchant(form);break;case 'signin-form':{const result=await sb.auth.signInWithPassword({email:form.elements.email.value.trim(),password:form.elements.password.value});if(result.error)throw Error(result.error.message);await refresh();window.scrollTo({top:0,behavior:'instant'});toast('Accesso effettuato.');break;}

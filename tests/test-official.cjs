@@ -18,6 +18,12 @@ assert.ok(!js.includes('service_role')&&!js.includes('secretKey'),'no secret key
 assert.match(config,/https:\/\/ixczkhmvbjszgmlqznlk\.supabase\.co/);
 assert.match(config,/sb_publishable_/);
 assert.ok(!config.includes('eyJhbGci')&&!config.includes('service_role'));
+// The official app needs a real QR decoder on iPhone (native BarcodeDetector is not available).
+assert.ok(js.includes('jsqr@1.4.0/+esm'),'Safari iPhone has a QR decoder fallback');
+assert.ok(js.includes('getImageData(0,0,canvas.width,canvas.height)'),'fallback decodes frames locally');
+assert.ok(js.includes('generation!==cameraGeneration'),'stale camera permission responses cannot re-open the scanner');
+assert.ok(js.includes('acquired.getTracks().forEach(t=>t.stop())'),'late camera tracks are released');
+assert.ok(js.includes("addEventListener('visibilitychange'"),'background/foreground lifecycle is handled');
 assert.match(sw,/gooddiner-real-v100/);assert.ok(!sw.includes('fetch(request).then(res=>caches.match') );
 assert.match(read('account.js'),/const cfg = \{\};/,'legacy account client must stay inactive');
 console.log('PASS: GoodDiner v1.0 real Supabase client, gated merchant privileges, legacy demo isolated, no service secrets');
