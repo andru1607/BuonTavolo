@@ -30,6 +30,7 @@ assert.match(sql,/revoke all on function public\.publish_guest_review/);
 assert.doesNotMatch(sql,/grant (insert|update|delete) on public\.visits to authenticated/i);
 assert.doesNotMatch(sql,/grant (insert|update|delete) on public\.reviews to authenticated/i);
 assert.doesNotMatch(sql,/grant (insert|update|delete) on public\.restaurants to authenticated/i);
-assert.match(docs,/NON applicato a Supabase/);
+assert.match(docs,/Sono state applicate in Supabase/);
+assert.match(docs,/ixczkhmvbjszgmlqznlk/);
 assert.match(docs,/easygart/);
 console.log('PASS: GoodDiner database baseline isolated, RLS, owner checks, short-lived QR, 8-10 stars, 10-review pending vouchers');

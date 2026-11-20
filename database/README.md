@@ -1,10 +1,10 @@
-# GoodDiner · Database dedicato (installato, frontend non collegato)
+# GoodDiner · Database dedicato (installato, home 1.0 collegata)
 
 **Stato verificato il 20 novembre 2026:** progetto Supabase **GoodDiner** creato e attivo nell'organizzazione **andru1607's Org**, regione `eu-central-1` (Francoforte), project ref `ixczkhmvbjszgmlqznlk`. Confermato costo mensile di creazione pari a 0. **Non è il progetto easygart.**
 
 Sono state applicate in Supabase le migrazioni `gooddiner_initial_secure_schema` (`20261120163135`) e `gooddiner_policy_performance_baseline` (`20261120163247`). Nove tabelle risultano create con RLS attiva e zero record; testati i privilegi di tabella e funzione: ruoli anonimi senza accesso ai dati, `gd_private` non leggibile da client, funzioni critiche eseguibili solo da `authenticated` e con controlli interni. Gli advisor segnalano come attese due tabelle private deny-all senza policy e quattro funzioni `SECURITY DEFINER` pubbliche per autenticati. Le prove con utenti distinti, moderazione, autenticazione e letture/scritture end-to-end **non sono ancora eseguite**.
 
-**Il frontend GoodDiner continua in modalità demo locale**; `config.js` non deve essere impostato finché `account.js` non è stato allineato alle nuove RPC e finché i test RLS multiutente non sono superati. EasyGart non è stato modificato.
+**La home principale GoodDiner v1.0 è collegata a questo database tramite `official.js` e chiave browser pubblicabile in `config.js`.** La vecchia demo vive soltanto su `/demo.html` per i test, e `account.js` legacy è disabilitato. Non annunciare il lancio pubblico prima dei test RLS multiutente, della configurazione Auth, delle verifiche dei gestori e della valutazione GDPR. EasyGart non è stato modificato.
 
 ## Contenuto
 
@@ -25,8 +25,8 @@ Sono state applicate in Supabase le migrazioni `gooddiner_initial_secure_schema`
 - **Verifica operatore**: provider Places/API e controllo documentale/Business Profile con permessi definiti, no “verificato” al semplice risultato di ricerca.
 - **Moderazione e GDPR**: informativa, base giuridica, limiti della valutazione delle persone, accesso ai dati, contestazioni, eliminazioni, retention, audit, possibile DPIA. Nessuna raccolta reale finché non completati.
 - **Protezione abuso**: CAPTCHA/Turnstile e limiti anche a livello gateway per iscrizioni anonime e QR; monitoraggio, revoca sessioni, job di pulizia token scaduti e audit.
-- **Frontend**: `account.js` è una bozza storica (usa vecchie operazioni di insert) e **non è compatibile con questa nuova API finché non viene migrato**. `config.js` resta vuoto e la demo locale resta operativa separatamente.
-- **Schema**: eseguire in un progetto **nuovo e vuoto**. Non sovrascrivere le tabelle di altri prodotti. Eseguire advisors Supabase dopo l'installazione, verificare ruoli e test RLS con almeno due utenti e due ristoranti prima di attivare l'accesso.
+- **Frontend**: `official.js` è collegato alle nuove RPC, con sola chiave publishable. `account.js` è una bozza storica disabilitata e non deve essere riattivato. La demo locale rimane disponibile in `/demo.html` esclusivamente per test.
+- **Schema**: le due migrazioni sono già state applicate al progetto dedicato e gli advisor eseguiti. Restano i test RLS con almeno due utenti e due ristoranti prima di aprire il servizio al pubblico.
 
 ## Test minimi richiesti sul progetto dedicato
 
