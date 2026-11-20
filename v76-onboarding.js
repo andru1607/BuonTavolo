@@ -89,18 +89,20 @@
     if(!active)return null;
     const now=Date.now();let obj=readLocal(QR_KEY,null);
     if(!obj||obj.customerId!==active.id||!obj.token||obj.expires<=now){
-      obj={customerId:active.id,token:'GDDEMO1:'+rand(18),expires:now+90000};saveLocal(QR_KEY,obj);
+      obj={customerId:active.id,token:'GDDEMO1:'+rand(18),expires:now+90000};
+      if(!saveLocal(QR_KEY,obj))return null;
     }
     return obj;
   }
-  function qrHTML(t=tokenData()){
-    if(!t)return '<p>Non è disponibile un profilo demo.</p>';
+  function qrHTML(t){
+    if(!t)return '<p>DinerPass temporaneo non disponibile. Controlla lo spazio nel browser e riprova.</p><button type="button" class="gd-outline" data-gd-entry="retry-pass">Riprova</button>';
     const qr=window.GoodDinerQR?.svg(t.token)||'<div>QR non disponibile</div>';
     return `<div class="gd-qr-visual" aria-label="QR del DinerPass" data-qr-token="${HTML(t.token)}">${qr}</div><div class="gd-qr-expiry">QR temporaneo dimostrativo · aggiornamento ogni 90 secondi</div>`;
   }
   function guestQR(){
+    const pass=tokenData();
     return `<section class="gd-qr-section" aria-labelledby="gd-qr-head"><div class="gd-qr-copy"><span class="gd-kicker">IL TUO DINERPASS</span><h2 id="gd-qr-head">Il tuo ingresso, un solo gesto.</h2><p>Mostra il QR personale al ristoratore: nella versione completa registrerà la tua presenza. Questo QR è utilizzabile solo nella simulazione locale.</p><span class="gd-qr-code">${HTML(customer(db.activeCustomer)?.id||'')}</span></div>
-    <div class="gd-qr-side"><div id="gd-qr-viewport">${qrHTML()}</div><button type="button" data-gd-entry="copy-qr" class="gd-outline gd-qr-copybtn">${icon('copy',17)} Copia il codice QR demo</button><details class="gd-manual-code"><summary>Mostra codice manuale</summary><code>${HTML(tokenData()?.token||'')}</code></details></div></section>`;
+    <div class="gd-qr-side"><div id="gd-qr-viewport">${qrHTML(pass)}</div><div id="gd-qr-actions"${pass?'':' hidden'}><button type="button" data-gd-entry="copy-qr" class="gd-outline gd-qr-copybtn">${icon('copy',17)} Copia il codice QR demo</button><details class="gd-manual-code"><summary>Mostra codice manuale</summary><code>${HTML(pass?.token||'')}</code></details></div></div></section>`;
   }
   clientHome = function(){
     const original=originalClientHome();
@@ -234,6 +236,7 @@
       case 'resume':{const s=session();if(s?.role==='customer'&&customer(s.customerId))enter('customer',s.customerId);else if(s?.role==='restaurant')enter('restaurant');else enter('customer');break;}
       case 'maps':openGoogleMaps();break;
       case 'logout':localStorage.removeItem(SESSION_KEY);renderGate('landing');break;
+      case 'retry-pass':refreshPass(true);break;
       case 'copy-qr':{
         const token=refreshPass();
         if(!token)break;
@@ -271,11 +274,19 @@
     }
   });
   // Refresh the visual QR only while visible. Avoid exposing contact data in the payload.
-  function refreshPass(){
+  function refreshPass(retry=false){
     const view=document.getElementById('gd-qr-viewport');
     if(!view||document.hidden)return;
+    const actions=document.getElementById('gd-qr-actions');
+    if(actions?.hidden&&!retry)return;
     const pass=tokenData();
-    if(!pass)return;
+    if(actions)actions.hidden=!pass;
+    if(!pass){
+      if(!view.querySelector('[data-gd-entry="retry-pass"]'))view.innerHTML=qrHTML(null);
+      const manual=document.querySelector('.gd-manual-code code');
+      if(manual)manual.textContent='';
+      return;
+    }
     if(view.querySelector('[data-qr-token]')?.dataset.qrToken!==pass.token){
       view.innerHTML=qrHTML(pass);
       const manual=document.querySelector('.gd-manual-code code');
