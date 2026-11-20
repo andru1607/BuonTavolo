@@ -10,7 +10,7 @@ Leggi [le note ufficiali di rilascio](docs/official-release-v1.md) e [il databas
 
 # GoodDiner · Database Supabase dedicato installato
 
-Il progetto Supabase **GoodDiner** (`ixczkhmvbjszgmlqznlk`) è attivo in `andru1607's Org` nella regione `eu-central-1`. Sono state applicate [la migrazione iniziale](database/gooddiner_initial.sql) e [l'ottimizzazione RLS/indici](database/gooddiner_policy_performance.sql). Le nove tabelle sono vuote e hanno RLS abilitata. Il frontend resta intenzionalmente demo e non è ancora collegato ai nuovi account: [stato delle verifiche e prossimi passi](database/README.md). Non usare o modificare il database easygart.
+Il progetto Supabase **GoodDiner** (`ixczkhmvbjszgmlqznlk`) è attivo in `andru1607's Org` nella regione `eu-central-1`. Sono state applicate [la migrazione iniziale](database/gooddiner_initial.sql) e [l'ottimizzazione RLS/indici](database/gooddiner_policy_performance.sql). Le nove tabelle sono vuote e hanno RLS abilitata. La home 1.0 usa Supabase. Per provare i flussi con dati inventati nel browser, apri [la demo locale](demo.html). Consulta lo [stato delle verifiche prima del lancio](database/README.md). Non usare o modificare il database easygart.
 
 ---
 
