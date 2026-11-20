@@ -27,7 +27,7 @@
     return `<section class="gd10-section gd10-customer" aria-label="Storico delle mie presenze">
       <div class="gd10-heading"><div><span class="gd10-kicker">DINERPASS / LE MIE VISITE</span>
         <h2>${full?'Le tue presenze.':'Ogni visita conta.'}</h2><p>Registrazioni della demo su questo dispositivo, separate dalle recensioni.</p></div>
-        <span class="gd10-total" aria-label="${activeRows.length} presenze confermate">${activeRows.length}<small>visite</small></span></div>
+        <span class="gd10-total" aria-label="${activeRows.length} ${activeRows.length===1?'presenza confermata':'presenze confermate'}">${activeRows.length}<small>${activeRows.length===1?'visita':'visite'}</small></span></div>
       ${shown.length?`<div class="gd10-list">${shown.map(x=>visitCard(x,true)).join('')}</div>`:
         `<div class="gd10-empty">${icon('scan',25)}<strong>Nessuna visita ancora.</strong><span>Quando un ristoratore scansiona il tuo DinerPass nella demo, la presenza comparirà qui.</span></div>`}
       ${!full&&all.length>3?`<button type="button" class="gd10-view-all" data-gd10="history">Apri tutto lo storico ${icon('arrow',16)}</button>`:''}
