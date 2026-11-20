@@ -33,3 +33,28 @@ assert.match(html,/v76-onboarding.js/);
 assert.match(html,/QR/);
 assert.doesNotMatch(js,/\p{Emoji_Presentation}/u);
 console.log('PASS V7.9: app themes, per-user DinerPass, merchant studio, local storage, accessibilità, no backend');
+const choices = Object.fromEntries(Array.from({length:81},(_,i)=>['GD-TEST'+i,'coral']));
+let stored = JSON.stringify({theme:'night',density:'compact',passes:choices,venue:'signature'});
+let refuseWrite = true;
+let onClick;
+const studio = {
+  db:{activeCustomer:'GD-TEST80'}, state:{role:'customer'}, document:{
+    documentElement:{dataset:{}},addEventListener:(name,fn)=>{if(name==='click')onClick=fn},
+    querySelectorAll:()=>[]
+  },
+  window:{addEventListener(){}},localStorage:{
+    getItem:()=>stored,setItem:(_,v)=>{if(refuseWrite)throw Error('quota');stored=v}
+  },notify(){},render(){},clientProfile(){},merchantManage(){},clientHome(){},merchantHome(){}
+};
+vm.runInNewContext(js,studio);
+const attrs=studio.document.documentElement.dataset;
+assert.equal(attrs.gdPass,'coral','Appearance survives reopening the 81st demo profile');
+function reset(){onClick({target:{closest:()=>({dataset:{gdCustom:'reset',scope:'customer'}})}})}
+reset();
+studio.render();
+assert.equal(attrs.gdTheme,'night','A failed reset must preserve the active theme after navigation');
+assert.equal(attrs.gdPass,'coral');
+refuseWrite=false;
+reset();
+assert.equal(attrs.gdTheme,'signature');
+assert.equal(JSON.parse(stored).passes['GD-TEST79'],'coral','Reset only affects the current pass');

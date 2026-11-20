@@ -56,3 +56,4 @@
 
 .gd10-receipt{display:flex;align-items:center;gap:10px;padding:12px;border:1px solid #b6dfcc;border-radius:12px;background:#e6f4ec;color:#174f3c;margin:10px 0 0}
 .gd10-receipt>svg{flex:none}.gd10-receipt>div{display:flex;flex-direction:column;gap:3px;min-width:0}.gd10-receipt strong{font-size:12px}.gd10-receipt span{font-size:11px;overflow-wrap:anywhere}
+#gd10-void-error:empty{display:none}

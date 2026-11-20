@@ -19,7 +19,7 @@
       if(!parsed||typeof parsed!=='object')return {theme:'signature',density:'comfortable',passes:{},venue:'signature'};
       const passes={};
       if(parsed.passes&&typeof parsed.passes==='object'){
-        for(const [id,value] of Object.entries(parsed.passes).slice(0,80)){
+        for(const [id,value] of Object.entries(parsed.passes)){
           if(/^(GD|CL)-[A-Z0-9-]{3,25}$/.test(id)&&CHOICES.pass.includes(value))passes[id]=value;
         }
       }
@@ -51,7 +51,7 @@
   }
   function option(kind,value,label,description,mark='circle'){
     const chosen=currentValue(kind)===value;
-    return `<button type="button" class="gd9-option gd9-choice-${safe(value)} ${chosen?'is-selected':''}" data-gd-custom="choice" data-kind="${kind}" data-value="${value}" aria-pressed="${chosen}" aria-label="${safe(label)}${chosen?', selezionato':''}">
+    return `<button type="button" class="gd9-option gd9-choice-${safe(value)} ${chosen?'is-selected':''}" data-gd-custom="choice" data-kind="${kind}" data-value="${value}" aria-pressed="${chosen}" aria-label="${safe(label)}">
        <span class="gd9-option-art" aria-hidden="true">${iconMini(mark)}</span><span class="gd9-option-copy"><strong>${safe(label)}</strong><small>${safe(description)}</small></span><span class="gd9-selected-indicator" aria-hidden="true"></span>
     </button>`;
   }
@@ -160,6 +160,7 @@
     window.setTimeout(()=>live.remove(),2200);
   }
   function resetAppearance(scope){
+    const before=JSON.stringify(appearance);
     if(scope==='customer'){
       appearance.theme=DEFAULT.theme;
       appearance.density=DEFAULT.density;
@@ -169,7 +170,11 @@
       appearance.density=DEFAULT.density;
       appearance.venue=DEFAULT.venue;
     }else{return;}
-    if(!persist()){notify('Non riesco a salvare su questo dispositivo.');return;}
+    if(!persist()){
+      appearance=JSON.parse(before);
+      notify('Non riesco a salvare su questo dispositivo.');
+      return;
+    }
     apply();updateChoices();notify('Aspetto originale ripristinato.');
   }
   document.addEventListener('click',event=>{

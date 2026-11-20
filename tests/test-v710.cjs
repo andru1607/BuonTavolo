@@ -53,3 +53,9 @@ assert.ok(!ctx.lastMarkup.includes('gd-visit-title'),'old stale merchant list re
 assert.ok(!ctx.lastMarkup.includes('Ristorante Due'),'merchant cannot see another venue');
 assert.ok(ctx.lastMarkup.includes('2</strong><span>Oggi'));
 console.log('PASS V7.10 VM: wrapper registration, venue isolation, customer timeline, replacement of legacy register');
+const fullRegister=Array.from({length:100},(_,i)=>({...visits[0],id:'V'+i,at:now-i*1000}));
+local.setItem(V.KEY,JSON.stringify(fullRegister));
+assert.equal((ctx.merchantHome().match(/class="gd10-detail"/g)||[]).length,100);
+assert.equal((ctx.clientProfile().match(/<article class="gd10-visit /g)||[]).length,100);
+assert.equal((ctx.clientHome().match(/<article class="gd10-visit /g)||[]).length,3);
+console.log('PASS V7.10: all 100 visits accessible in register and profile, latest three on home');

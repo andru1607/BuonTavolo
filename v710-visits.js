@@ -23,11 +23,11 @@
     </article>`;
   }
   function clientHistory(full=false){
-    const all=guestRows(),shown=all.slice(0,full?30:3),activeRows=all.filter(active);
+    const all=guestRows(),shown=full?all:all.slice(0,3),activeRows=all.filter(active);
     return `<section class="gd10-section gd10-customer" aria-label="Storico delle mie presenze">
       <div class="gd10-heading"><div><span class="gd10-kicker">DINERPASS / LE MIE VISITE</span>
         <h2>${full?'Le tue presenze.':'Ogni visita conta.'}</h2><p>Registrazioni della demo su questo dispositivo, separate dalle recensioni.</p></div>
-        <span class="gd10-total" aria-label="${activeRows.length} presenze confermate">${activeRows.length}<small>visite</small></span></div>
+        <span class="gd10-total" aria-label="${activeRows.length} ${activeRows.length===1?'presenza confermata':'presenze confermate'}">${activeRows.length}<small>${activeRows.length===1?'visita':'visite'}</small></span></div>
       ${shown.length?`<div class="gd10-list">${shown.map(x=>visitCard(x,true)).join('')}</div>`:
         `<div class="gd10-empty">${icon('scan',25)}<strong>Nessuna visita ancora.</strong><span>Quando un ristoratore scansiona il tuo DinerPass nella demo, la presenza comparirà qui.</span></div>`}
       ${!full&&all.length>3?`<button type="button" class="gd10-view-all" data-gd10="history">Apri tutto lo storico ${icon('arrow',16)}</button>`:''}
@@ -43,8 +43,9 @@
       return !query||`${row.nickname||''} ${row.customerId||''}`.toLocaleLowerCase('it-IT').includes(query);
     });
   }
+  const resultCount=n=>n+' '+(n===1?'risultato':'risultati');
   function listMarkup(){const all=merchantFilterRows();
-    return all.length?all.slice(0,50).map(row=>visitCard(row)).join(''):
+    return all.length?all.map(row=>visitCard(row)).join(''):
       `<div class="gd10-empty">${icon('search',24)}<strong>Nessuna presenza per questa ricerca.</strong><span>Modifica i filtri oppure scansiona un DinerPass.</span></div>`;
   }
   function merchantRegister(){
@@ -58,7 +59,7 @@
       <div class="gd10-toolbar"><div class="gd10-filters" role="group" aria-label="Periodo delle presenze">
         ${[['today','Oggi'],['week','7 giorni'],['all','Tutte']].map(([value,label])=>`<button type="button" data-gd10="filter" data-filter="${value}" aria-pressed="${filter===value}">${label}</button>`).join('')}
       </div><label class="gd10-search">${icon('search',18)}<span class="sr-only">Cerca per nickname o ID</span><input type="search" id="gd10-search" autocomplete="off" placeholder="Cerca un ospite" value="${safe(searchTerm)}"></label></div>
-      <div class="gd10-result-count" aria-live="polite">${merchantFilterRows().length} risultati</div>
+      <div class="gd10-result-count" aria-live="polite">${resultCount(merchantFilterRows().length)}</div>
       <div class="gd10-list" id="gd10-rows">${listMarkup()}</div>
       <p class="gd10-note">Dati inventati, salvati soltanto in questo browser. Le presenze annullate restano visibili per chiarezza.</p>
     </section>`;
@@ -86,7 +87,7 @@
     if(stats)stats.innerHTML=`<div><strong>${counts.today}</strong><span>Oggi</span></div><div><strong>${counts.week}</strong><span>Ultimi 7 giorni</span></div><div><strong>${counts.total}</strong><span>Totale</span></div>`;
     host.querySelectorAll('[data-gd10="filter"]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.filter===filter)));
     const results=merchantFilterRows(),box=host.querySelector('#gd10-rows');if(box)box.innerHTML=listMarkup();
-    const count=host.querySelector('.gd10-result-count');if(count)count.textContent=`${results.length} risultati`;
+    const count=host.querySelector('.gd10-result-count');if(count)count.textContent=resultCount(results.length);
   }
   let lastFocus=null;
   function openDetail(id){
@@ -98,6 +99,7 @@
       <div class="gd10-detail-rows"><div><span>Ristorante</span><strong>${safe(row.restaurant)}</strong></div><div><span>Codice cliente</span><strong>${safe(row.customerId)}</strong></div><div><span>Registrata il</span><strong>${safe(when(row))}</strong></div><div><span>Stato</span><strong>${active(row)?'Registrata · demo':'Annullata · demo'}</strong></div></div>
       <p class="gd10-note">Questa è soltanto una simulazione locale, non una conferma di presenza reale.</p>
       ${active(row)?`<button type="button" class="gd10-cancel" data-gd10="void" data-id="${safe(row.id)}">Annulla presenza demo</button>`:''}
+      <p id="gd10-void-error" role="status"></p>
       <button type="button" class="gd10-done" data-gd10="close">Chiudi</button>
     </div>`;
     document.body.appendChild(el);el.querySelector('.gd10-close')?.focus({preventScroll:true});
@@ -121,7 +123,10 @@
       if(!window.confirm('Annullare questa presenza nella demo? Rimarrà nello storico con stato Annullata.'))return;
       if(V.voidDemo(localStorage,row.id,currentVenue())){
         closeDetail();render();notify('Presenza demo annullata. Lo storico è stato conservato.');
-      }else notify('Non è stato possibile aggiornare la presenza demo.');
+      }else {
+        const error=document.getElementById('gd10-void-error');
+        if(error)error.textContent='Annullamento non salvato. Chiudi il dettaglio e ricontrolla la presenza nel registro.';
+      }
     }
   });
   document.addEventListener('input',event=>{
