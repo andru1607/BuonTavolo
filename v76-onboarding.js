@@ -13,15 +13,14 @@
   let scannedPreview = '';
   let searchOpened = false;
   let cameraStream = null;
-  let scannerRunning = false;
-  let qrDetector = null;
+  let cameraGeneration = 0;
   let latestScan = '';
   const session = () => {
     try {const x=JSON.parse(localStorage.getItem(SESSION_KEY)||'null'); return x && typeof x==='object' ? x : null;} catch {return null;}
   };
   const saveSession = data => {try{localStorage.setItem(SESSION_KEY,JSON.stringify(data));}catch{}};
   const readLocal = (key, fallback) => {try {return JSON.parse(localStorage.getItem(key)||'null')||fallback;} catch{return fallback;}};
-  const saveLocal = (key,data) => {try{localStorage.setItem(key,JSON.stringify(data));}catch{}};
+  const saveLocal = (key,data) => {try{localStorage.setItem(key,JSON.stringify(data));return true;}catch{return false;}};
   const existing=session();
   if (existing?.role==='customer' && customer(existing.customerId)) {
     state.role='customer';state.tab='home';db.activeCustomer=existing.customerId;state.welcome=false;
@@ -36,7 +35,7 @@
   const originalSwitchRole = switchRole;
 
   const logo = (size=50) => `<img src="/icons/mark-light.svg" width="${size}" height="${size}" alt="" loading="eager">`;
-  const exitButton = `<button type="button" class="gd-text-link" data-gd-entry="landing">Indietro</button>`;
+  const backButton = destination => `<button type="button" class="gd-text-link" data-gd-entry="${destination}">Indietro</button>`;
   const formField = (id,label,placeholder,required=false,type='text') => `<label class="gd-field"><span>${label}${required?' <b aria-label="obbligatorio">*</b>':''}</span><input id="${id}" name="${id}" type="${type}" ${required?'required':''} placeholder="${placeholder}" maxlength="${id==='gd-nick'?24:80}" autocomplete="off"></label>`;
   function landing(){
     return `<div class="gd-landing">
@@ -50,7 +49,7 @@
     return `<div class="gd-form-frame"><div class="gd-kicker">NUOVO PROFILO</div><h1>Cominciamo da te.</h1><p>Come vuoi utilizzare GoodDiner?</p>
     <button class="gd-pick" data-gd-entry="customer"><span class="gd-pick-icon">${icon('user',25)}</span><span><strong>Il mio profilo personale</strong><small>Nickname, DinerPass e riconoscimenti.</small></span>${icon('arrow',19)}</button>
     <button class="gd-pick" data-gd-entry="merchant"><span class="gd-pick-icon">${icon('settings',24)}</span><span><strong>Registro un ristorante</strong><small>Identità del locale e gestione visite.</small></span>${icon('arrow',19)}</button>
-    ${exitButton}</div>`;
+    ${backButton('landing')}</div>`;
   }
   function customerSignup(){
     return `<div class="gd-form-frame"><div class="gd-kicker">ACCOUNT PERSONALE · DEMO</div><h1>Il tuo DinerPass inizia qui.</h1><p>Scegli un nickname. Email e telefono non sono necessari per creare questa anteprima.</p>
@@ -58,7 +57,7 @@
     ${formField('gd-email','Email (facoltativa)','nome@esempio.it',false,'email')}
     ${formField('gd-phone','Telefono (facoltativo)','+39 ...',false,'tel')}
     <div class="gd-security-note">${icon('shield',19)} <span>Il tuo ID cliente sarà generato automaticamente. Email e telefono non vengono salvati in questa demo. L'accesso reale richiederà una passkey o un altro metodo sicuro.</span></div>
-    <button class="gd-primary" type="submit">Crea il mio profilo demo ${icon('arrow',17)}</button></form>${exitButton}</div>`;
+    <button class="gd-primary" type="submit">Crea il mio profilo demo ${icon('arrow',17)}</button></form>${backButton('signup')}</div>`;
   }
   function merchantSignup(){
     return `<div class="gd-form-frame"><div class="gd-kicker">PER I RISTORATORI · DEMO</div><h1>Troviamo il tuo locale.</h1><p>Inserisci nome e città per consultare la sua presenza online. La verifica del gestore è un passaggio separato.</p>
@@ -67,14 +66,14 @@
     ${formField('gd-venue-city','Città','Es. Verona',true)}
     <button type="button" class="gd-outline gd-search-button" data-gd-entry="maps">${icon('search',19)} Cerca il locale su Google Maps</button>
     <div class="gd-security-note">${icon('info',19)} <span>La ricerca si apre su Google Maps. Non possiamo verificare automaticamente chi gestisce il locale senza un servizio dedicato. La registrazione reale resterà in attesa di verifica.</span></div>
-    <button class="gd-primary" type="submit">Continua nell'anteprima ristoratore ${icon('arrow',17)}</button></form>${exitButton}</div>`;
+    <button class="gd-primary" type="submit">Continua nell'anteprima ristoratore ${icon('arrow',17)}</button></form>${backButton('signup')}</div>`;
   }
   function signin(){
     const saved=session();const canResume=!!saved;
     return `<div class="gd-form-frame"><div class="gd-kicker">IL TUO SPAZIO</div><h1>Bentornato.</h1><p>Accedi al tuo profilo GoodDiner. Nella demo non è ancora disponibile un'autenticazione reale.</p>
     <div class="gd-signin-card">${icon('fingerprint',34)}<strong>Accesso con passkey</strong><small>In preparazione per la versione con backend protetto.</small><button class="gd-outline" type="button" disabled>Continua con passkey</button></div>
     ${canResume?`<button class="gd-primary" data-gd-entry="resume">Riprendi la sessione demo ${icon('arrow',16)}</button>`:`<button class="gd-primary" data-gd-entry="preview">Entra nel profilo dimostrativo ${icon('arrow',16)}</button>`}
-    ${exitButton}</div>`;
+    ${backButton('landing')}</div>`;
   }
   function gate(){
     const body={landing,signup:chooseSignup,customer:customerSignup,merchant:merchantSignup,signin}[step]||landing;
@@ -90,18 +89,20 @@
     if(!active)return null;
     const now=Date.now();let obj=readLocal(QR_KEY,null);
     if(!obj||obj.customerId!==active.id||!obj.token||obj.expires<=now){
-      obj={customerId:active.id,token:'GDDEMO1:'+rand(18),expires:now+90000};saveLocal(QR_KEY,obj);
+      obj={customerId:active.id,token:'GDDEMO1:'+rand(18),expires:now+90000};
+      if(!saveLocal(QR_KEY,obj))return null;
     }
     return obj;
   }
-  function qrHTML(){
-    const t=tokenData();if(!t)return '<p>Non è disponibile un profilo demo.</p>';
+  function qrHTML(t){
+    if(!t)return '<p>DinerPass temporaneo non disponibile. Controlla lo spazio nel browser e riprova.</p><button type="button" class="gd-outline" data-gd-entry="retry-pass">Riprova</button>';
     const qr=window.GoodDinerQR?.svg(t.token)||'<div>QR non disponibile</div>';
-    return `<div class="gd-qr-visual" aria-label="QR del DinerPass">${qr}</div><div class="gd-qr-expiry">QR temporaneo dimostrativo · aggiornamento ogni 90 secondi</div>`;
+    return `<div class="gd-qr-visual" aria-label="QR del DinerPass" data-qr-token="${HTML(t.token)}">${qr}</div><div class="gd-qr-expiry">QR temporaneo dimostrativo · aggiornamento ogni 90 secondi</div>`;
   }
   function guestQR(){
+    const pass=tokenData();
     return `<section class="gd-qr-section" aria-labelledby="gd-qr-head"><div class="gd-qr-copy"><span class="gd-kicker">IL TUO DINERPASS</span><h2 id="gd-qr-head">Il tuo ingresso, un solo gesto.</h2><p>Mostra il QR personale al ristoratore: nella versione completa registrerà la tua presenza. Questo QR è utilizzabile solo nella simulazione locale.</p><span class="gd-qr-code">${HTML(customer(db.activeCustomer)?.id||'')}</span></div>
-    <div class="gd-qr-side"><div id="gd-qr-viewport">${qrHTML()}</div><button type="button" data-gd-entry="copy-qr" class="gd-outline gd-qr-copybtn">${icon('copy',17)} Copia il codice QR demo</button></div></section>`;
+    <div class="gd-qr-side"><div id="gd-qr-viewport">${qrHTML(pass)}</div><div id="gd-qr-actions"${pass?'':' hidden'}><button type="button" data-gd-entry="copy-qr" class="gd-outline gd-qr-copybtn">${icon('copy',17)} Copia il codice QR demo</button><details class="gd-manual-code"><summary>Mostra codice manuale</summary><code>${HTML(pass?.token||'')}</code></details></div></div></section>`;
   }
   clientHome = function(){
     const original=originalClientHome();
@@ -135,6 +136,7 @@
     <div id="gd-camera-box" class="gd-camera-box"><div class="gd-camera-idle">${icon('scan',36)}<span>La fotocamera si attiverà solo quando la richiedi.</span></div></div>
     <button type="button" class="gd-outline" data-gd-entry="camera">${icon('scan',18)} Attiva fotocamera</button>
     <form id="gd-scan-manual" class="gd-manual-form"><label for="gd-manual-token">Codice QR demo (alternativa)</label><div><input id="gd-manual-token" name="token" placeholder="GDDEMO1:..." required autocapitalize="off" autocomplete="off" spellcheck="false"><button class="gd-primary" type="submit">Verifica</button></div></form>
+    <p id="gd-scan-result" class="gd-scan-result" role="status"></p>
     <p class="gd-privacy-line">La lettura non equivale a una verifica reale. Il check-in sicuro richiederà un server.</p></div></div>`;
   }
   function closeScanner(){
@@ -145,36 +147,63 @@
     if(reduced){overlay.remove();}else{overlay.classList.add('gd-leaving');window.setTimeout(()=>overlay.remove(),170);}
     document.querySelector('.gd-scan-launch')?.focus({preventScroll:true});
   }
-  function stopCamera(){scannerRunning=false;if(cameraStream){cameraStream.getTracks().forEach(t=>t.stop());cameraStream=null;}qrDetector=null;}
+  function stopCamera(){
+    cameraGeneration++;
+    cameraStream?.getTracks().forEach(track=>track.stop());
+    cameraStream=null;
+  }
   async function startCamera(){
     const box=document.getElementById('gd-camera-box');if(!box)return;
-    if(!navigator.mediaDevices?.getUserMedia){box.textContent='Fotocamera non disponibile. Inserisci il codice manualmente.';return;}
-    if(typeof window.BarcodeDetector==='undefined'){box.textContent='La scansione nativa non è supportata da questo browser. Utilizza il codice manuale.';return;}
+    if(!navigator.mediaDevices?.getUserMedia||!window.BarcodeDetector){
+      box.textContent='Scansione non disponibile. Inserisci il codice manuale del DinerPass.';return;
+    }
+    stopCamera();
+    const generation=cameraGeneration;
+    const active=()=>generation===cameraGeneration;
     try{
-      qrDetector=new window.BarcodeDetector({formats:['qr_code']});
-      cameraStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false});
-      if(!document.getElementById('gd-camera-box')){stopCamera();return;}
+      const detector=new window.BarcodeDetector({formats:['qr_code']});
+      const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false});
+      if(!active()){stream.getTracks().forEach(track=>track.stop());return;}
+      cameraStream=stream;
       box.innerHTML='<video autoplay playsinline muted aria-label="Anteprima fotocamera per la lettura QR"></video>';
-      const video=box.querySelector('video');video.srcObject=cameraStream;await video.play();
-      scannerRunning=true;
-      const frame=async()=>{if(!scannerRunning||!document.getElementById('gd-camera-box'))return;
-        try{const codes=await qrDetector.detect(video);if(codes.length){scanCode(codes[0].rawValue);return;}}catch{}
-        if(scannerRunning)window.setTimeout(frame,230);
-      };frame();
-    }catch(err){stopCamera();box.textContent='Impossibile utilizzare la fotocamera. Controlla il permesso o inserisci il codice manuale.';}
+      const video=box.querySelector('video');video.srcObject=stream;await video.play();
+      let previous='';
+      const frame=async()=>{
+        if(!active())return;
+        try{
+          const codes=await detector.detect(video);
+          const raw=codes[0]?.rawValue||'';
+          if(active()&&raw&&raw!==previous)scanCode(raw);
+          previous=raw;
+        }catch{}
+        if(active())window.setTimeout(frame,230);
+      };
+      frame();
+    }catch{
+      if(!active())return;
+      stopCamera();box.textContent='Impossibile utilizzare la fotocamera. Controlla il permesso o inserisci il codice manuale.';
+    }
+  }
+  function scanError(message){
+    const result=document.getElementById('gd-scan-result');
+    if(result)result.textContent=message;
+    else notify(message);
   }
   function scanCode(raw){
     const value=String(raw||'').trim().toUpperCase();const qr=readLocal(QR_KEY,null);
-    if(!value.startsWith('GDDEMO1:')){notify('Questo non è un QR DinerPass demo valido.');return;}
+    if(!value.startsWith('GDDEMO1:')){scanError('Questo non è un QR DinerPass demo valido.');return;}
     if(!qr||qr.expires<=Date.now()||value!==qr.token||!customer(qr.customerId)){
-      notify('QR demo scaduto o non presente su questo dispositivo. Non è stata registrata alcuna visita.');return;
+      scanError('QR demo scaduto o non presente su questo dispositivo. Non è stata registrata alcuna visita.');return;
     }
     const c=customer(qr.customerId),todayKey=today(),venueName=readLocal(VENUE_KEY,null)?.name||N;
     if(visits().some(v=>v.customerId===c.id&&v.day===todayKey&&v.restaurant===venueName&&v.status!=='annullata')){
-      notify('La presenza di oggi risulta già registrata.');return;
+      scanError('La presenza di oggi risulta già registrata.');return;
     }
     const next=[{id:'DV'+rand(8),customerId:c.id,nickname:c.nickname,restaurant:venueName,at:Date.now(),day:todayKey,status:'confermata'},...visits()].slice(0,100);
-    saveLocal(DEMO_VISITS,next);
+    if(!saveLocal(DEMO_VISITS,next)){
+      scanError('Visita non salvata. Verifica lo spazio disponibile e riprova con il DinerPass.');
+      return;
+    }
     // A QR token is single-use in the local demo.
     saveLocal(QR_KEY,{customerId:qr.customerId,token:'used',expires:0});
     latestScan=c.id;closeScanner();render();notify(`Presenza demo registrata: ${c.nickname}.`);
@@ -207,7 +236,18 @@
       case 'resume':{const s=session();if(s?.role==='customer'&&customer(s.customerId))enter('customer',s.customerId);else if(s?.role==='restaurant')enter('restaurant');else enter('customer');break;}
       case 'maps':openGoogleMaps();break;
       case 'logout':localStorage.removeItem(SESSION_KEY);renderGate('landing');break;
-      case 'copy-qr':{const t=tokenData();if(t&&navigator.clipboard?.writeText)navigator.clipboard.writeText(t.token).then(()=>notify('Codice demo copiato.')).catch(()=>notify('Seleziona il codice dal tuo dispositivo.'));else notify('Copia non supportata su questo browser.');break;}
+      case 'retry-pass':refreshPass(true);break;
+      case 'copy-qr':{
+        const token=refreshPass();
+        if(!token)break;
+        const showManual=()=>{
+          const details=document.querySelector('.gd-manual-code');
+          if(details){details.open=true;notify('Puoi selezionare e copiare il codice mostrato.');}
+        };
+        if(navigator.clipboard?.writeText)navigator.clipboard.writeText(token).then(()=>notify('Codice demo copiato.')).catch(showManual);
+        else showManual();
+        break;
+      }
       case 'scan':{if(document.querySelector('.gd-scan-overlay'))break;document.body.insertAdjacentHTML('beforeend',scanPanel());document.querySelector('.gd-scan-overlay .gd-icon-close')?.focus({preventScroll:true});break;}
       case 'close-scan':closeScanner();break;
       case 'camera':startCamera();break;
@@ -234,12 +274,33 @@
     }
   });
   // Refresh the visual QR only while visible. Avoid exposing contact data in the payload.
-  window.setInterval(()=>{
-    const view=document.getElementById('gd-qr-viewport');if(view&&!document.hidden){
-      const token=tokenData();if(token&&token.expires-Date.now()<15000)view.innerHTML=qrHTML();
+  function refreshPass(retry=false){
+    const view=document.getElementById('gd-qr-viewport');
+    if(!view||document.hidden)return;
+    const actions=document.getElementById('gd-qr-actions');
+    if(actions?.hidden&&!retry)return;
+    const pass=tokenData();
+    if(actions)actions.hidden=!pass;
+    if(!pass){
+      if(!view.querySelector('[data-gd-entry="retry-pass"]'))view.innerHTML=qrHTML(null);
+      const manual=document.querySelector('.gd-manual-code code');
+      if(manual)manual.textContent='';
+      return;
     }
-  },12000);
-  window.addEventListener('pagehide',stopCamera);
-  document.addEventListener('visibilitychange',()=>{if(document.hidden)stopCamera();});
+    if(view.querySelector('[data-qr-token]')?.dataset.qrToken!==pass.token){
+      view.innerHTML=qrHTML(pass);
+      const manual=document.querySelector('.gd-manual-code code');
+      if(manual)manual.textContent=pass.token;
+    }
+    return pass.token;
+  }
+  window.setInterval(refreshPass,1000);
+  function pauseScanner(){
+    stopCamera();
+    const box=document.getElementById('gd-camera-box');
+    if(box)box.textContent='Fotocamera disattivata. Puoi riattivarla o inserire il codice manuale.';
+  }
+  window.addEventListener('pagehide',pauseScanner);
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)pauseScanner();else refreshPass();});
   render();
 })();
