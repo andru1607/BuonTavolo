@@ -1,7 +1,7 @@
 const fs=require('node:fs'),assert=require('node:assert/strict'),path=require('node:path');
 const root=path.resolve(__dirname,'..');
 const read=path=>fs.readFileSync(require('node:path').join(root,path),'utf8');
-const css=read('ux-v78.css'),html=read('index.html'),account=read('account.html'),onboarding=read('v76-onboarding.js'),sw=read('sw.js');
+const css=read('ux-v78.css'),html=read('demo.html'),account=read('account.html'),onboarding=read('v76-onboarding.js'),sw=read('sw.js');
 assert.ok(html.includes('<link rel="stylesheet" href="/ux-v78.css">'),'Main app includes UX correction');
 assert.ok(account.includes('<link rel="stylesheet" href="/ux-v78.css">'),'Account includes UX correction');
 assert.ok(css.includes('font-size:16px!important')&&css.includes('.gd-manual-form input')===false,'Input scope uses correct selectors');

@@ -1,7 +1,7 @@
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
 const root=path.resolve(__dirname,'..');
 const read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const html=read('index.html'),account=read('account.html'),css=read('theme-v77.css'),sw=read('sw.js');
+const html=read('demo.html'),account=read('account.html'),css=read('theme-v77.css'),sw=read('sw.js');
 const manifest=JSON.parse(read('manifest.webmanifest'));
 assert.match(html,/<link rel="stylesheet" href="\/theme-v77.css">/);
 assert.match(account,/<link rel="stylesheet" href="\/theme-v77.css">/);

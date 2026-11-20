@@ -1,6 +1,6 @@
 const fs=require('fs'),vm=require('vm'),assert=require('node:assert/strict'),path=require('path');
 const base=path.resolve(__dirname,'..');const read=n=>fs.readFileSync(path.join(base,n),'utf8');
-const html=read('index.html'),start=html.match(/<script>([\s\S]*?)<\/script>/)[1];
+const html=read('demo.html'),start=html.match(/<script>([\s\S]*?)<\/script>/)[1];
 const v76=read('v76-onboarding.js'),qr=read('qr-core.js'),css=read('v76-onboarding.css');
 assert.ok(html.includes('v76-onboarding.js')&&html.includes('v76-onboarding.css')&&html.includes('qr-core.js'));
 assert.ok(v76.includes('GDDEMO1:')&&v76.includes('getUserMedia')&&v76.includes('BarcodeDetector'));

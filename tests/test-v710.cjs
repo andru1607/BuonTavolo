@@ -24,7 +24,7 @@ assert.equal(V.canCheckIn(V.read(s),'GD-AAA','Ristorante Uno',day),true,'new vis
 assert.equal(V.read(s).find(x=>x.id==='V1').status,'annullata');
 assert.equal(V.voidDemo(s,'V1','Ristorante Uno',now),false,'cannot cancel twice');
 s.setItem(V.KEY,'not json');assert.deepEqual(V.read(s),[]);
-const client=read('v710-visits.js'),css=read('visits-v710.css'),home=read('index.html'),on=read('v76-onboarding.js');
+const client=read('v710-visits.js'),css=read('visits-v710.css'),home=read('demo.html'),on=read('v76-onboarding.js');
 assert.ok(home.includes('/visit-core-v710.js')&&home.includes('/visits-v710.css')&&home.includes('/v710-visits.js'));
 assert.ok(client.includes('originalClientHome')&&client.includes('originalMerchantHome')&&client.includes('visitCard(row,true)')===false);
 assert.ok(client.includes('Annulla presenza demo')&&client.includes('Storico delle mie presenze'));

@@ -1,7 +1,7 @@
 'use strict';
 const assert=require('node:assert/strict'),fs=require('fs'),vm=require('node:vm'),path=require('node:path');
 const root=path.resolve(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const html=read('index.html'), css=read('personalize-v79.css'),js=read('v79-customize.js'),boot=read('v79-boot.js');
+const html=read('demo.html'), css=read('personalize-v79.css'),js=read('v79-customize.js'),boot=read('v79-boot.js');
 assert.match(html,/src="\/v79-boot\.js"/);
 assert.match(html,/src="\/v79-customize\.js"/);
 assert.match(html,/href="\/personalize-v79\.css"/);

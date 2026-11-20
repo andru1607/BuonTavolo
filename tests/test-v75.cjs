@@ -1,6 +1,6 @@
 const fs=require('fs'),assert=require('node:assert/strict'),path=require('path');
 const root=path.resolve(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const icon=read('icons/icon.svg'),mark=read('icons/mark.svg'),h=read('index.html');
+const icon=read('icons/icon.svg'),mark=read('icons/mark.svg'),h=read('demo.html');
 assert.ok(icon.includes('GoodDiner')&&icon.includes('simbolo GD intrecciato'));
 assert.ok(mark.includes('fill="#153F32"')&&mark.includes('#D2A965'));
 assert.ok(icon.includes('viewBox="0 0 512 512"')&&!icon.includes('gradient'));
