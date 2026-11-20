@@ -1,5 +1,5 @@
 const fs=require('fs'),assert=require('node:assert/strict'),vm=require('vm'),path=require('path');
-const root=path.resolve(__dirname,'..'),html=fs.readFileSync(path.join(root,'index.html'),'utf8');
+const root=path.resolve(__dirname,'..'),html=fs.readFileSync(path.join(root,'demo.html'),'utf8');
 for(const marker of ['V7.3','passport-rotor','flip-passport','rewardCelebrate','hallmarkCollection','venue-gallery-mini','data-last','prefers-reduced-motion:reduce','POSITIVE_MIN=8'])assert.ok(html.includes(marker),marker);
 assert.ok(!html.includes('/media/sala.webp')&&!html.includes('/media/tavola.webp'),'No stock food imagery');
 const js=html.match(/<script>([\s\S]*?)<\/script>/)[1];let memory={},element={innerHTML:'',classList:{add(){},remove(){}}};

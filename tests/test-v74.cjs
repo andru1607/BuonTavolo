@@ -1,7 +1,7 @@
 const fs=require('fs'),assert=require('node:assert/strict'),vm=require('vm'),path=require('path');
 const root=path.resolve(__dirname,'..');
 const read=p=>fs.readFileSync(path.join(root,p),'utf8');
-const html=read('index.html'),account=read('account.html'),script=read('account.js'),manifest=JSON.parse(read('manifest.webmanifest'));
+const html=read('demo.html'),account=read('account.html'),script=read('account.js'),manifest=JSON.parse(read('manifest.webmanifest'));
 assert.ok(html.includes('GoodDiner')&&account.includes('GoodDiner')&&manifest.name.includes('GoodDiner'));
 assert.ok(html.includes('DINERPASS')&&html.includes('DinerBadge')&&html.includes('DINERREWARDS'));
 assert.ok(!html.includes('BuonTavolo')&&!account.includes('BuonTavolo'));

@@ -1,5 +1,5 @@
 const fs=require('fs'),assert=require('node:assert/strict'),path=require('path');
-const root=path.resolve(__dirname,'..'), html=fs.readFileSync(path.join(root,'index.html'),'utf8');
+const root=path.resolve(__dirname,'..'), html=fs.readFileSync(path.join(root,'demo.html'),'utf8');
 for(const key of ['friendlyInsight','recentGuests','rememberGuest','venue-story-form','merchantStory','merchantStory.style','STYLES','emptyScene','living-hint','recent-rail','venue-story-preview','prefers-reduced-motion:reduce','POSITIVE_MIN=8']) assert.ok(html.includes(key),'Missing V7.2 feature: '+key);
 assert.ok(!html.includes('/media/sala.webp')&&!html.includes('/media/tavola.webp'),'Stock imagery regression');
 assert.ok(fs.readFileSync(path.join(root,'sw.js'),'utf8').includes('v710'),'Service worker cache version');

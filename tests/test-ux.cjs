@@ -1,5 +1,5 @@
 const fs=require('fs'),vm=require('vm'),crypto=require('crypto');
-const html=fs.readFileSync(__dirname+'/../index.html','utf8');
+const html=fs.readFileSync(__dirname+'/../demo.html','utf8');
 const js=html.split('<script>')[1].split('</script>')[0];
 const storage={};const ui={innerHTML:'',classList:{add(){},remove(){}}};
 const context={console,crypto:crypto.webcrypto,localStorage:{getItem:k=>storage[k]??null,setItem:(k,v)=>storage[k]=v},document:{getElementById:k=>ui,addEventListener(){}},navigator:{},window:{scrollTo(){}},setTimeout,clearTimeout,confirm:()=>true};
