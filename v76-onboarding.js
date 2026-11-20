@@ -169,11 +169,11 @@
     if(!qr||qr.expires<=Date.now()||value!==qr.token||!customer(qr.customerId)){
       notify('QR demo scaduto o non presente su questo dispositivo. Non è stata registrata alcuna visita.');return;
     }
-    const c=customer(qr.customerId),todayKey=today();
-    if(visits().some(v=>v.customerId===c.id&&v.day===todayKey)){
+    const c=customer(qr.customerId),todayKey=today(),venueName=readLocal(VENUE_KEY,null)?.name||N;
+    if(visits().some(v=>v.customerId===c.id&&v.day===todayKey&&v.restaurant===venueName&&v.status!=='annullata')){
       notify('La presenza di oggi risulta già registrata.');return;
     }
-    const next=[{id:'DV'+rand(8),customerId:c.id,nickname:c.nickname,restaurant:N,at:Date.now(),day:todayKey},...visits()].slice(0,100);
+    const next=[{id:'DV'+rand(8),customerId:c.id,nickname:c.nickname,restaurant:venueName,at:Date.now(),day:todayKey,status:'confermata'},...visits()].slice(0,100);
     saveLocal(DEMO_VISITS,next);
     // A QR token is single-use in the local demo.
     saveLocal(QR_KEY,{customerId:qr.customerId,token:'used',expires:0});

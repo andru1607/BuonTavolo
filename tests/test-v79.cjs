@@ -20,7 +20,7 @@ assert.match(js,/aria-pressed/);
 assert.match(js,/localStorage\.setItem/);
 assert.match(js,/aria-label="Personalizzazione del locale"/);
 assert.match(js,/aria-label="Personalizza il DinerPass"/);
-const sw=read('sw.js');assert.match(sw,/gooddiner-demo-v79/);
+const sw=read('sw.js');assert.match(sw,/gooddiner-demo-v710/);
 for(const s of ['v79-boot.js','personalize-v79.css','v79-customize.js'])assert.ok(sw.includes("'/"+s+"'"));
 for(const p of ['v79-boot.js','v79-customize.js'])new vm.Script(read(p),{filename:p});
 const doc={documentElement:{dataset:{gdTheme:'signature',gdDensity:'comfortable'}}};
