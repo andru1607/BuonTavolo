@@ -20,7 +20,7 @@
   };
   const saveSession = data => {try{localStorage.setItem(SESSION_KEY,JSON.stringify(data));}catch{}};
   const readLocal = (key, fallback) => {try {return JSON.parse(localStorage.getItem(key)||'null')||fallback;} catch{return fallback;}};
-  const saveLocal = (key,data) => {try{localStorage.setItem(key,JSON.stringify(data));}catch{}};
+  const saveLocal = (key,data) => {try{localStorage.setItem(key,JSON.stringify(data));return true;}catch{return false;}};
   const existing=session();
   if (existing?.role==='customer' && customer(existing.customerId)) {
     state.role='customer';state.tab='home';db.activeCustomer=existing.customerId;state.welcome=false;
@@ -134,6 +134,7 @@
     <div id="gd-camera-box" class="gd-camera-box"><div class="gd-camera-idle">${icon('scan',36)}<span>La fotocamera si attiverà solo quando la richiedi.</span></div></div>
     <button type="button" class="gd-outline" data-gd-entry="camera">${icon('scan',18)} Attiva fotocamera</button>
     <form id="gd-scan-manual" class="gd-manual-form"><label for="gd-manual-token">Codice QR demo (alternativa)</label><div><input id="gd-manual-token" name="token" placeholder="GDDEMO1:..." required autocapitalize="off" autocomplete="off" spellcheck="false"><button class="gd-primary" type="submit">Verifica</button></div></form>
+    <p id="gd-scan-result" class="gd-scan-result" role="status"></p>
     <p class="gd-privacy-line">La lettura non equivale a una verifica reale. Il check-in sicuro richiederà un server.</p></div></div>`;
   }
   function closeScanner(){
@@ -181,18 +182,26 @@
       stopCamera();box.textContent='Impossibile utilizzare la fotocamera. Controlla il permesso o inserisci il codice manuale.';
     }
   }
+  function scanError(message){
+    const result=document.getElementById('gd-scan-result');
+    if(result)result.textContent=message;
+    else notify(message);
+  }
   function scanCode(raw){
     const value=String(raw||'').trim().toUpperCase();const qr=readLocal(QR_KEY,null);
-    if(!value.startsWith('GDDEMO1:')){notify('Questo non è un QR DinerPass demo valido.');return;}
+    if(!value.startsWith('GDDEMO1:')){scanError('Questo non è un QR DinerPass demo valido.');return;}
     if(!qr||qr.expires<=Date.now()||value!==qr.token||!customer(qr.customerId)){
-      notify('QR demo scaduto o non presente su questo dispositivo. Non è stata registrata alcuna visita.');return;
+      scanError('QR demo scaduto o non presente su questo dispositivo. Non è stata registrata alcuna visita.');return;
     }
     const c=customer(qr.customerId),todayKey=today();
     if(visits().some(v=>v.customerId===c.id&&v.day===todayKey)){
-      notify('La presenza di oggi risulta già registrata.');return;
+      scanError('La presenza di oggi risulta già registrata.');return;
     }
     const next=[{id:'DV'+rand(8),customerId:c.id,nickname:c.nickname,restaurant:N,at:Date.now(),day:todayKey},...visits()].slice(0,100);
-    saveLocal(DEMO_VISITS,next);
+    if(!saveLocal(DEMO_VISITS,next)){
+      scanError('Visita non salvata. Verifica lo spazio disponibile e riprova con il DinerPass.');
+      return;
+    }
     // A QR token is single-use in the local demo.
     saveLocal(QR_KEY,{customerId:qr.customerId,token:'used',expires:0});
     latestScan=c.id;closeScanner();render();notify(`Presenza demo registrata: ${c.nickname}.`);
@@ -275,7 +284,12 @@
     return pass.token;
   }
   window.setInterval(refreshPass,1000);
-  window.addEventListener('pagehide',stopCamera);
-  document.addEventListener('visibilitychange',()=>{if(document.hidden)stopCamera();else refreshPass();});
+  function pauseScanner(){
+    stopCamera();
+    const box=document.getElementById('gd-camera-box');
+    if(box)box.textContent='Fotocamera disattivata. Puoi riattivarla o inserire il codice manuale.';
+  }
+  window.addEventListener('pagehide',pauseScanner);
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)pauseScanner();else refreshPass();});
   render();
 })();

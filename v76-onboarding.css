@@ -88,3 +88,8 @@
 .gd-manual-code {max-width:100%;font-size:14px}
 .gd-manual-code summary {min-height:44px;align-content:center;cursor:pointer;text-decoration:underline}
 .gd-manual-code code {display:block;overflow-wrap:anywhere;user-select:all;-webkit-user-select:all}
+
+.gd-scan-result:not(:empty){margin:10px 0;padding:10px 12px;background:#fff3dc;color:#453016;border-radius:10px;font-weight:600}
+.gd-scan-result:empty{margin:0}
+.gd-scan-modal .gd-scan-top .gd-kicker{color:#79562c}
+.gd-scan-modal .gd-icon-close{min-width:44px;min-height:44px}
