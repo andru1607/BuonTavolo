@@ -25,7 +25,7 @@ async function testRecovery() {
       },
       from: () => query
     })},
-    window: {GOODDINER_PUBLIC_CONFIG: {supabaseUrl: 'https://ixczkhmvbjszgmlqznlk.supabase.co', supabasePublishableKey: 'sb_publishable_test'}},
+    window: {scrollTo() {}, GOODDINER_PUBLIC_CONFIG: {supabaseUrl: 'https://ixczkhmvbjszgmlqznlk.supabase.co', supabasePublishableKey: 'sb_publishable_test'}},
     document: {getElementById: id => id === 'app' ? app : id === 'toast' ? toast : null,
       addEventListener: (name, handler) => { events[name] = handler; }},
     sessionStorage: {getItem: () => null}, setTimeout() {}, clearTimeout() {}
