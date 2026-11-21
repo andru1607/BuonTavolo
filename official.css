@@ -22,3 +22,7 @@
 .gd-captcha-wrap>div{max-width:100%;min-width:0}
 .gd-captcha-wrap iframe{max-width:100%}
 .gd-captcha-wrap .muted{line-height:1.5;margin:0}
+
+/* Pagination stays within one existing navigation screen; no fifth tab. */
+.history-more{display:flex;justify-content:center;padding:22px 0 8px}
+.history-more .btn{min-height:48px;width:min(100%,350px)}
