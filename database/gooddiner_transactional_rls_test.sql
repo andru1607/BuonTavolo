@@ -287,6 +287,27 @@ BEGIN
     IF (SELECT count(*) FROM gd_private.operator_audit WHERE target_id=privacy_request_a)<>1
       THEN RAISE EXCEPTION 'FAIL: missing privacy operator audit'; END IF;
 
+    -- RLS-invoker totals must be exact and non-guessable across accounts.
+    PERFORM set_config('request.jwt.claim.sub',guest_a::text,true);
+    PERFORM set_config('request.jwt.claims',jsonb_build_object('sub',guest_a::text,'is_anonymous',false)::text,true);
+    EXECUTE 'SET LOCAL ROLE authenticated';
+    SELECT confirmed_visits INTO n FROM public.get_my_dinerpass_counts();
+    IF n<>1 THEN RAISE EXCEPTION 'FAIL: guest A exact count after reviewed/voided visits: %',n; END IF;
+    SELECT published_reviews INTO n FROM public.get_my_dinerpass_counts();
+    IF n<>0 THEN RAISE EXCEPTION 'FAIL: removed review counted: %',n; END IF;
+    SELECT count(*) INTO n FROM public.get_my_restaurant_counts(venue_a);
+    IF n<>0 THEN RAISE EXCEPTION 'FAIL: non-owner saw merchant A totals'; END IF;
+    EXECUTE 'RESET ROLE';
+
+    PERFORM set_config('request.jwt.claim.sub',merchant_b::text,true);
+    PERFORM set_config('request.jwt.claims',jsonb_build_object('sub',merchant_b::text,'is_anonymous',false)::text,true);
+    EXECUTE 'SET LOCAL ROLE authenticated';
+    SELECT confirmed_visits INTO n FROM public.get_my_restaurant_counts(venue_b);
+    IF n<>1 THEN RAISE EXCEPTION 'FAIL: merchant B count includes voided visit: %',n; END IF;
+    SELECT count(*) INTO n FROM public.get_my_restaurant_counts(venue_a);
+    IF n<>0 THEN RAISE EXCEPTION 'FAIL: merchant B could inspect merchant A totals'; END IF;
+    EXECUTE 'RESET ROLE';
+
     -- All nested fixture mutations MUST roll back before leaving this DO block.
     passed := true;
     RAISE EXCEPTION 'GOODDINER_ROLLBACK_ALL_TEST_FIXTURES';
