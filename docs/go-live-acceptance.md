@@ -36,7 +36,7 @@ Eseguire questi casi su ambiente di collaudo isolato o con **volontari informati
 - [ ] Recensione da 1 a 10 solo su visita confermata; 7 non positivo e 8 positivo; contesto privacy.
 - [ ] Contestazione cliente: una richiesta, stato in attesa e decisione umana tracciata.
 - [ ] Nessuna nuova registrazione API diretta senza verifica anti-bot.
-- [ ] Paginazione e conteggio corretto con più di 250 visite o recensioni per ruolo.
+- [x] RPC di conteggio completo protetta da RLS e paginazione a blocchi in frontend, con test locale.\n- [ ] Prova reale sul server e su due dispositivi con oltre 250 visite/recensioni per ruolo.
 
 ## D. Test Safari iPhone e Android
 
