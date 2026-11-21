@@ -10,3 +10,9 @@
 .qr-space>svg:not(.icon){width:210px;height:210px;max-height:210px;background:white;border-radius:10px;padding:12px}
 .qr-space svg.icon{width:18px;height:18px;max-height:none;background:none;padding:0;border-radius:0}
 .qr-space>svg.icon{width:50px;height:50px}
+/* Manual DinerPass code is available even when Safari cannot scan QR images. */
+.qr-manual{width:100%;max-width:370px;margin-top:2px;text-align:left;border:1px solid var(--line);border-radius:12px;background:var(--paper);padding:8px 13px}
+.qr-manual summary{cursor:pointer;min-height:44px;display:flex;align-items:center;font-weight:700;font-size:14px;color:var(--teal)}
+.qr-manual p{font-size:13px;line-height:1.5;color:var(--muted);margin:3px 0 12px}
+.qr-manual code{display:block;min-width:0;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:16px;line-height:1.5;overflow-wrap:anywhere;word-break:break-word;user-select:all;-webkit-user-select:all;border-radius:8px;padding:12px;background:#f3f5f2;border:1px solid var(--line)}
+.qr-manual button{margin-top:12px;width:100%}
