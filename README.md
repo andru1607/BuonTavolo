@@ -1,10 +1,12 @@
 # GoodDiner 1.0 · Accesso reale (rilascio controllato)
 
-**Accesso controllato:** le nuove registrazioni sono disabilitate finché non sono configurati il CAPTCHA server-side, email e privacy. La home resta consultabile e l'accesso agli account esistenti non è rimosso. [Checklist go-live](docs/go-live-acceptance.md).
+**Accesso controllato:** le nuove registrazioni sono disabilitate nel browser e, dopo l'applicazione della [migrazione del gate Auth](database/gooddiner_registration_gate.sql), anche direttamente nel database, finché non sono configurati il CAPTCHA server-side, email e privacy. La home resta consultabile e l'accesso agli account esistenti non è rimosso. [Checklist go-live](docs/go-live-acceptance.md).
 
 **La home principale `/` non è più una demo.** Profili, DinerPass e storico consultano il database Supabase GoodDiner dedicato `ixczkhmvbjszgmlqznlk`; nessun utente, visita o recensione viene inventato. La vecchia demo è mantenuta in [demo.html](demo.html) solo per test. Il vecchio `account.html` è disabilitato.
 
 **Non è ancora il lancio pubblico:** i test automatici e la verifica dei privilegi non sostituiscono le prove fra account reali su iPhone. Restano da completare configurazione Auth/email, URL pubblico canonico, protezione anti-bot, approvazione documentale dei locali, operatore effettivo per la moderazione e documentazione GDPR. Nessun locale è approvato automaticamente. [Registro di rilascio aggiornato](https://github.com/andru1607/BuonTavolo/issues/10).
+
+**Sicurezza iscrizioni:** la [procedura per aprire e richiudere le registrazioni](docs/registration-gate.md) richiede una decisione amministrativa documentata. Il controllo nel frontend da solo non è una misura anti-bot.
 
 **Diritti degli utenti:** il Profilo offre un archivio JSON personale e un modulo per le richieste di accesso, rettifica, cancellazione, limitazione e opposizione, con esame umano e audit. Il modulo non sostituisce un contatto privacy esterno né una valida informativa, ancora da completare. [Procedure privacy](docs/privacy-operations.md).
 
