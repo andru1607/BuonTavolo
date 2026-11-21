@@ -6,6 +6,8 @@
 
 **Non è ancora il lancio pubblico:** i test automatici e la verifica dei privilegi non sostituiscono le prove fra account reali su iPhone. Restano da completare configurazione Auth/email, URL pubblico canonico, protezione anti-bot, approvazione documentale dei locali, operatore effettivo per la moderazione e documentazione GDPR. Nessun locale è approvato automaticamente. [Registro di rilascio aggiornato](https://github.com/andru1607/BuonTavolo/issues/10).
 
+**Diritti degli utenti:** il Profilo offre un archivio JSON personale e un modulo per le richieste di accesso, rettifica, cancellazione, limitazione e opposizione, con esame umano e audit. Il modulo non sostituisce un contatto privacy esterno né una valida informativa, ancora da completare. [Procedure privacy](docs/privacy-operations.md).
+
 Leggi [le note ufficiali di rilascio](docs/official-release-v1.md) e [il database](database/README.md).
 
 ---
