@@ -69,6 +69,8 @@ async function exercise(){
  };
  vm.runInNewContext(read('official.js').replace(/import\('https:\/\/cdn\.jsdelivr\.net\/npm\/@supabase[^']+'\)/,'Promise.resolve(globalThis.sdk)'),context);
  const gd=context.window.GD;
+ await new Promise(resolve=>setImmediate(resolve)); // finish async Supabase init before rendering signed-in profile
+ gd.state.user=user;gd.state.profile={id:user.id,nickname:'Cliente',customer_code:'GD-OWN'};
  gd.state.section='profile';gd.state.view='app';gd.render();
  assert.match(app.innerHTML,/id="privacy-request-form"/);
  assert.match(app.innerHTML,/data-action="export-data"/);
