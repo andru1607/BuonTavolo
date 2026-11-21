@@ -102,3 +102,7 @@ from public.disputes where status='pending';
 - Manca un backoffice dedicato per un team di moderazione. Per il collaudo interno sono disponibili soltanto operazioni esplicite via SQL Editor protetto.
 - Non è ancora definita la policy commerciale di riattivazione di traguardi sospesi in seguito a nuove recensioni; i voucher non sono utilizzabili.
 - Sono da completare registri del trattamento, base giuridica, informativa privacy, processi di cancellazione/retention e controlli antiabuso.
+
+## Richieste privacy
+
+La nuova tabella `public.privacy_requests` permette l'inoltro da Profilo. Gli operatori con accesso SQL protetto possono applicare la routine `gd_private.close_privacy_request` **solo dopo avere evaso davvero l'istanza**, con audit in `gd_private.operator_audit`. Non cancellare automaticamente i dati. Vedi [procedure privacy e requisiti legali](privacy-operations.md).
