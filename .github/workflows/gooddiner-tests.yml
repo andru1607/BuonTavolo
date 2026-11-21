@@ -18,7 +18,7 @@ jobs:
       - name: Regression tests and official release tests
         run: npm test
       - name: JavaScript syntax
-        run: node --check official.js && node --check turnstile.js && node --check scripts/live-smoke.mjs
+        run: node --check official.js && node --check turnstile.js && node --check client-export.js && node --check scripts/live-smoke.mjs
       - name: Live smoke (requires configured canonical URL)
         if: ${{ github.ref == 'refs/heads/main' && vars.GOODDINER_BASE_URL != '' }}
         env:
