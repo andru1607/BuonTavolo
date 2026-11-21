@@ -56,7 +56,8 @@ Nessuno dei test fisici qui sopra è marcato completato: richiedono dispositivi 
 - [ ] Identità e contatti del **titolare effettivo del trattamento**; fornitori, accordo/DPA con Supabase, incaricati e responsabili; policy di retention.
 - [ ] Base giuridica specifica per la valutazione delle **persone**, trasparenza prima del check-in, minimizzazione e diritti GDPR; analisi dei rischi e valutazione DPIA da professionista incaricato quando necessaria.
 - [ ] Policy pubblica sulle recensioni, casi vietati, correzioni, contestazioni e revisione umana con tempi e responsabilità.
-- [ ] Procedure verificabili per accesso, portabilità, rettifica, cancellazione/limitazione e reclami, senza eliminazione indiscriminata di registri legittimi.
+- [x] Predisposti modulo istanze GDPR, stato delle richieste e archivio JSON personale; sono necessarie prove applicative con utenti reali. [Procedure privacy](privacy-operations.md).
+- [ ] Procedure operative reali e verificabili per accesso, portabilità, rettifica, cancellazione/limitazione, canale esterno e reclami; nessuna eliminazione indiscriminata dei registri legittimi.
 - [ ] Verifica del marchio/nome GoodDiner e delle classi rilevanti tramite [EUIPO](https://www.euipo.europa.eu/) e [UIBM](https://uibm.mise.gov.it/), preferibilmente professionale.
 - [ ] Un addetto reale incaricato dell'approvazione dei locali; conservazione protetta delle prove necessarie, nessuna scheda Maps come prova sufficiente.
 - [ ] Eseguire un ultimo controllo degli advisor Supabase; monitorare errori e predisporre backup/incident response.
