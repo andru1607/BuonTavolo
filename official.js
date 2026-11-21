@@ -95,7 +95,27 @@ const GD = (() => {
     const failed=[applications,restaurants,visits,reviews,vouchers,disputes].filter(x=>x.error);if(failed.length){toast('Alcuni dati non sono disponibili. Riprova più tardi.');}
     state.applications=applications.data||[];state.restaurants=restaurants.data||[];state.visits=visits.data||[];state.reviews=reviews.data||[];state.vouchers=vouchers.data||[];state.disputes=disputes.data||[];
     if(state.view!=='reset'){state.view='app';state.section=state.section||'pass';}render();
-    if(!isAnon()&&sessionStorage.getItem('gd_merchant_pending')){let pending=null;try{pending=JSON.parse(sessionStorage.getItem('gd_merchant_pending'));}catch{}sessionStorage.removeItem('gd_merchant_pending');if(pending?.name&&pending?.city&&!state.applications.some(a=>a.status==='pending')){try{await submitApplication(pending.name,pending.city,true);}catch(error){toast('Richiesta del locale da completare: '+error.message);}}}
+    if(!isAnon()&&sessionStorage.getItem('gd_merchant_pending')){
+      const pendingKey='gd_merchant_pending',raw=sessionStorage.getItem(pendingKey);
+      let pending=null;try{pending=JSON.parse(raw);}catch{}
+      const expectedEmail=String(pending?.email||'').trim().toLowerCase();
+      const currentEmail=String(state.user?.email||'').trim().toLowerCase();
+      if(!pending?.name||!pending?.city||!expectedEmail){
+        sessionStorage.removeItem(pendingKey);
+        toast('Richiesta precedente incompleta: reinserisci i dati del locale.');
+      }else if(!currentEmail||expectedEmail!==currentEmail){
+        // Never associate a stored application with a different user on a shared phone.
+        sessionStorage.removeItem(pendingKey);
+        toast('Questa richiesta appartiene a un altro indirizzo email. Registra il locale dal tuo account.');
+      }else if(state.applications.some(a=>a.status==='pending'||a.status==='approved')){
+        sessionStorage.removeItem(pendingKey);
+      }else{
+        // Clear before the recursive refresh in submitApplication; restore if insert fails.
+        sessionStorage.removeItem(pendingKey);
+        try{await submitApplication(pending.name,pending.city,true);}
+        catch(error){sessionStorage.setItem(pendingKey,raw);toast('Richiesta del locale da completare: '+error.message);}
+      }
+    }
   }
   async function refresh(){state.qr=null;busy(true);try{await loadAccount();}catch(err){toast('Impossibile aggiornare i dati: '+err.message);}finally{busy(false);}}
   async function signupCustomer(form){const nick=form.elements.nickname.value.trim(),email=form.elements.email.value.trim().toLowerCase(),phone=form.elements.phone.value.trim(),password=form.elements.password.value;if(nick.length<3||nick.length>30)throw Error('Scegli un nickname tra 3 e 30 caratteri.');if(phone&&!/^\+?[0-9\s().-]{5,24}$/.test(phone))throw Error('Numero di telefono non valido.');
@@ -106,7 +126,7 @@ const GD = (() => {
   }
   async function signupMerchant(form){const name=form.elements.name.value.trim(),city=form.elements.city.value.trim(),email=form.elements.email.value.trim().toLowerCase(),password=form.elements.password.value;if(name.length<3||city.length<2||password.length<10)throw Error('Completa i dati del locale e usa una password di almeno 10 caratteri.');
     const answer=await sb.auth.signUp({email,password,options:{data:{nickname:'gestore_'+Math.random().toString(36).slice(2,10)},emailRedirectTo:location.origin+'/'}});if(answer.error)throw Error(answer.error.message);
-    if(answer.data?.session){state.side='merchant';state.section='merchant';await refresh();await submitApplication(name,city,true);}else{sessionStorage.setItem('gd_merchant_pending',JSON.stringify({name,city}));state.notice='Conferma l’email del tuo account, quindi accedi: potrai completare la richiesta di verifica del locale.';setView('confirm');}
+    if(answer.data?.session){state.side='merchant';state.section='merchant';await refresh();await submitApplication(name,city,true);}else{sessionStorage.setItem('gd_merchant_pending',JSON.stringify({name,city,email}));state.notice='Conferma l’email del tuo account, quindi accedi: potrai completare la richiesta di verifica del locale.';setView('confirm');}
   }
   async function submitApplication(name,city,auto=false){if(isAnon())throw Error('Prima collega e verifica un’email al tuo account.');if(state.applications.some(a=>a.status==='pending')){if(!auto)toast('Hai già una richiesta in attesa.');return;}
     const {error}=await sb.from('merchant_applications').insert({applicant_id:state.user.id,restaurant_name:name,city,source:'manual'});if(error)throw Error(error.message);state.side='merchant';state.section='merchant';await loadAccount();if(!auto)toast('Richiesta di verifica registrata.');}
