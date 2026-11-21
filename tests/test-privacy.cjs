@@ -34,7 +34,7 @@ async function exercise(){
  assert.equal(data.visits.length,501,'all personal rows beyond 250 are exported');
  assert.deepEqual(pages,[500,1]);
  assert.equal(data.account.email,'client@example.test');
- assert.equal(requested.length,7,'two visits pages plus four other data tables and the privacy queue');
+ assert.equal(requested.length,6,'two visits pages plus four additional personal tables');
  assert.ok(requested.every(item=>item.ownId===user.id));
  assert.equal(requested.find(item=>item.table==='privacy_requests').ownField,'requester_id');
  assert.ok(!JSON.stringify(data).includes('access_token'));
