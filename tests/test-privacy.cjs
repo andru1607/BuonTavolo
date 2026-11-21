@@ -6,12 +6,12 @@ const path=require('node:path');
 const read=x=>fs.readFileSync(path.join(__dirname,'..',x),'utf8');
 
 const sql=read('database/gooddiner_privacy_requests.sql');
-assert.match(sql,/alter table public\\.privacy_requests enable row level security/);
-assert.match(sql,/revoke all on public\\.privacy_requests from public,anon,authenticated/);
-assert.match(sql,/using \\(requester_id=\\(select auth\\.uid\\(\\)\\)\\)/);
-assert.match(sql,/grant insert \\(requester_id,request_kind,details\\)/,'no client grant for status changes');
-assert.match(sql,/current_user <> 'postgres'/,'private resolutions are administrator-only');
-assert.match(sql,/revoke all on function gd_private\\.close_privacy_request/);
+assert.ok(sql.includes('alter table public.privacy_requests enable row level security'));
+assert.ok(sql.includes('revoke all on public.privacy_requests from public,anon,authenticated'));
+assert.ok(sql.includes('using (requester_id=(select auth.uid()))'));
+assert.ok(sql.includes('grant insert (requester_id,request_kind,details)'), 'no client grant for status changes');
+assert.ok(sql.includes("current_user <> 'postgres'"),'private resolutions are administrator-only');
+assert.ok(sql.includes('revoke all on function gd_private.close_privacy_request'));
 
 async function exercise(){
  const exportCode=read('client-export.js');
