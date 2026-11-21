@@ -38,6 +38,7 @@ try{
   if(!script.includes('registrationEnabled'))throw Error('Release gating not deployed');
   await check('/config.js',project);
   await check('/turnstile.js','GoodDinerCaptcha');
+  await check('/client-export.js','GoodDinerDataExport');
   await check('/manifest.webmanifest','GoodDiner');
   console.log('PASS LIVE READ-ONLY SMOKE '+origin);
 }catch(err){
