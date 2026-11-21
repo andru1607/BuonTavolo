@@ -8,7 +8,11 @@
 
 **Sicurezza iscrizioni:** la [procedura per aprire e richiudere le registrazioni](docs/registration-gate.md) richiede una decisione amministrativa documentata. Il controllo nel frontend da solo non è una misura anti-bot.
 
+**Protezione dei voti:** il database vieta check-in e valutazioni del ristoratore verso sé stesso. Le iscrizioni sono chiuse anche sul server tramite [gate Auth privato](docs/registration-gate.md). Il codice ufficiale ha [controlli CSP/HTTPS](vercel.json), ma il deploy va verificato sull'URL canonico.
+
 **Diritti degli utenti:** il Profilo offre un archivio JSON personale e un modulo per le richieste di accesso, rettifica, cancellazione, limitazione e opposizione, con esame umano e audit. Il modulo non sostituisce un contatto privacy esterno né una valida informativa, ancora da completare. [Procedure privacy](docs/privacy-operations.md).
+
+**Distribuzione 21/11/2026:** GitHub Actions supera i test del codice; i due controlli Vercel per il commit `922965a` indicano **limite di build esaurito**. Non è prova di un sito aggiornato. Vedi [registro di rilascio](https://github.com/andru1607/BuonTavolo/issues/10).
 
 Leggi [le note ufficiali di rilascio](docs/official-release-v1.md) e [il database](database/README.md).
 
@@ -16,7 +20,7 @@ Leggi [le note ufficiali di rilascio](docs/official-release-v1.md) e [il databas
 
 # GoodDiner · Database Supabase dedicato installato
 
-Il progetto Supabase **GoodDiner** (`ixczkhmvbjszgmlqznlk`) è attivo in `andru1607's Org` nella regione `eu-central-1`. Sono state applicate [la migrazione iniziale](database/gooddiner_initial.sql), [l'ottimizzazione RLS/indici](database/gooddiner_policy_performance.sql) e [la migrazione di moderazione riservata](database/gooddiner_operator_moderation.sql). Il database contiene 7 tabelle applicative con RLS e 3 tabelle private con RLS; alla verifica del 21 novembre erano prive di utenti e operazioni reali. La home 1.0 usa Supabase. [Procedure operatori](docs/operator-moderation.md). Per provare i flussi con dati inventati nel browser, apri [la demo locale](demo.html). Consulta lo [stato delle verifiche prima del lancio](database/README.md). Non usare o modificare il database easygart.
+Il progetto Supabase **GoodDiner** (`ixczkhmvbjszgmlqznlk`) è attivo in `andru1607's Org` nella regione `eu-central-1`. Sono state applicate [la migrazione iniziale](database/gooddiner_initial.sql), [l'ottimizzazione RLS/indici](database/gooddiner_policy_performance.sql) e [la migrazione di moderazione riservata](database/gooddiner_operator_moderation.sql). Il database contiene 8 tabelle pubbliche con RLS e 5 tabelle private con RLS; alla verifica del 21 novembre erano prive di utenti e operazioni reali. La home 1.0 usa Supabase. [Procedure operatori](docs/operator-moderation.md). Per provare i flussi con dati inventati nel browser, apri [la demo locale](demo.html). Consulta lo [stato delle verifiche prima del lancio](database/README.md). Non usare o modificare il database easygart.
 
 ---
 

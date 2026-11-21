@@ -26,3 +26,6 @@
 /* Pagination stays within one existing navigation screen; no fifth tab. */
 .history-more{display:flex;justify-content:center;padding:22px 0 8px}
 .history-more .btn{min-height:48px;width:min(100%,350px)}
+
+/* Explain personal-data consequences before guests create a visit token. */
+.qr-disclosure{width:100%;max-width:380px;margin:10px auto 16px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;text-align:left;font-size:13px;line-height:1.55;color:var(--muted);background:var(--paper)}
