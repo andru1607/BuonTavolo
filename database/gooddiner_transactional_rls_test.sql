@@ -32,6 +32,9 @@ BEGIN
     RAISE EXCEPTION 'Test must run from the restricted postgres SQL editor';
   END IF;
   BEGIN
+    -- This fixture is a single rollback-only SQL statement run as postgres.
+    -- It never opens registration for Supabase Auth API requests.
+    PERFORM set_config('gooddiner.test_fixture','enabled',true);
     INSERT INTO auth.users(id,aud,role,email,raw_user_meta_data,email_confirmed_at,is_anonymous,created_at,updated_at)
     VALUES
       (guest_a,'authenticated','authenticated','test-guest-a-'||guest_a||'@example.invalid',jsonb_build_object('nickname','ProvaOspiteA','role','merchant'),now(),false,now(),now()),
