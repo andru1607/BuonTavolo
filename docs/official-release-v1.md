@@ -19,6 +19,8 @@
 
 **Moderazione amministrativa:** la migrazione [operator-only](../database/gooddiner_operator_moderation.sql) è installata solo nel progetto GoodDiner; le istruzioni e i controlli obbligatori dell'operatore sono in [procedure riservate](operator-moderation.md). Le funzioni non sono disponibili al browser e nessuna domanda è stata realmente approvata.
 
+**Gate sicurezza aggiornato:** in `config.js` le iscrizioni restano disattivate (`registrationEnabled:false`) e la site key Cloudflare Turnstile è vuota. L'app usa `turnstile.js` per passare il token temporaneo ai flussi di iscrizione, login e recupero password quando configurato, senza esporre il segreto server. La protezione reale delle API richiede l'attivazione del provider CAPTCHA in Supabase. I controlli transazionali multiutente con rollback (6 identità simulate, 2 locali verificati) sono stati eseguiti sul database GoodDiner senza dati persistenti: `database/gooddiner_transactional_rls_test.sql`. Rimangono necessari test email, dispositivi e registrazione autentici. [Checklist dettagliata](go-live-acceptance.md).
+
 ## Configurazione e blocchi per l'accesso pubblico
 
 1. In **Supabase → Authentication → URL Configuration**, configurare `Site URL` sull'URL pubblico Vercel ufficiale e aggiungere `/` tra gli indirizzi di reindirizzamento autorizzati. Le conferme email e il recupero password dipendono da questi URL.

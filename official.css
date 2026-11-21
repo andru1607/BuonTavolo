@@ -16,3 +16,9 @@
 .qr-manual p{font-size:13px;line-height:1.5;color:var(--muted);margin:3px 0 12px}
 .qr-manual code{display:block;min-width:0;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:16px;line-height:1.5;overflow-wrap:anywhere;word-break:break-word;user-select:all;-webkit-user-select:all;border-radius:8px;padding:12px;background:#f3f5f2;border:1px solid var(--line)}
 .qr-manual button{margin-top:12px;width:100%}
+
+/* Sign-in challenge: optional public site-key, never store the response token. */
+.gd-captcha-wrap{min-height:72px;min-width:0;padding:6px 0;display:grid;justify-items:start;gap:8px}
+.gd-captcha-wrap>div{max-width:100%;min-width:0}
+.gd-captcha-wrap iframe{max-width:100%}
+.gd-captcha-wrap .muted{line-height:1.5;margin:0}
