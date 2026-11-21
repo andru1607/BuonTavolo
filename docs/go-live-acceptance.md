@@ -8,6 +8,7 @@ Ultima revisione tecnica: 21 novembre 2026. Questo è un registro di verifiche, 
 - [x] Ricontrollo dopo il test: nessun account, profilo, visita, recensione, token o intervento di moderazione persistente nel progetto.
 - [x] Registro interno delle decisioni degli operatori con permessi negati a `anon` e `authenticated`.
 - [x] Release gate nel frontend: nuove registrazioni **chiuse di default**; Turnstile mostrato solo dopo impostazione della *site key pubblica*. Senza chiave non è possibile aprire le registrazioni tramite la UI.
+- [x] Nuovo gate **nel database Auth**: nuove righe `auth.users` bloccate per impostazione iniziale anche tramite API dirette; stato e modifiche tracciati in tabelle private. [Procedura e condizioni per aprire](registration-gate.md).
 - [ ] Domini Vercel **non verificati** direttamente. Due check Vercel su GitHub non identificano da soli un URL pubblico canonico.
 
 ## B. Configurazioni necessarie prima di aprire le iscrizioni
@@ -20,7 +21,7 @@ Le operazioni seguenti richiedono accesso dell'amministratore ai rispettivi acco
 4. **URL email:** [Supabase URL Configuration](https://supabase.com/dashboard/project/ixczkhmvbjszgmlqznlk/auth/url-configuration). Impostare il dominio canonico come Site URL e consentire esclusivamente i redirect HTTPS necessari (signup/confirm/recovery). Testare che i link riportino al dominio corretto, non alla demo.
 5. **Posta:** [Supabase Email Templates](https://supabase.com/dashboard/project/ixczkhmvbjszgmlqznlk/auth/templates). Configurare provider SMTP affidabile e dominio di invio; controllare recapito, conferma e recupero su mailbox che appartengono ai tester. Non registrare password nei report.
 6. **Anti-bot:** creare un widget [Cloudflare Turnstile](https://dash.cloudflare.com/) per il dominio esatto. Mettere la *secret key* solo in [Supabase Bot and Abuse Protection](https://supabase.com/dashboard/project/ixczkhmvbjszgmlqznlk/auth/protection), selezionando il medesimo provider. Inserire **solo la site key pubblica** nel campo `turnstileSiteKey` di `config.js`. Verificare il rifiuto di signup/login/recovery privi del token sia dal browser sia da richieste API dirette. Il blocco visuale non protegge le API se Supabase non è configurato.
-7. **Apertura controllata:** soltanto dopo le verifiche tecniche, la nomina dell'operatore e la revisione legale, modificare `registrationEnabled: true` in `config.js`, eseguire CI/HTTP smoke e rilascio controllato. Non rimuovere `noindex` prima di avere un'informativa privacy approvata e un dominio verificato.
+7. **Apertura controllata:** soltanto dopo le verifiche tecniche, la nomina dell'operatore e la revisione legale, autorizzare la modifica a `gd_private.registration_gate.is_open=true` nell'editor SQL riservato, poi modificare `registrationEnabled: true` in `config.js`, eseguire CI/HTTP smoke e rilascio controllato. Non rimuovere `noindex` prima di avere un'informativa privacy approvata e un dominio verificato.
 
 ## C. Test autenticazione con identità reali
 
@@ -28,7 +29,7 @@ Eseguire questi casi su ambiente di collaudo isolato o con **volontari informati
 
 - [ ] Cliente con email: signup, email ricevuta, click conferma, accesso e logout.
 - [ ] Password dimenticata: link ricevuto, nuova password, impossibilità di usare quella precedente.
-- [ ] Utente anonimo se attivato: accesso locale; collegamento email; conferma; impostazione password; recupero da secondo dispositivo; stessa identità/codice personale.
+- [ ] Utente anonimo se attivato: abilitazione manual identity linking Supabase; accesso locale; collegamento email; conferma; impostazione password; recupero da secondo dispositivo; stessa identità/codice personale.
 - [ ] Ristoratore con email confermata: richiesta inizialmente **pending**, impossibilità di scansionare senza verifica umana, approvazione solo con prove reali.
 - [ ] Titolare A non può confermare visite/recensioni del locale B.
 - [ ] Cliente A non vede profilo, visite, recensioni, contestazioni e premi del cliente B.
@@ -36,7 +37,8 @@ Eseguire questi casi su ambiente di collaudo isolato o con **volontari informati
 - [ ] Recensione da 1 a 10 solo su visita confermata; 7 non positivo e 8 positivo; contesto privacy.
 - [ ] Contestazione cliente: una richiesta, stato in attesa e decisione umana tracciata.
 - [ ] Nessuna nuova registrazione API diretta senza verifica anti-bot.
-- [x] RPC di conteggio completo protetta da RLS e paginazione a blocchi in frontend, con test locale.\n- [ ] Prova reale sul server e su due dispositivi con oltre 250 visite/recensioni per ruolo.
+- [x] RPC di conteggio completo protetta da RLS e paginazione a blocchi in frontend, con test locale.
+- [ ] Prova reale sul server e su due dispositivi con oltre 250 visite/recensioni per ruolo.
 
 ## D. Test Safari iPhone e Android
 
