@@ -1,0 +1,16 @@
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const read=p=>fs.readFileSync(path.join(__dirname,'..',p),'utf8');
+const migration=read('database/gooddiner_no_self_rating.sql');
+const integration=read('database/gooddiner_transactional_rls_test.sql');
+const client=read('official.js');
+assert.match(migration,/alter table public\.visits\s+add constraint gd_no_self_checkin check \(customer_id <> scanned_by\)/);
+assert.match(migration,/alter table public\.reviews\s+add constraint gd_no_self_rating check \(customer_id <> rater_id\)/);
+assert.match(integration,/owner checked in own DinerPass/);
+assert.match(integration,/self-rating bypassed DB check/);
+assert.match(integration,/EXCEPTION WHEN check_violation THEN seen_error := true/);
+assert.match(client,/gd_no_self_checkin/);
+assert.match(client,/Non puoi registrare il tuo DinerPass nel ristorante che gestisci/);
+console.log('PASS: self-check-in and self-rating prohibited in DB, integration fixture and UI');

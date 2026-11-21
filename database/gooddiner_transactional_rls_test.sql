@@ -17,6 +17,7 @@ DECLARE
   token_expired text;
   token_repeat text;
   token_extra text;
+  token_self text;
   visit_a uuid;
   visit_b uuid;
   visit_extra uuid;
@@ -109,6 +110,20 @@ BEGIN
     IF NOT seen_error THEN RAISE EXCEPTION 'FAIL: replayed QR accepted'; END IF;
     EXECUTE 'RESET ROLE';
 
+    -- A verified restaurant owner must not use their own DinerPass to
+    -- fabricate a visit and earn a positive rating at their own venue.
+    PERFORM set_config('request.jwt.claim.sub',merchant_a::text,true);
+    PERFORM set_config('request.jwt.claims',jsonb_build_object('sub',merchant_a::text,'is_anonymous',false)::text,true);
+    EXECUTE 'SET LOCAL ROLE authenticated';
+    SELECT t.qr_token INTO token_self FROM public.issue_guest_qr() t;
+    seen_error := false;
+    BEGIN
+      PERFORM public.checkin_guest(token_self,venue_a);
+    EXCEPTION WHEN check_violation THEN seen_error := true;
+    END;
+    IF NOT seen_error THEN RAISE EXCEPTION 'FAIL: owner checked in own DinerPass'; END IF;
+    EXECUTE 'RESET ROLE';
+
     -- Issue an expired QR directly in an isolated, rolled-back database fixture.
     INSERT INTO gd_private.visit_tokens(customer_id,created_at,expires_at)
       VALUES (guest_b,now()-interval '3 minutes',now()-interval '1 minute')
@@ -177,6 +192,17 @@ BEGIN
     END;
     IF NOT seen_error THEN RAISE EXCEPTION 'FAIL: restaurant B rated restaurant A visit'; END IF;
     EXECUTE 'RESET ROLE';
+
+    -- The database also rejects a forged self-rating, even if the caller
+    -- bypasses the normal application RPC and uses a privileged SQL session.
+    seen_error := false;
+    BEGIN
+      INSERT INTO public.reviews(visit_id,customer_id,restaurant_id,rater_id,rating,comment)
+      VALUES (visit_a,guest_a,venue_a,guest_a,10,
+        'Tentativo di auto-valutazione non consentito dal vincolo');
+    EXCEPTION WHEN check_violation THEN seen_error := true;
+    END;
+    IF NOT seen_error THEN RAISE EXCEPTION 'FAIL: self-rating bypassed DB check'; END IF;
 
     PERFORM set_config('request.jwt.claim.sub',merchant_a::text,true);
     PERFORM set_config('request.jwt.claims',jsonb_build_object('sub',merchant_a::text,'is_anonymous',false)::text,true);
