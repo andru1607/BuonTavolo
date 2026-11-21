@@ -14,6 +14,7 @@ try{
   origin=url.origin;
 }catch(err){console.error('Invalid GOODDINER_BASE_URL: '+err.message);process.exit(2);}
 const project='ixczkhmvbjszgmlqznlk';
+const shouldBeOpen=process.env.GOODDINER_EXPECT_REGISTRATION_OPEN==='true';
 async function check(path,expected){
   const url=origin+path;
   const controller=new AbortController();
@@ -36,7 +37,7 @@ async function check(path,expected){
         throw Error('official Content-Security-Policy missing or incomplete');
       if(!hsts.includes('max-age='))throw Error('HTTPS transport protection missing');
       if(!perms.includes('camera=(self)'))throw Error('camera permissions policy missing');
-      if(!robots.includes('noindex'))throw Error('prelaunch search-engine block missing');
+      if(!shouldBeOpen&&!robots.includes('noindex'))throw Error('prelaunch search-engine block missing');
     }
     const body=await res.text();
     if(!body.includes(expected))throw Error('content signature missing');
@@ -49,11 +50,10 @@ try{
   if(!html.includes('src="/official.js"')||!html.includes('src="/turnstile.js"')){
     throw Error('Main page does not load verified GoodDiner official client');
   }
-  if(!html.includes('noindex,nofollow'))throw Error('prelaunch meta noindex missing');
+  if(!shouldBeOpen&&!html.includes('noindex,nofollow'))throw Error('prelaunch meta noindex missing');
   const script=await check('/official.js',"issue_guest_qr");
   if(!script.includes('registrationEnabled'))throw Error('Release gating not deployed');
   const deployedConfig=await check('/config.js',project);
-  const shouldBeOpen=process.env.GOODDINER_EXPECT_REGISTRATION_OPEN==='true';
   if(!new RegExp('registrationEnabled:\\s*'+String(shouldBeOpen)).test(deployedConfig))
     throw Error('deployed signup gate differs from approved release mode');
   if(shouldBeOpen&&!/turnstileSiteKey:\\s*["'][^"']{8,}["']/.test(deployedConfig))
