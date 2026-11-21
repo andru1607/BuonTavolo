@@ -9,7 +9,7 @@ async function testVoidForm(){
  const user={id:'operator-1',email:'operator@example.test',is_anonymous:false};
  const calls=[];
  const query={data:[],error:null,select(){return this;},eq(){return this;},order(){return this;},limit(){return this;},single(){return {data:{id:user.id,nickname:'Operatore',customer_code:'GD-TEST'},error:null};}};
- const sdk={createClient:()=>({auth:{onAuthStateChange(){},getUser:async()=>({data:{user},error:null})},from:()=>query,rpc:async(name,args)=>{calls.push({name,args});return {data:true,error:null};}})};
+ const sdk={createClient:()=>({auth:{onAuthStateChange(){},getUser:async()=>({data:{user},error:null})},from:()=>query,rpc:async(name,args)=>{if(name==='void_guest_visit')calls.push({name,args});return {data:true,error:null};}})};
  const context={sdk,window:{GOODDINER_PUBLIC_CONFIG:{supabaseUrl:'https://ixczkhmvbjszgmlqznlk.supabase.co',supabasePublishableKey:'sb_publishable_test'},scrollTo(){}},
    document:{getElementById:key=>key==='app'?app:key==='toast'?toast:null,addEventListener:(key,fn)=>events[key]=fn},
    sessionStorage:{getItem(){return null;}},setTimeout(){},clearTimeout(){}};

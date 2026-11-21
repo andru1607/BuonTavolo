@@ -49,3 +49,6 @@ Sono state applicate in Supabase le migrazioni `gooddiner_initial_secure_schema`
 - https://supabase.com/docs/guides/auth/auth-anonymous
 - https://supabase.com/docs/guides/auth/passkeys
 - https://supabase.com/docs/guides/api/securing-your-api
+## Conteggi affidabili e paginazione
+
+La migrazione `gooddiner_accurate_statistics.sql` aggiunge due RPC **SECURITY INVOKER**, che non bypassano RLS, per ottenere i conteggi esatti del cliente e del singolo locale verificato. Le liste nell'interfaccia sono caricate a pagine di 250 record per ruolo e i riepiloghi non dipendono più dalle pagine scaricate. I conteggi e la paginazione reali devono ancora essere collaudati su più dispositivi con account veri.
