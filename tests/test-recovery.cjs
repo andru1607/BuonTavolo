@@ -10,9 +10,11 @@ async function testRecovery() {
   const toast = {};
   const user = {id: 'demo'};
   let fail = true;
+  let lastInsert = null;
   const query = {
     select() { return this; }, eq() { return this; }, order() { return this; },
-    limit() { return this; }, single() { return {data: {id: 'demo', nickname: 'Ospite'}}; }
+    limit() { return this; }, single() { return {data: {id: 'demo', nickname: 'Ospite'}}; },
+    insert(payload) { lastInsert=payload; return Promise.resolve({error:null}); }
   };
   const context = {
     sdk: {createClient: () => ({
@@ -121,6 +123,43 @@ async function testRecovery() {
   // Merchant register remains available to this verified operator.
   gd.state.side='merchant';gd.state.section='visits';gd.render();
   assert.match(app.innerHTML,/Ospite Esterno/);
+
+  // A customer can see the dispute status and submit via an accessible form,
+  // without sharing other guests' reviews or re-submitting the same dispute.
+  gd.state.side='customer';
+  gd.state.section='reviews';
+  gd.state.user={id:'demo',is_anonymous:false};
+  gd.state.reviews=[
+    {id:'customer-review',visit_id:'visit-self',customer_id:'demo',rating:9,comment:'Un fatto verificabile descrive la visita.',status:'published',created_at:'2026-11-21T10:00:00Z'},
+    {id:'foreign-review',visit_id:'visit-other',customer_id:'other-guest',rating:1,comment:'Non dovrebbe apparire.',status:'published',created_at:'2026-11-20T10:00:00Z'}
+  ];
+  gd.state.disputes=[];
+  gd.state.view='app';gd.render();
+  assert.match(app.innerHTML,/data-action="dispute" data-id="customer-review"/);
+  assert.doesNotMatch(app.innerHTML,/Non dovrebbe apparire/);
+  gd.state.disputes=[{id:'d1',customer_id:'demo',review_id:'customer-review',status:'pending',created_at:'2026-11-21T12:00:00Z'}];
+  gd.render();
+  assert.match(app.innerHTML,/Contestazione in valutazione/);
+  assert.doesNotMatch(app.innerHTML,/data-action="dispute" data-id="customer-review"/);
+  gd.state.disputes[0].status='accepted';
+  gd.render();
+  assert.match(app.innerHTML,/Contestazione accolta/);
+  assert.match(app.innerHTML,/<small>Positive \(8–10\)<\/small><strong>0<\/strong>/);
+  gd.state.disputes=[];
+  gd.state.disputeReview='customer-review';
+  gd.setView('dispute-compose');
+  assert.match(app.innerHTML,/id="dispute-form"/);
+  assert.match(app.innerHTML,/Un fatto verificabile descrive la visita/);
+  const sendReason=reason=>events.submit({preventDefault(){},target:{id:'dispute-form',elements:{reason:{value:reason}}}});
+  await sendReason('breve');
+  assert.equal(toast.textContent,'Il motivo deve essere compreso tra 10 e 1000 caratteri.');
+  assert.equal(lastInsert,null);
+  await sendReason('Segnalo un fatto verificabile: la ricostruzione non è corretta.');
+  assert.equal(lastInsert.review_id,'customer-review');
+  assert.equal(lastInsert.customer_id,'demo');
+  assert.equal(gd.state.view,'app');
+  assert.equal(toast.textContent,'Contestazione registrata: in attesa di valutazione.');
+
 
 
 
