@@ -1,5 +1,7 @@
 # GoodDiner 1.0 · Accesso reale (rilascio controllato)
 
+**Accesso controllato:** le nuove registrazioni sono disabilitate finché non sono configurati il CAPTCHA server-side, email e privacy. La home resta consultabile e l'accesso agli account esistenti non è rimosso. [Checklist go-live](docs/go-live-acceptance.md).
+
 **La home principale `/` non è più una demo.** Profili, DinerPass e storico consultano il database Supabase GoodDiner dedicato `ixczkhmvbjszgmlqznlk`; nessun utente, visita o recensione viene inventato. La vecchia demo è mantenuta in [demo.html](demo.html) solo per test. Il vecchio `account.html` è disabilitato.
 
 **Non è ancora il lancio pubblico:** i test automatici e la verifica dei privilegi non sostituiscono le prove fra account reali su iPhone. Restano da completare configurazione Auth/email, URL pubblico canonico, protezione anti-bot, approvazione documentale dei locali, operatore effettivo per la moderazione e documentazione GDPR. Nessun locale è approvato automaticamente. [Registro di rilascio aggiornato](https://github.com/andru1607/BuonTavolo/issues/10).
