@@ -22,6 +22,7 @@ DECLARE
   visit_extra uuid;
   review_a uuid;
   dispute_a uuid;
+  privacy_request_a uuid;
   n integer;
   seen_error boolean;
   passed boolean := false;
@@ -246,6 +247,45 @@ BEGIN
     IF (SELECT status FROM public.visits WHERE id=visit_extra)<>'voided'
       THEN RAISE EXCEPTION 'FAIL: void status missing'; END IF;
     EXECUTE 'RESET ROLE';
+
+    -- The same short-lived test fixtures exercise authenticated GDPR requests.
+    PERFORM set_config('request.jwt.claim.sub',guest_a::text,true);
+    PERFORM set_config('request.jwt.claims',jsonb_build_object('sub',guest_a::text,'is_anonymous',false)::text,true);
+    EXECUTE 'SET LOCAL ROLE authenticated';
+    INSERT INTO public.privacy_requests(requester_id,request_kind,details)
+      VALUES(guest_a,'erasure','Richiesta di cancellazione simulata nel test')
+      RETURNING id INTO privacy_request_a;
+    seen_error := false;
+    BEGIN
+      INSERT INTO public.privacy_requests(requester_id,request_kind,details)
+        VALUES(guest_a,'erasure','Duplicato non consentito');
+    EXCEPTION WHEN OTHERS THEN seen_error := true;
+    END;
+    IF NOT seen_error THEN RAISE EXCEPTION 'FAIL: duplicate open privacy request allowed'; END IF;
+    EXECUTE 'RESET ROLE';
+
+    PERFORM set_config('request.jwt.claim.sub',guest_b::text,true);
+    PERFORM set_config('request.jwt.claims',jsonb_build_object('sub',guest_b::text,'is_anonymous',false)::text,true);
+    EXECUTE 'SET LOCAL ROLE authenticated';
+    SELECT count(*) INTO n FROM public.privacy_requests WHERE id=privacy_request_a;
+    IF n<>0 THEN RAISE EXCEPTION 'FAIL: guest B read guest A privacy request'; END IF;
+    seen_error := false;
+    BEGIN
+      INSERT INTO public.privacy_requests(requester_id,request_kind,details)
+        VALUES(guest_a,'access','Richiesta per dati di altro utente');
+    EXCEPTION WHEN OTHERS THEN seen_error := true;
+    END;
+    IF NOT seen_error THEN RAISE EXCEPTION 'FAIL: guest B opened privacy request for A'; END IF;
+    EXECUTE 'RESET ROLE';
+
+    PERFORM gd_private.close_privacy_request(
+      privacy_request_a,true,'collaudo-interno',
+      'Test transazionale: il registro tutela la decisione senza cancellare dati reali'
+    );
+    IF (SELECT status FROM public.privacy_requests WHERE id=privacy_request_a)<>'resolved'
+      THEN RAISE EXCEPTION 'FAIL: privacy request not resolved'; END IF;
+    IF (SELECT count(*) FROM gd_private.operator_audit WHERE target_id=privacy_request_a)<>1
+      THEN RAISE EXCEPTION 'FAIL: missing privacy operator audit'; END IF;
 
     -- All nested fixture mutations MUST roll back before leaving this DO block.
     passed := true;

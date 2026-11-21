@@ -21,6 +21,8 @@
 
 **Gate sicurezza aggiornato:** in `config.js` le iscrizioni restano disattivate (`registrationEnabled:false`) e la site key Cloudflare Turnstile è vuota. L'app usa `turnstile.js` per passare il token temporaneo ai flussi di iscrizione, login e recupero password quando configurato, senza esporre il segreto server. La protezione reale delle API richiede l'attivazione del provider CAPTCHA in Supabase. I controlli transazionali multiutente con rollback (6 identità simulate, 2 locali verificati) sono stati eseguiti sul database GoodDiner senza dati persistenti: `database/gooddiner_transactional_rls_test.sql`. Rimangono necessari test email, dispositivi e registrazione autentici. [Checklist dettagliata](go-live-acceptance.md).
 
+**Centro privacy:** nel Profilo autenticato sono disponibili esportazione JSON locale e richieste dei diritti con stato. Il database conserva la coda con RLS e una procedura operatore per chiudere l'istanza **soltanto dopo un effettivo adempimento**. La richiesta di cancellazione non elimina automaticamente l'account. [Procedure e dati mancanti per l'informativa](privacy-operations.md).
+
 ## Configurazione e blocchi per l'accesso pubblico
 
 1. In **Supabase → Authentication → URL Configuration**, configurare `Site URL` sull'URL pubblico Vercel ufficiale e aggiungere `/` tra gli indirizzi di reindirizzamento autorizzati. Le conferme email e il recupero password dipendono da questi URL.
