@@ -4,6 +4,17 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: 'Verified HTTPS origin of GoodDiner (without path)'
+        required: true
+        type: string
+      registrations_open:
+        description: 'Expect explicitly approved public registration'
+        required: false
+        type: boolean
+        default: false
 permissions:
   contents: read
 jobs:
@@ -19,8 +30,12 @@ jobs:
         run: npm test
       - name: JavaScript syntax
         run: node --check official.js && node --check turnstile.js && node --check client-export.js && node --check scripts/live-smoke.mjs
-      - name: Live smoke (requires configured canonical URL)
-        if: ${{ github.ref == 'refs/heads/main' && vars.GOODDINER_BASE_URL != '' }}
+      - name: Live smoke (verified HTTPS origin only)
+        if: ${{ github.ref == 'refs/heads/main' && (vars.GOODDINER_BASE_URL != '' || github.event_name == 'workflow_dispatch') }}
         env:
-          GOODDINER_BASE_URL: ${{ vars.GOODDINER_BASE_URL }}
+          GOODDINER_BASE_URL: ${{ inputs.base_url || vars.GOODDINER_BASE_URL }}
+          GOODDINER_EXPECT_REGISTRATION_OPEN: ${{ inputs.registrations_open || 'false' }}
         run: node scripts/live-smoke.mjs
+      - name: Explain skipped live smoke
+        if: ${{ github.ref == 'refs/heads/main' && vars.GOODDINER_BASE_URL == '' && github.event_name != 'workflow_dispatch' }}
+        run: echo "::warning::GOODDINER_BASE_URL not configured; live HTTPS deployment has NOT been verified."
