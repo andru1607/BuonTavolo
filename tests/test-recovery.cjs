@@ -75,5 +75,18 @@ async function testRecovery() {
   assert.equal(toast.textContent,'Password salvata. Ora puoi accedere con email e password.');
   assert.equal(resetCalled,true);
 
+  // Server-issued token must be readable and selectable without BarcodeDetector.
+  gd.state.section = 'pass';
+  gd.state.qr = {qr_token:'GD1:aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa', expires_at:new Date(Date.now()+90000).toISOString()};
+  gd.render();
+  assert.match(app.innerHTML, /id="qr-manual-token"/);
+  assert.match(app.innerHTML, /GD1:aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa/);
+  assert.match(app.innerHTML, /Mostra codice manuale/);
+  // An expired capability must disappear from the rendered pass, including the fallback.
+  gd.state.qr.expires_at=new Date(Date.now()-1000).toISOString();
+  gd.render();
+  assert.doesNotMatch(app.innerHTML,/id="qr-manual-token"/);
+
+
 }
 testRecovery().catch(err => { console.error(err.message.slice(0,160)); process.exitCode = 1; });
