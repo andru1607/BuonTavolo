@@ -84,16 +84,30 @@ const GD = (() => {
   function goSection(section){resetScanner();state.reviewVisit=null;state.disputeReview=null;state.view='app';state.section=section;render();window.scrollTo({top:0,behavior:'instant'});}
   async function loadAccount(){if(!sb){render();return;}const {data,error}=await sb.auth.getUser();if(error||!data?.user){state.user=null;state.profile=null;state.qr=null;if(!['signup','signup-customer','signup-merchant','signin','forgot','confirm'].includes(state.view))state.view='landing';render();return;}
     state.user=data.user;const id=data.user.id;const profile=await sb.from('profiles').select('id,nickname,customer_code,role').eq('id',id).single();if(profile.error){state.error='Impossibile caricare il profilo: '+profile.error.message;state.profile=null;dom.app.innerHTML=layout(`<div class="container"><div class="interstitial"><h2>Profilo non disponibile.</h2><p>${e(state.error)}</p>${button('Riprova','retry','btn-dark')}</div></div>`);return;}state.profile=profile.data;
-    const [applications,restaurants,visits,reviews,vouchers,disputes]=await Promise.all([
+    // Fetch each role independently. A busy restaurant must never push its
+    // operator's personal DinerPass history out of a single 250-row query.
+    const visitFields='id,customer_id,restaurant_id,guest_nickname,guest_code,visited_on,checked_in_at,status';
+    const reviewFields='id,visit_id,customer_id,restaurant_id,rater_id,rating,comment,status,created_at';
+    const [applications,restaurants,customerVisits,merchantVisits,customerReviews,merchantReviews,vouchers,disputes]=await Promise.all([
       sb.from('merchant_applications').select('id,restaurant_name,city,status,created_at').eq('applicant_id',id).order('created_at',{ascending:false}),
       sb.from('restaurants').select('id,owner_id,name,city,verified_at,suspended_at'),
-      sb.from('visits').select('id,customer_id,restaurant_id,guest_nickname,guest_code,visited_on,checked_in_at,status').order('checked_in_at',{ascending:false}).limit(250),
-      sb.from('reviews').select('id,visit_id,customer_id,restaurant_id,rater_id,rating,comment,status,created_at').order('created_at',{ascending:false}).limit(250),
-      sb.from('vouchers').select('id,customer_id,milestone,status,created_at').order('created_at',{ascending:false}).limit(250),
-      sb.from('disputes').select('id,review_id,customer_id,reason,status,created_at,resolved_at').order('created_at',{ascending:false}).limit(250)
+      sb.from('visits').select(visitFields).eq('customer_id',id).order('checked_in_at',{ascending:false}).limit(250),
+      sb.from('visits').select(visitFields).eq('scanned_by',id).order('checked_in_at',{ascending:false}).limit(250),
+      sb.from('reviews').select(reviewFields).eq('customer_id',id).order('created_at',{ascending:false}).limit(250),
+      sb.from('reviews').select(reviewFields).eq('rater_id',id).order('created_at',{ascending:false}).limit(250),
+      sb.from('vouchers').select('id,customer_id,milestone,status,created_at').eq('customer_id',id).order('created_at',{ascending:false}).limit(250),
+      sb.from('disputes').select('id,review_id,customer_id,reason,status,created_at,resolved_at').eq('customer_id',id).order('created_at',{ascending:false}).limit(250)
     ]);
-    const failed=[applications,restaurants,visits,reviews,vouchers,disputes].filter(x=>x.error);if(failed.length){toast('Alcuni dati non sono disponibili. Riprova più tardi.');}
-    state.applications=applications.data||[];state.restaurants=restaurants.data||[];state.visits=visits.data||[];state.reviews=reviews.data||[];state.vouchers=vouchers.data||[];state.disputes=disputes.data||[];
+    const failed=[applications,restaurants,customerVisits,merchantVisits,customerReviews,merchantReviews,vouchers,disputes].filter(x=>x.error);
+    if(failed.length)toast('Alcuni dati non sono disponibili. Riprova più tardi.');
+    const mergeUnique=(first,second,sortField)=>[...new Map([...(first.data||[]),...(second.data||[])].map(row=>[row.id,row])).values()]
+      .sort((a,b)=>Date.parse(b[sortField])-Date.parse(a[sortField]));
+    state.applications=applications.data||[];
+    state.restaurants=restaurants.data||[];
+    state.visits=mergeUnique(customerVisits,merchantVisits,'checked_in_at');
+    state.reviews=mergeUnique(customerReviews,merchantReviews,'created_at');
+    state.vouchers=vouchers.data||[];
+    state.disputes=disputes.data||[];
     if(state.view!=='reset'){state.view='app';state.section=state.section||'pass';}render();
     if(!isAnon()&&sessionStorage.getItem('gd_merchant_pending')){
       const pendingKey='gd_merchant_pending',raw=sessionStorage.getItem(pendingKey);
