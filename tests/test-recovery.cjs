@@ -87,6 +87,42 @@ async function testRecovery() {
   gd.render();
   assert.doesNotMatch(app.innerHTML,/id="qr-manual-token"/);
 
+  // Same account can act as a merchant and a customer. Never combine the
+  // merchant's guests with this account's own DinerPass history or reviews.
+  gd.state.qr=null;
+  gd.state.user={id:'demo',is_anonymous:false,email:'me@example.test',email_confirmed_at:'2026-11-21T12:00:00Z'};
+  gd.state.restaurants=[
+    {id:'venue-own-visit',name:'Trattoria Esperienza',owner_id:'someone-else'},
+    {id:'venue-managed',name:'Locale Gestito',owner_id:'demo',verified_at:'2026-11-20T12:00:00Z'}
+  ];
+  gd.state.visits=[
+    {id:'visit-other',customer_id:'other-guest',restaurant_id:'venue-managed',guest_nickname:'Ospite Esterno',guest_code:'GD-OTHER',checked_in_at:'2026-11-20T10:00:00Z',status:'confirmed'},
+    {id:'visit-self',customer_id:'demo',restaurant_id:'venue-own-visit',guest_nickname:'Ospite',checked_in_at:'2026-11-21T10:00:00Z',status:'confirmed'}
+  ];
+  gd.state.reviews=[
+    {id:'review-other',customer_id:'other-guest',visit_id:'visit-other',comment:'RECENSIONE DI UN ALTRO OSPITE',rating:1,status:'published',created_at:'2026-11-20T11:00:00Z'},
+    {id:'review-self',customer_id:'demo',visit_id:'visit-self',comment:'Commento della mia visita',rating:9,status:'published',created_at:'2026-11-21T11:00:00Z'}
+  ];
+  gd.state.vouchers=[
+    {id:'voucher-other',customer_id:'other-guest',milestone:20,status:'pending'},
+    {id:'voucher-self',customer_id:'demo',milestone:10,status:'pending'}
+  ];
+  gd.state.side='customer';gd.state.section='pass';gd.render();
+  assert.match(app.innerHTML,/Trattoria Esperienza/);
+  assert.doesNotMatch(app.innerHTML,/Locale Gestito/);
+  gd.state.section='visits';gd.render();
+  assert.match(app.innerHTML,/Trattoria Esperienza/);
+  assert.doesNotMatch(app.innerHTML,/Locale Gestito/);
+  gd.state.section='reviews';gd.render();
+  assert.match(app.innerHTML,/Commento della mia visita/);
+  assert.doesNotMatch(app.innerHTML,/RECENSIONE DI UN ALTRO OSPITE/);
+  assert.match(app.innerHTML,/Traguardo: 10 recensioni positive/);
+  assert.doesNotMatch(app.innerHTML,/Traguardo: 20 recensioni positive/);
+  // Merchant register remains available to this verified operator.
+  gd.state.side='merchant';gd.state.section='visits';gd.render();
+  assert.match(app.innerHTML,/Ospite Esterno/);
+
+
 
 }
 testRecovery().catch(err => { console.error(err.message.slice(0,160)); process.exitCode = 1; });
