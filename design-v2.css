@@ -544,3 +544,9 @@ body{
   .business-body .business-feature{padding:24px}
   .business-body .business-price{font-size:56px}
 }
+
+/* Controlled beta: invitation field and participant acknowledgment. */
+.gooddiner-app .pilot-ack{display:flex;gap:12px;align-items:flex-start;font-size:13px;line-height:1.55;color:var(--muted);cursor:pointer}
+.gooddiner-app .pilot-ack input{width:20px;height:20px;min-width:20px;margin:2px 0 0;accent-color:var(--teal)}
+.gooddiner-app #gd-invite-code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.045em;font-size:16px!important}
+.gooddiner-app #gd-invite-code::placeholder{font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:normal;font-size:14px}
