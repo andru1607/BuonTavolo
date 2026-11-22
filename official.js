@@ -25,6 +25,7 @@ const GD = (() => {
   const currentVenue=()=>verifiedRestaurant()||state.restaurants.find(r=>r.owner_id===state.user?.id)||null;
   let sb=null,toastTimer=null,qrTimer=null,scanStream=null,scanTimer=null,detector=null,lockedScan=false,scannerOpen=false,cameraGeneration=0;
   let sdkError='';
+  let accountLoadGeneration=0;
   function clearToast(){
     clearTimeout(toastTimer);
     dom.toast.className='toast';
@@ -40,6 +41,15 @@ const GD = (() => {
   function button(label,action,cls='btn-dark',extra=''){return `<button type="button" class="btn ${cls}" data-action="${e(action)}" ${extra}>${label}</button>`;}
   function busy(flag){state.busy=flag;dom.app.classList.toggle('loading',flag);}
   function resetScanner(){cameraGeneration++;scannerOpen=false;lockedScan=false;detector=null;resetCameraStream();document.getElementById('scanner')?.remove();}
+  function clearAccountState(){
+    resetScanner();clearTimeout(qrTimer);qrTimer=null;
+    state.user=null;state.profile=null;state.applications=[];state.restaurants=[];
+    state.visits=[];state.reviews=[];state.vouchers=[];state.disputes=[];
+    state.privacyRequests=[];state.totals={customer:null,merchant:null};
+    state.merchantLicense=null;state.hasMore={};state.historyPages={customerVisits:250,merchantVisits:250,customerReviews:250,merchantReviews:250};
+    state.reviewVisit=null;state.disputeReview=null;state.voidVisitId=null;state.qr=null;
+    state.side='customer';state.section='pass';
+  }
   function layout(main){const logged=Boolean(state.user),merchant=state.side==='merchant';const links=logged?merchant?[['merchant','Panoramica'],['visits','Presenze'],['profile','Account']]:[['pass','DinerPass'],['visits','Visite'],['reviews','Recensioni'],['profile','Profilo']]:[];
     const navIcons={merchant:'store',pass:'scan',visits:'clock',reviews:'star',profile:'user'};
     const navIcon=s=>svg(navIcons[s]||'info',19);
@@ -126,8 +136,8 @@ const GD = (() => {
   function tickQr(){clearTimeout(qrTimer);const node=document.getElementById('qr-countdown');if(!node)return;const secs=Math.max(0,Math.ceil((new Date(state.qr.expires_at).getTime()-Date.now())/1000));node.textContent=secs;if(secs>0)qrTimer=setTimeout(tickQr,1000);else{state.qr=null;render();}}
   function setView(view){clearToast();if(view!=='review-compose')state.reviewVisit=null;if(view!=='dispute-compose')state.disputeReview=null;if(view!=='void-compose')state.voidVisitId=null;resetScanner();state.view=view;render();window.scrollTo({top:0,behavior:'instant'});}
   function goSection(section){resetScanner();state.reviewVisit=null;state.disputeReview=null;state.voidVisitId=null;state.view='app';state.section=section;render();window.scrollTo({top:0,behavior:'instant'});}
-  async function loadAccount(){if(!sb){render();return;}const {data,error}=await sb.auth.getUser();if(error||!data?.user){state.user=null;state.profile=null;state.merchantLicense=null;state.qr=null;if(!['signup','signup-customer','signup-merchant','signin','forgot','confirm'].includes(state.view))state.view='landing';render();return;}
-    state.user=data.user;const id=data.user.id;const profile=await sb.from('profiles').select('id,nickname,customer_code,role').eq('id',id).single();if(profile.error){state.error='Impossibile caricare il profilo: '+profile.error.message;state.profile=null;dom.app.innerHTML=layout(`<div class="container"><div class="interstitial"><h2>Profilo non disponibile.</h2><p>${e(state.error)}</p>${button('Riprova','retry','btn-dark')}</div></div>`);return;}state.profile=profile.data;
+  async function loadAccount(){const generation=++accountLoadGeneration;if(!sb){render();return;}const {data,error}=await sb.auth.getUser();if(generation!==accountLoadGeneration)return;if(error||!data?.user){clearAccountState();if(!['signup','signup-customer','signup-merchant','signin','forgot','confirm'].includes(state.view))state.view='landing';render();return;}
+    state.user=data.user;const id=data.user.id;const profile=await sb.from('profiles').select('id,nickname,customer_code,role').eq('id',id).single();if(generation!==accountLoadGeneration)return;if(profile.error){state.error='Impossibile caricare il profilo: '+profile.error.message;state.profile=null;dom.app.innerHTML=layout(`<div class="container"><div class="interstitial"><h2>Profilo non disponibile.</h2><p>${e(state.error)}</p>${button('Riprova','retry','btn-dark')}</div></div>`);return;}state.profile=profile.data;
     // Fetch each role independently. A busy restaurant must never push its
     // operator's personal DinerPass history out of a single 250-row query.
     const visitFields='id,customer_id,restaurant_id,guest_nickname,guest_code,visited_on,checked_in_at,status';
@@ -143,6 +153,7 @@ const GD = (() => {
       sb.from('disputes').select('id,review_id,customer_id,reason,status,created_at,resolved_at').eq('customer_id',id).order('created_at',{ascending:false}).limit(250),
       sb.from('privacy_requests').select('id,requester_id,request_kind,details,status,created_at,resolved_at').eq('requester_id',id).order('created_at',{ascending:false}).limit(100)
     ]);
+    if(generation!==accountLoadGeneration)return;
     const failed=[applications,restaurants,customerVisits,merchantVisits,customerReviews,merchantReviews,vouchers,disputes,privacyRequests].filter(x=>x.error);
     if(failed.length)toast('Alcuni dati non sono disponibili. Riprova più tardi.');
     const mergeUnique=(first,second,sortField)=>[...new Map([...(first.data||[]),...(second.data||[])].map(row=>[row.id,row])).values()]
@@ -165,6 +176,7 @@ const GD = (() => {
           restaurant?sb.rpc('get_my_restaurant_counts',{p_restaurant_id:restaurant.id}):Promise.resolve(null),
           restaurant?sb.rpc('get_my_merchant_license',{p_restaurant_id:restaurant.id}):Promise.resolve(null)
         ]);
+        if(generation!==accountLoadGeneration)return;
         state.totals.customer=countPayload(personal,['confirmed_visits','published_reviews','positive_reviews','pending_rewards']);
         state.totals.merchant=countPayload(venue,['confirmed_visits','published_reviews','todays_visits']);
         const access=Array.isArray(license?.data)?license.data[0]:license?.data;
@@ -172,6 +184,7 @@ const GD = (() => {
         if(personal?.error||venue?.error)toast('Conteggi generali non disponibili. Lo storico mostra le voci caricate.');
       }catch{state.totals={customer:null,merchant:null};state.merchantLicense=null;}
     }
+    if(generation!==accountLoadGeneration)return;
     if(state.view!=='reset'){state.view='app';state.section=state.section||'pass';}render();
     if(!isAnon()&&sessionStorage.getItem('gd_merchant_pending')){
       const pendingKey='gd_merchant_pending',raw=sessionStorage.getItem(pendingKey);
@@ -215,7 +228,7 @@ const GD = (() => {
   async function voidVisit(form){const visit=state.visits.find(v=>v.id===state.voidVisitId),merchant=verifiedRestaurant();if(!visit||!merchant||visit.restaurant_id!==merchant.id||visit.status!=='confirmed'||state.reviews.some(r=>r.visit_id===visit.id))throw Error('Questa visita non può essere annullata.');const reason=form.elements.reason.value.trim();if(reason.length<10||reason.length>500)throw Error('Il motivo deve contenere tra 10 e 500 caratteri.');const {error}=await sb.rpc('void_guest_visit',{p_visit_id:visit.id,p_reason:reason});if(error)throw Error(error.message);state.voidVisitId=null;state.section='visits';state.view='app';await refresh();toast('Visita annullata e motivazione registrata.');}
   async function publishReview(form){if(!personalReviewsEnabled)throw Error('Le recensioni sulle persone non sono attive nel piano pilota.');const rating=Number(form.elements.rating.value),comment=form.elements.comment.value.trim();if(!Number.isInteger(rating)||rating<1||rating>10||comment.length<10||comment.length>1200)throw Error('Seleziona il voto e descrivi il comportamento (10–1200 caratteri).');if(!state.reviewVisit)throw Error('Visita non selezionata.');const {error}=await sb.rpc('publish_guest_review',{p_visit_id:state.reviewVisit,p_rating:rating,p_comment:comment});if(error)throw Error(error.message);state.reviewVisit=null;state.view='app';state.section='visits';await refresh();toast('Recensione salvata e associata alla visita.');}
   async function createDispute(form){const review=ownReviews().find(r=>r.id===state.disputeReview);if(!review||review.status!=='published'||ownDisputes().some(d=>d.review_id===review.id))throw Error('Recensione già contestata o non disponibile.');const reason=form.elements.reason.value.trim();if(reason.length<10||reason.length>1000)throw Error('Il motivo deve essere compreso tra 10 e 1000 caratteri.');const {error}=await sb.from('disputes').insert({review_id:review.id,customer_id:state.user.id,reason});if(error)throw Error(error.message);state.disputeReview=null;state.section='reviews';state.view='app';await refresh();toast('Contestazione registrata: in attesa di valutazione.');}
-  async function signOut(){if(isAnon()&&!window.confirm('Il tuo profilo senza recapito potrebbe non essere più recuperabile dopo la disconnessione. Vuoi uscire comunque?'))return;const {error}=await sb.auth.signOut();if(error)throw Error(error.message);state.user=null;state.profile=null;state.applications=[];state.restaurants=[];state.visits=[];state.reviews=[];state.vouchers=[];state.disputes=[];state.privacyRequests=[];state.totals={customer:null,merchant:null};state.merchantLicense=null;state.hasMore={};state.disputeReview=null;state.voidVisitId=null;state.qr=null;state.view='landing';state.side='customer';render();}
+  async function signOut(){if(isAnon()&&!window.confirm('Il tuo profilo senza recapito potrebbe non essere più recuperabile dopo la disconnessione. Vuoi uscire comunque?'))return;accountLoadGeneration++;const {error}=await sb.auth.signOut();if(error){await refresh();throw Error(authMessage(error));}clearAccountState();sessionStorage.removeItem('gd_merchant_pending');clearToast();state.view='landing';render();}
   async function startCamera(){
     const camera=document.getElementById('camera');
     if(!camera||!scannerOpen)return;
