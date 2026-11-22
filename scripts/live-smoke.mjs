@@ -58,6 +58,14 @@ try{
     throw Error('deployed signup gate differs from approved release mode');
   if(shouldBeOpen&&!/turnstileSiteKey:\\s*["'][^"']{8,}["']/.test(deployedConfig))
     throw Error('signup opened without a public Turnstile site key');
+  if(!deployedConfig.includes('personalReviewsEnabled: false'))
+    throw Error('personal ratings enabled before explicit legal release');
+  const expectedLeadIntake=process.env.GOODDINER_EXPECT_LEADS_OPEN==='true';
+  if(!new RegExp('businessLeadIntakeEnabled:\\\\s*'+String(expectedLeadIntake)).test(deployedConfig))
+    throw Error('business lead intake differs from approved release mode');
+  await check('/business.html','BUSINESS PILOTA');
+  await check('/business.js','businessLeadIntakeEnabled');
+  await check('/business.css','business-hero');
   await check('/turnstile.js','GoodDinerCaptcha');
   await check('/client-export.js','GoodDinerDataExport');
   await check('/manifest.webmanifest','GoodDiner');
