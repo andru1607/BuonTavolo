@@ -18,6 +18,6 @@ assert.match(checkinError({message:'QR_SCADUTO_O_UTILIZZATO'}),/scaduto/);
 assert.match(checkinError({message:'VISITA_GIA_REGISTRATA'}),/già stata registrata/);
 assert.match(checkinError({message:'gd_no_self_checkin'}),/tuo DinerPass/);
 assert.doesNotMatch(checkinError({message:'internal error: secret SQL connection details'}),/secret|SQL/);
-assert.match(src,/rejectedScanToken=code;rejectedScanUntil=Date\.now\(\)\+4000/);
+assert.match(src,/rejectedScanToken=scannedValue;rejectedScanUntil=Date\.now\(\)\+4000/);
 assert.match(src,/value===rejectedScanToken&&Date\.now\(\)<rejectedScanUntil/);
 console.log('PASS: QR syntax, localized server errors, duplicate camera retry cooldown');
