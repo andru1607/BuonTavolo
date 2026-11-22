@@ -3,6 +3,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
 const vm=require('node:vm');
+const authFeedback=require('../auth-feedback.js');
 
 async function verifyMerchantPending(){
   const email='titolare@example.test';
@@ -23,7 +24,7 @@ async function verifyMerchantPending(){
     from:()=>query
   })};
   const context={
-    sdk,window:{GOODDINER_PUBLIC_CONFIG:{supabaseUrl:'https://ixczkhmvbjszgmlqznlk.supabase.co',supabasePublishableKey:'sb_publishable_local-test'},scrollTo(){}},
+    sdk,window:{GOODDINER_PUBLIC_CONFIG:{supabaseUrl:'https://ixczkhmvbjszgmlqznlk.supabase.co',supabasePublishableKey:'sb_publishable_local-test'},GoodDinerAuthUX:authFeedback,scrollTo(){}},
     document:{getElementById:id=>id==='app'?app:id==='toast'?toast:null,addEventListener:(k,fn)=>events[k]=fn},
     sessionStorage:{getItem:k=>saved.get(k)??null,setItem:(k,v)=>saved.set(k,v),removeItem:k=>saved.delete(k)},
     setTimeout(){},clearTimeout(){},location:{origin:'https://example.test'}
