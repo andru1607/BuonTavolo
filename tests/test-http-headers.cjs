@@ -11,7 +11,7 @@ assert.equal(headers['x-frame-options'],'DENY');
 assert.match(headers['strict-transport-security'],/max-age=31536000/);
 assert.match(headers['permissions-policy'],/camera=\(self\)/);
 assert.match(headers['x-robots-tag'],/noindex/);
-for(const source of ['/','/index.html']){
+for(const source of ['/','/index.html','/business.html']){
  const route=config.headers.find(x=>x.source===source);
  assert.ok(route,source+' header route missing');
  const csp=route.headers.find(x=>x.key==='Content-Security-Policy')?.value;

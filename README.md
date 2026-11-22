@@ -1,3 +1,14 @@
+# GoodDiner Business · Primo modello commerciale (pilota)
+
+**Offerta iniziale proposta: 39 €/mese per ristorante, IVA esclusa se dovuta, con 14 giorni di prova dopo verifica.** Nessun pagamento è ancora collegato o accettato dall'app; le iscrizioni generali sono chiuse. Le vendite possono iniziare soltanto quando servizio, fatturazione, privacy e Stripe saranno effettivamente pronti.
+
+- [Pagina Business](business.html): descrizione reale della web app, caratteristiche, prezzo pilota e richiesta demo attivabile solo dopo CAPTCHA e informativa privacy approvati.
+- [Licenze e documentazione commerciale](docs/business-pilot.md): trial 14 giorni, blocco nuove scansioni dopo scadenza, attivazione manuale solo dopo pagamento verificato; opzione Stripe per abbonamenti ricorrenti.
+- **La prima versione vendibile è la gestione presenze QR, storico e conteggi.** Le valutazioni sulle persone sono chiuse lato server fino alla revisione legale. I voucher restano inattivi.
+- Le nuove tabelle business e il modulo contatti saranno applicati al solo Supabase GoodDiner. Non usare o modificare database di altri progetti.
+
+---
+
 # GoodDiner 1.0 · Accesso reale (rilascio controllato)
 
 **Accesso controllato:** le nuove registrazioni sono disabilitate nel browser e, dopo l'applicazione della [migrazione del gate Auth](database/gooddiner_registration_gate.sql), anche direttamente nel database, finché non sono configurati il CAPTCHA server-side, email e privacy. La home resta consultabile e l'accesso agli account esistenti non è rimosso. [Checklist go-live](docs/go-live-acceptance.md).
