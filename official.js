@@ -25,6 +25,7 @@ const GD = (() => {
   const currentVenue=()=>verifiedRestaurant()||state.restaurants.find(r=>r.owner_id===state.user?.id)||null;
   let sb=null,toastTimer=null,qrTimer=null,scanStream=null,scanTimer=null,detector=null,lockedScan=false,scannerOpen=false,cameraGeneration=0;
   let sdkError='';
+  let rejectedScanToken='',rejectedScanUntil=0;
   let accountLoadGeneration=0;
   function clearToast(){
     clearTimeout(toastTimer);
@@ -40,7 +41,7 @@ const GD = (() => {
   function notice(text,kind=''){return `<div class="notice ${kind?'notice-'+kind:''}">${svg(kind==='alert'?'info':'shield',17)} ${e(text)}</div>`;}
   function button(label,action,cls='btn-dark',extra=''){return `<button type="button" class="btn ${cls}" data-action="${e(action)}" ${extra}>${label}</button>`;}
   function busy(flag){state.busy=flag;dom.app.classList.toggle('loading',flag);}
-  function resetScanner(){cameraGeneration++;scannerOpen=false;lockedScan=false;detector=null;resetCameraStream();document.getElementById('scanner')?.remove();}
+  function resetScanner(){cameraGeneration++;scannerOpen=false;lockedScan=false;detector=null;rejectedScanToken='';rejectedScanUntil=0;resetCameraStream();document.getElementById('scanner')?.remove();}
   function clearAccountState(){
     resetScanner();clearTimeout(qrTimer);qrTimer=null;
     state.user=null;state.profile=null;state.applications=[];state.restaurants=[];
@@ -223,8 +224,24 @@ const GD = (() => {
   }
   async function submitApplication(name,city,auto=false){if(!window.GoodDinerAuthUX?.emailConfirmed(state.user))throw Error('Prima di richiedere la verifica del locale, conferma il tuo indirizzo email.');if(state.applications.some(a=>a.status==='pending')){if(!auto)toast('Hai già una richiesta in attesa.');return;}
     const {error}=await sb.from('merchant_applications').insert({applicant_id:state.user.id,restaurant_name:name,city,source:'manual'});if(error)throw Error(error.message);state.side='merchant';state.section='merchant';await loadAccount();if(!auto)toast('Richiesta di verifica registrata.');}
-  async function issueQR(){const {data,error}=await sb.rpc('issue_guest_qr');if(error)throw Error(error.message);const result=Array.isArray(data)?data[0]:data;if(!result?.qr_token||!result?.expires_at)throw Error('Risposta QR inattesa.');state.qr=result;render();toast('QR pronto, valido per 90 secondi.');}
-  async function claim(token){const restaurant=verifiedRestaurant();if(!restaurant)throw Error('Il tuo ristorante non è verificato.');if(!state.merchantLicense?.is_usable)throw Error('Prova o abbonamento Business non attivo.');const {data,error}=await sb.rpc('checkin_guest',{p_qr_token:token,p_restaurant_id:restaurant.id});if(error){if(String(error.message||'').includes('gd_no_self_checkin'))throw Error('Non puoi registrare il tuo DinerPass nel ristorante che gestisci.');throw Error(error.message);}resetScanner();await refresh();const result=Array.isArray(data)?data[0]:data;toast('Presenza registrata: '+(result?.guest_nickname||'cliente'));}
+  async function issueQR(){const {data,error}=await sb.rpc('issue_guest_qr');if(error)throw Error('Impossibile generare il codice QR. Controlla la connessione e riprova.');const result=Array.isArray(data)?data[0]:data;if(!result?.qr_token||!result?.expires_at)throw Error('Risposta QR inattesa.');state.qr=result;render();toast('QR pronto, valido per 90 secondi.');}
+  function validateDinerPassToken(token){
+    const value=String(token||'').trim();
+    if(!/^GD1:[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$/.test(value))
+      throw Error('Codice non valido. Fai generare un nuovo DinerPass al cliente.');
+    return value;
+  }
+  function checkinError(error){
+    const message=String(error?.message||'');
+    if(message.includes('QR_SCADUTO_O_UTILIZZATO'))return 'QR scaduto o già utilizzato. Chiedi al cliente di generare un nuovo codice.';
+    if(message.includes('VISITA_GIA_REGISTRATA'))return 'La presenza di questo cliente è già stata registrata oggi.';
+    if(message.includes('QR_NON_VALIDO'))return 'Questo codice QR non è valido. Fanne generare uno nuovo.';
+    if(message.includes('gd_no_self_checkin'))return 'Non puoi registrare il tuo DinerPass nel ristorante che gestisci.';
+    if(message.includes('RISTORANTE_NON_VERIFICATO'))return 'Il ristorante non è ancora verificato.';
+    if(message.includes('MERCHANT_LICENSE')||message.includes('ABBONAMENTO'))return 'Accesso Business non attivo. Controlla la licenza del locale.';
+    return 'Registrazione non riuscita. Controlla la connessione e riprova.';
+  }
+  async function claim(token){token=validateDinerPassToken(token);const restaurant=verifiedRestaurant();if(!restaurant)throw Error('Il tuo ristorante non è verificato.');if(!state.merchantLicense?.is_usable)throw Error('Prova o abbonamento Business non attivo.');const {data,error}=await sb.rpc('checkin_guest',{p_qr_token:token,p_restaurant_id:restaurant.id});if(error)throw Error(checkinError(error));resetScanner();await refresh();const result=Array.isArray(data)?data[0]:data;toast('Presenza registrata: '+(result?.guest_nickname||'cliente'));}
   async function voidVisit(form){const visit=state.visits.find(v=>v.id===state.voidVisitId),merchant=verifiedRestaurant();if(!visit||!merchant||visit.restaurant_id!==merchant.id||visit.status!=='confirmed'||state.reviews.some(r=>r.visit_id===visit.id))throw Error('Questa visita non può essere annullata.');const reason=form.elements.reason.value.trim();if(reason.length<10||reason.length>500)throw Error('Il motivo deve contenere tra 10 e 500 caratteri.');const {error}=await sb.rpc('void_guest_visit',{p_visit_id:visit.id,p_reason:reason});if(error)throw Error(error.message);state.voidVisitId=null;state.section='visits';state.view='app';await refresh();toast('Visita annullata e motivazione registrata.');}
   async function publishReview(form){if(!personalReviewsEnabled)throw Error('Le recensioni sulle persone non sono attive nel piano pilota.');const rating=Number(form.elements.rating.value),comment=form.elements.comment.value.trim();if(!Number.isInteger(rating)||rating<1||rating>10||comment.length<10||comment.length>1200)throw Error('Seleziona il voto e descrivi il comportamento (10–1200 caratteri).');if(!state.reviewVisit)throw Error('Visita non selezionata.');const {error}=await sb.rpc('publish_guest_review',{p_visit_id:state.reviewVisit,p_rating:rating,p_comment:comment});if(error)throw Error(error.message);state.reviewVisit=null;state.view='app';state.section='visits';await refresh();toast('Recensione salvata e associata alla visita.');}
   async function createDispute(form){const review=ownReviews().find(r=>r.id===state.disputeReview);if(!review||review.status!=='published'||ownDisputes().some(d=>d.review_id===review.id))throw Error('Recensione già contestata o non disponibile.');const reason=form.elements.reason.value.trim();if(reason.length<10||reason.length>1000)throw Error('Il motivo deve essere compreso tra 10 e 1000 caratteri.');const {error}=await sb.from('disputes').insert({review_id:review.id,customer_id:state.user.id,reason});if(error)throw Error(error.message);state.disputeReview=null;state.section='reviews';state.view='app';await refresh();toast('Contestazione registrata: in attesa di valutazione.');}
@@ -277,9 +294,9 @@ const GD = (() => {
           if(!scannerOpen||generation!==cameraGeneration||!scanStream)return;
           if(codes.length){
             const value=String(codes[0].rawValue||'').trim();
-            if(value.startsWith('GD1:')){lockedScan=true;await claim(value);return;}
+            if(value.startsWith('GD1:')&&!(value===rejectedScanToken&&Date.now()<rejectedScanUntil)){lockedScan=true;await claim(value);return;}
           }
-        }catch(err){if(lockedScan){toast(err.message||'Lettura non riuscita.');lockedScan=false;}}
+        }catch(err){if(lockedScan){const code=String(codes?.[0]?.rawValue||'').trim();rejectedScanToken=code;rejectedScanUntil=Date.now()+4000;toast(err.message||'Lettura non riuscita.');lockedScan=false;}}
         if(scannerOpen&&generation===cameraGeneration&&scanStream&&!document.hidden)scanTimer=setTimeout(frame,300);
       };
       frame();
