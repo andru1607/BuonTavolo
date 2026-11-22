@@ -1,0 +1,16 @@
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const read=p=>fs.readFileSync(path.join(__dirname,'..',p),'utf8');
+const sql=read('database/gooddiner_business_lead_retention.sql');
+const leads=read('database/gooddiner_business_pilot_leads.sql');
+assert.match(sql,/create extension if not exists pg_cron with schema pg_catalog/);
+assert.match(sql,/select cron\.schedule\(/);
+assert.match(sql,/gooddiner-pilot-lead-retention/);
+assert.match(sql,/20 3 \* \* \*/);
+assert.match(sql,/delete from public\.business_pilot_leads where delete_after < now\(\)/);
+assert.match(leads,/delete_after timestamptz not null default \(now\(\)\+interval '90 days'\)/);
+assert.match(leads,/revoke all on public\.business_pilot_leads from public,anon,authenticated/);
+assert.ok(!sql.includes('grant insert on public.business_pilot_leads to anon'));
+console.log('PASS: daily 90-day business-lead retention and no direct anonymous access');
