@@ -61,7 +61,7 @@ try{
   if(!deployedConfig.includes('personalReviewsEnabled: false'))
     throw Error('personal ratings enabled before explicit legal release');
   const expectedLeadIntake=process.env.GOODDINER_EXPECT_LEADS_OPEN==='true';
-  if(!new RegExp('businessLeadIntakeEnabled:\\\\s*'+String(expectedLeadIntake)).test(deployedConfig))
+  if(!new RegExp('businessLeadIntakeEnabled:\\s*'+String(expectedLeadIntake)).test(deployedConfig))
     throw Error('business lead intake differs from approved release mode');
   await check('/business.html','BUSINESS PILOTA');
   await check('/business.js','businessLeadIntakeEnabled');
