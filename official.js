@@ -278,6 +278,7 @@ const GD = (() => {
       if(jsDecoder&&!context)throw Error('Lettore immagini non disponibile.');
       lockedScan=false;
       const frame=async()=>{
+        let scannedValue='';
         if(!scannerOpen||generation!==cameraGeneration||!scanStream||lockedScan||document.hidden)return;
         try{
           let codes=[];
@@ -293,10 +294,10 @@ const GD = (() => {
           }
           if(!scannerOpen||generation!==cameraGeneration||!scanStream)return;
           if(codes.length){
-            const value=String(codes[0].rawValue||'').trim();
+            const value=String(codes[0].rawValue||'').trim();scannedValue=value;
             if(value.startsWith('GD1:')&&!(value===rejectedScanToken&&Date.now()<rejectedScanUntil)){lockedScan=true;await claim(value);return;}
           }
-        }catch(err){if(lockedScan){const code=String(codes?.[0]?.rawValue||'').trim();rejectedScanToken=code;rejectedScanUntil=Date.now()+4000;toast(err.message||'Lettura non riuscita.');lockedScan=false;}}
+        }catch(err){if(lockedScan){rejectedScanToken=scannedValue;rejectedScanUntil=Date.now()+4000;toast(err.message||'Lettura non riuscita.');lockedScan=false;}}
         if(scannerOpen&&generation===cameraGeneration&&scanStream&&!document.hidden)scanTimer=setTimeout(frame,300);
       };
       frame();
