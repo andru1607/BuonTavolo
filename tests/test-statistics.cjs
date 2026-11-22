@@ -6,7 +6,7 @@ const vm=require('node:vm');
 const read=x=>fs.readFileSync(path.join(__dirname,'..',x),'utf8');
 const schema=read('database/gooddiner_accurate_statistics.sql');
 assert.ok(schema.includes('security invoker'),'never bypass RLS to compute aggregates');
-for(const method of ['get_my_dinerpass_counts','get_my_restaurant_counts']){
+for(const method of ['get_my_dinerpass_counts','get_my_restaurant_counts','get_my_merchant_license']){
  assert.ok(schema.includes('public.'+method),'aggregate missing: '+method);
  assert.ok(schema.includes('grant execute on function public.'+method),'function must be limited to authenticated callers');
 }
@@ -47,6 +47,7 @@ async function run(){
      rpcCalls.push({name,args});
      if(name==='get_my_dinerpass_counts')return {data:[{confirmed_visits:307,published_reviews:286,positive_reviews:272,pending_rewards:5}],error:null};
      if(name==='get_my_restaurant_counts')return {data:[{confirmed_visits:920,published_reviews:600,todays_visits:37}],error:null};
+     if(name==='get_my_merchant_license')return {data:[{license_status:'trialing',active_until:'2026-12-08T10:00:00Z',is_usable:true}],error:null};
      return {error:{message:'unexpected RPC '+name}};
    }
  };
