@@ -61,16 +61,20 @@ Il form può essere aperto **soltanto dopo** una informativa dedicata alla richi
 - Il client deve conoscere soltanto `turnstileSiteKey` pubblica, `businessPrivacyUrl` HTTPS e `businessLeadIntakeEnabled:true` in `config.js`
 - Abilitare `supabase/config.toml` con `verify_jwt=false` per la Edge Function **soltanto** perché la verifica Turnstile viene fatta obbligatoriamente sul server. Se manca un parametro la funzione risponde `503` e non raccoglie contatti.
 
-La tabella `public.business_pilot_leads` ha RLS, nessuna policy/grant per `anon` o `authenticated`: solo server autorizzato può scrivere. Conserva **nome locale, città ed email di contatto**, data e hash di rate-limit, non dati degli ospiti. La scadenza `delete_after` a 90 giorni è una **data per l'operatore**, non elimina automaticamente i dati. Prima di aprire il form va attivata una cancellazione verificabile e scegliere il periodo di conservazione con il titolare.
+La tabella `public.business_pilot_leads` ha RLS, nessuna policy/grant per `anon` o `authenticated`: solo server autorizzato può scrivere. Conserva **nome locale, città ed email di contatto**, data e hash di rate-limit, non dati degli ospiti. La scadenza `delete_after` a 90 giorni viene applicata da una cancellazione giornaliera **soltanto dopo aver installato e verificato** la migrazione `database/gooddiner_business_lead_retention.sql`, che abilita `pg_cron`. Il titolare deve approvare il periodo prima di aprire il form; monitorare gli esiti dei job.
 
-Esempio di intervento manuale sul database autorizzato (da automatizzare e auditare prima del go-live del form):
+Verifica periodica nel SQL Editor dopo l'installazione della pianificazione automatica:
 
 ```sql
 select count(*) from public.business_pilot_leads
 where delete_after < now();
 
--- Eseguire dopo approvazione della retention e verifica dei backup:
--- delete from public.business_pilot_leads where delete_after < now();
+select jobid,jobname,schedule,active from cron.job
+where jobname='gooddiner-pilot-lead-retention';
+
+-- Controllo esiti senza esporre email o dettagli dei contatti:
+select status,start_time,end_time from cron.job_run_details
+order by start_time desc limit 10;
 ```
 
 Non accettare documenti, informazioni sensibili dei clienti, dati sanitari o numeri di carta nel modulo contatti.
@@ -79,7 +83,9 @@ Non accettare documenti, informazioni sensibili dei clienti, dati sanitari o num
 
 - [x] Il frontend mostra il business pilot senza pubblicare prezzi inventati come incassi reali.
 - [x] Il codice protegge l'abilitazione delle licenze e delle recensioni personali sul server.
-- [ ] Migrazione business applicata e test SQL transazionale superato.
+- [x] Migrazioni Business pilota e lead queue applicate al Supabase GoodDiner; test SQL transazionale superato senza dati persistenti.
+- [x] Funzione server lead `business-pilot-lead` distribuita in stato fail-closed: nessuna raccolta finché mancano dominio, CAPTCHA e privacy approvati.
+- [ ] Job pg_cron giornaliero presente e verificato, con cancellazione effettiva delle richieste scadute.
 - [ ] Test reale di rilascio su dominio canonico con traffico HTTPS e Safari iPhone.
 - [ ] Cliente + ristoratore volontari: sessione verificata, check-in reale, scadenza prova, accesso incrociato negato, modulo privacy funzionante.
 - [ ] Stripe verificato, prodotto attivo, checkout reale e pagamento correttamente registrato con fattura.
