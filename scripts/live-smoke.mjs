@@ -47,6 +47,7 @@ async function check(path,expected){
 }
 try{
   const html=await check('/','GoodDiner');
+  if(!html.includes('href="/design-v2.css"'))throw Error('new GoodDiner design CSS is not deployed');
   if(!html.includes('src="/official.js"')||!html.includes('src="/turnstile.js"')){
     throw Error('Main page does not load verified GoodDiner official client');
   }
@@ -66,6 +67,8 @@ try{
   await check('/business.html','BUSINESS PILOTA');
   await check('/business.js','businessLeadIntakeEnabled');
   await check('/business.css','business-hero');
+  await check('/design-v2.css','gooddiner-app .mobile-nav');
+  await check('/demo-design-v2.css','v73-app .sidebar');
   await check('/turnstile.js','GoodDinerCaptcha');
   await check('/client-export.js','GoodDinerDataExport');
   await check('/manifest.webmanifest','GoodDiner');
