@@ -7,7 +7,7 @@ const vm=require('node:vm');
 async function verifyMerchantPending(){
   const email='titolare@example.test';
   const saved=new Map([['gd_merchant_pending',JSON.stringify({name:'Trattoria Lago',city:'Garda',email})]]);
-  const user={id:'merchant-1',email:'un-altro@example.test',is_anonymous:false};
+  const user={id:'merchant-1',email:'un-altro@example.test',email_confirmed_at:'2026-11-22T12:00:00Z',is_anonymous:false};
   const events={};
   const app={innerHTML:'',classList:{toggle(){}}},toast={};
   const attempts=[];
@@ -37,6 +37,11 @@ async function verifyMerchantPending(){
   const retry=()=>events.click({preventDefault(){},target:{closest:()=>({dataset:{action:'retry'}})}});
   saved.set('gd_merchant_pending',JSON.stringify({name:'Trattoria Lago',city:'Garda',email}));
   user.email=email;
+  user.email_confirmed_at=null;
+  await retry();
+  assert.equal(attempts.length,0,'unconfirmed email cannot submit a merchant application');
+  assert.equal(saved.has('gd_merchant_pending'),true,'pending merchant request remains until email confirmation');
+  user.email_confirmed_at='2026-11-22T12:00:00Z';
   await retry();
   assert.equal(attempts.length,1,'attempts only for the registered email');
   assert.equal(saved.has('gd_merchant_pending'),true,'a failed submission is recoverable');
