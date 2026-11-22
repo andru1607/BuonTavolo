@@ -3,6 +3,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
 const vm=require('node:vm');
+const authFeedback=require('../auth-feedback.js');
 const read=x=>fs.readFileSync(path.join(__dirname,'..',x),'utf8');
 const schema=read('database/gooddiner_accurate_statistics.sql');
 assert.ok(schema.includes('security invoker'),'never bypass RLS to compute aggregates');
@@ -21,7 +22,7 @@ async function run(){
  const nextVenue=[{id:'venue-250',customer_id:'guest-new',restaurant_id:'venue-owned',guest_nickname:'Nuovo cliente 250',checked_in_at:'2026-11-01T10:00:00Z',status:'confirmed'}];
  const queryCalls=[],rpcCalls=[];
  const client={
-   auth:{onAuthStateChange(){},getUser:async()=>({data:{user:{id:account,email:'person@example.test',is_anonymous:false}},error:null})},
+   auth:{onAuthStateChange(){},getUser:async()=>({data:{user:{id:account,email:'person@example.test',email_confirmed_at:'2026-11-22T12:00:00Z',is_anonymous:false}},error:null})},
    from(table){
      let filter=null;
      const q={
@@ -53,7 +54,7 @@ async function run(){
  };
  const ctx={
    sdk:{createClient:()=>client},
-   window:{GOODDINER_PUBLIC_CONFIG:{supabaseUrl:'https://ixczkhmvbjszgmlqznlk.supabase.co',supabasePublishableKey:'sb_publishable_test'},scrollTo(){}},
+   window:{GOODDINER_PUBLIC_CONFIG:{supabaseUrl:'https://ixczkhmvbjszgmlqznlk.supabase.co',supabasePublishableKey:'sb_publishable_test'},GoodDinerAuthUX:authFeedback,scrollTo(){}},
    document:{getElementById:k=>k==='app'?app:k==='toast'?toast:null,addEventListener:(k,v)=>events[k]=v},
    sessionStorage:{getItem(){return null;}},setTimeout(){},clearTimeout(){}
  };
