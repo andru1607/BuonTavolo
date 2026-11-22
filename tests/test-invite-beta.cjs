@@ -36,5 +36,8 @@ assert.match(app,/name="inviteCode"/);
 assert.match(app,/name="pilotAcknowledged"/);
 assert.match(app,/captchaToken\(form,!pilotInviteOnly\)/);
 assert.match(app,/Conferma l.email/);
+assert.match(cfg,/registrationEnabled:\s*true/);
+assert.match(cfg,/registrationMode:\s*"invite"/);
+assert.match(cfg,/turnstileSiteKey:\s*""/);
 assert.ok(!cfg.includes('service_role')&&!cfg.includes('sk_live_'));
 console.log('PASS: controlled beta signup with one-time server-checked email invitations and no client secrets');
