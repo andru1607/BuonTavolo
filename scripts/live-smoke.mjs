@@ -57,8 +57,11 @@ try{
   const deployedConfig=await check('/config.js',project);
   if(!new RegExp('registrationEnabled:\\s*'+String(shouldBeOpen)).test(deployedConfig))
     throw Error('deployed signup gate differs from approved release mode');
-  if(shouldBeOpen&&!/turnstileSiteKey:\\s*["'][^"']{8,}["']/.test(deployedConfig))
-    throw Error('signup opened without a public Turnstile site key');
+  const invitationMode=/registrationMode:\\s*["']invite["']/.test(deployedConfig);
+  if(shouldBeOpen&&!invitationMode&&!/turnstileSiteKey:\\s*["'][^"']{8,}["']/.test(deployedConfig))
+    throw Error('public signup opened without a public Turnstile site key');
+  if(shouldBeOpen&&invitationMode&&!script.includes('gd_invite_purpose'))
+    throw Error('invite-only UI enabled without invitation token forwarding');
   if(!deployedConfig.includes('personalReviewsEnabled: false'))
     throw Error('personal ratings enabled before explicit legal release');
   const expectedLeadIntake=process.env.GOODDINER_EXPECT_LEADS_OPEN==='true';
