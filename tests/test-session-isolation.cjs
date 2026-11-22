@@ -19,4 +19,5 @@ for(const snippet of [
 const count=app.split('if(generation!==accountLoadGeneration)return;').length-1;
 assert.ok(count>=5,'check token after each awaited load to avoid stale-session data being rendered');
 assert.ok(app.includes("if(!['signup','signup-customer','signup-merchant','signin','forgot','confirm'].includes(state.view))state.view='landing'"),'signed-out navigation may not be left in private account');
+assert.ok(app.includes("state.view==='confirm'||!state.user"),'confirmed email prompt must be accessible to logged-in pending merchants');
 console.log('PASS: pending async data cannot repopulate signed-out accounts; QR and old histories cleared');
