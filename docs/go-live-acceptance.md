@@ -66,4 +66,20 @@ Nessuno dei test fisici qui sopra è marcato completato: richiedono dispositivi 
 - [ ] Un addetto reale incaricato dell'approvazione dei locali; conservazione protetta delle prove necessarie, nessuna scheda Maps come prova sufficiente.
 - [ ] Eseguire un ultimo controllo degli advisor Supabase; monitorare errori e predisporre backup/incident response.
 
+
+## F. Primo incasso GoodDiner Business · verifica 22 novembre 2026
+
+- [x] Offerta **pilota proposta** 39 €/mese per locale, IVA esclusa se applicabile, dopo 14 giorni di prova; [pagina dedicata](../business.html). Nessun ricavo effettivo registrato.
+- [x] Due migrazioni Business applicate (20261122005029, 20261122005035). Database GoodDiner: 9 tabelle pubbliche e 8 private, tutte RLS. Prova SQL transazionale di licenza scaduta e recensioni in fase di test superata senza dati persistenti.
+- [x] Ruoli anon e authenticated senza lettura delle licenze o inserimento diretto nella coda lead; la RPC get_my_merchant_license verifica il proprietario internamente.
+- [x] Disattivazione **server** delle valutazioni alle persone. Le visite possono essere monetizzate come servizio B2B soltanto quando esistono account reali, privacy, dominio, assistenza e fatturazione.
+- [x] Edge Function pubblica business-pilot-lead distribuita senza secret di pagamento; **fail closed** finché non vengono configurati origine HTTPS e segreto anti-bot. Il form sul sito resta disabilitato.
+- [ ] Applicare/verificare migrazione database/gooddiner_business_lead_retention.sql, monitorare il job pg_cron quotidiano e conservazione dati approvata.
+- [ ] Configurare dominio commerciale, Supabase Auth/SMTP/redirect, Cloudflare Turnstile (provider Auth e lead endpoint), informativa e contatto privacy approvati.
+- [ ] Collegare Stripe del **soggetto venditore**; definire condizioni, fatturazione, cancellazione e verifica pagamenti; inviare pagamento solo quando è possibile erogare il servizio. Attivazione licenza manuale solo dopo pagamento controllato.
+- [ ] Eseguire sessione iPhone reale cliente/ristoratore e testare un locale con trial, scadenza, pannello e storico completo.
+- [ ] Ricevere il primo pagamento reale e registrare data, locale, documentazione fiscale adeguata e conferma di utilizzo. **Non simulare acquisti, abbonamenti o ricavi.**
+
+[Runbook Business e Stripe manuale](business-pilot.md). [Blocco Vercel e dominio](https://github.com/andru1607/BuonTavolo/issues/28).
+
 **Regola di pubblicazione:** il progetto può essere considerato pronto soltanto quando ogni punto fondamentale sopra ha una prova verificabile e un responsabile. Non sostituire una checkbox con una promessa.
