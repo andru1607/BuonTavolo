@@ -1,0 +1,4 @@
+# Public lead endpoint must verify Cloudflare challenge and canonical Origin itself.
+# No JWT requirement because prospective restaurants are not registered.
+[functions.business-pilot-lead]
+verify_jwt = false
