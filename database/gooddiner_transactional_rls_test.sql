@@ -35,6 +35,9 @@ BEGIN
     -- This fixture is a single rollback-only SQL statement run as postgres.
     -- It never opens registration for Supabase Auth API requests.
     PERFORM set_config('gooddiner.test_fixture','enabled',true);
+    -- Human guest scoring is disabled in production. Enable only inside this
+    -- single rollback-only fixture to test historic review/dispute procedures.
+    update gd_private.business_features set personal_reviews_enabled=true where singleton=true;
     INSERT INTO auth.users(id,aud,role,email,raw_user_meta_data,email_confirmed_at,is_anonymous,created_at,updated_at)
     VALUES
       (guest_a,'authenticated','authenticated','test-guest-a-'||guest_a||'@example.invalid',jsonb_build_object('nickname','ProvaOspiteA','role','merchant'),now(),false,now(),now()),
@@ -52,6 +55,13 @@ BEGIN
     VALUES (merchant_a,'Locale di prova A','Garda',now()) RETURNING id INTO venue_a;
     INSERT INTO public.restaurants(owner_id,name,city,verified_at)
     VALUES (merchant_b,'Locale di prova B','Verona',now()) RETURNING id INTO venue_b;
+
+    -- Each manually verified venue receives a 14-day private trial license.
+    IF (SELECT status FROM gd_private.merchant_licenses WHERE restaurant_id=venue_a)
+       IS DISTINCT FROM 'trialing' OR
+       (SELECT active_until FROM gd_private.merchant_licenses WHERE restaurant_id=venue_a)<=now() THEN
+      RAISE EXCEPTION 'FAIL: verified restaurant trial not created';
+    END IF;
 
     -- Anonymous Auth accounts use the "authenticated" DB role. Their JWT
     -- is_anonymous claim must prevent merchant onboarding.
@@ -98,6 +108,24 @@ BEGIN
     END;
     IF NOT seen_error THEN RAISE EXCEPTION 'FAIL: merchant B operated merchant A venue'; END IF;
     EXECUTE 'RESET ROLE';
+
+    -- Even the verified owner cannot check in when the paid pilot has expired.
+    UPDATE gd_private.merchant_licenses
+       SET active_until=now()-interval '1 minute'
+     WHERE restaurant_id=venue_a;
+    PERFORM set_config('request.jwt.claim.sub',merchant_a::text,true);
+    PERFORM set_config('request.jwt.claims',jsonb_build_object('sub',merchant_a::text,'is_anonymous',false)::text,true);
+    EXECUTE 'SET LOCAL ROLE authenticated';
+    seen_error:=false;
+    BEGIN
+      PERFORM public.checkin_guest(token_a,venue_a);
+    EXCEPTION WHEN OTHERS THEN seen_error:=true;
+    END;
+    IF NOT seen_error THEN RAISE EXCEPTION 'FAIL: expired merchant license allowed check-in'; END IF;
+    EXECUTE 'RESET ROLE';
+    UPDATE gd_private.merchant_licenses
+       SET active_until=now()+interval '14 days'
+     WHERE restaurant_id=venue_a;
 
     -- Genuine merchant A can record a verified visit.
     PERFORM set_config('request.jwt.claim.sub',merchant_a::text,true);
