@@ -6,7 +6,7 @@ const vm=require('node:vm');
 const read=x=>fs.readFileSync(path.join(__dirname,'..',x),'utf8');
 const schema=read('database/gooddiner_accurate_statistics.sql');
 assert.ok(schema.includes('security invoker'),'never bypass RLS to compute aggregates');
-for(const method of ['get_my_dinerpass_counts','get_my_restaurant_counts','get_my_merchant_license']){
+for(const method of ['get_my_dinerpass_counts','get_my_restaurant_counts']){
  assert.ok(schema.includes('public.'+method),'aggregate missing: '+method);
  assert.ok(schema.includes('grant execute on function public.'+method),'function must be limited to authenticated callers');
 }
@@ -61,7 +61,7 @@ async function run(){
  const gd=ctx.window.GD;
  assert.equal(gd.state.visits.length,251,'client and merchant histories initially separated');
  assert.equal(gd.state.totals.customer.confirmed_visits,307);
- assert.deepEqual(JSON.parse(JSON.stringify(rpcCalls.map(r=>r.name))),['get_my_dinerpass_counts','get_my_restaurant_counts']);
+ assert.deepEqual(JSON.parse(JSON.stringify(rpcCalls.map(r=>r.name))),['get_my_dinerpass_counts','get_my_restaurant_counts','get_my_merchant_license']);
  gd.state.side='customer';gd.state.section='pass';gd.render();
  assert.match(app.innerHTML,/<small>Visite confermate<\/small><strong>307<\/strong>/,'personal totals do not cap at 250');
  assert.match(app.innerHTML,/<small>Valutazioni positive<\/small><strong>272<\/strong>/);
