@@ -5,7 +5,7 @@
 - [Pagina Business](business.html): descrizione reale della web app, caratteristiche, prezzo pilota e richiesta demo attivabile solo dopo CAPTCHA e informativa privacy approvati.
 - [Licenze e documentazione commerciale](docs/business-pilot.md): trial 14 giorni, blocco nuove scansioni dopo scadenza, attivazione manuale solo dopo pagamento verificato; opzione Stripe per abbonamenti ricorrenti.
 - **La prima versione vendibile è la gestione presenze QR, storico e conteggi.** Le valutazioni sulle persone sono chiuse lato server fino alla revisione legale. I voucher restano inattivi.
-- Le nuove tabelle business e il modulo contatti saranno applicati al solo Supabase GoodDiner. Non usare o modificare database di altri progetti.
+- Le tabelle Business e il gate di recensioni sono già installati **soltanto** sul Supabase GoodDiner. La funzione server di richiesta contatto è distribuita ma **non raccoglie dati**: manca la configurazione del dominio, della secret anti-bot e dell'informativa approvata. Non usare altri database.
 
 ---
 
@@ -31,7 +31,7 @@ Leggi [le note ufficiali di rilascio](docs/official-release-v1.md) e [il databas
 
 # GoodDiner · Database Supabase dedicato installato
 
-Il progetto Supabase **GoodDiner** (`ixczkhmvbjszgmlqznlk`) è attivo in `andru1607's Org` nella regione `eu-central-1`. Sono state applicate [la migrazione iniziale](database/gooddiner_initial.sql), [l'ottimizzazione RLS/indici](database/gooddiner_policy_performance.sql) e [la migrazione di moderazione riservata](database/gooddiner_operator_moderation.sql). Il database contiene 8 tabelle pubbliche con RLS e 5 tabelle private con RLS; alla verifica del 21 novembre erano prive di utenti e operazioni reali. La home 1.0 usa Supabase. [Procedure operatori](docs/operator-moderation.md). Per provare i flussi con dati inventati nel browser, apri [la demo locale](demo.html). Consulta lo [stato delle verifiche prima del lancio](database/README.md). Non usare o modificare il database easygart.
+Il progetto Supabase **GoodDiner** (`ixczkhmvbjszgmlqznlk`) è attivo in `andru1607's Org` nella regione `eu-central-1`. Sono state applicate [la migrazione iniziale](database/gooddiner_initial.sql), [l'ottimizzazione RLS/indici](database/gooddiner_policy_performance.sql) e [la migrazione di moderazione riservata](database/gooddiner_operator_moderation.sql). Dopo le migrazioni Business del 22 novembre, il database contiene **9 tabelle pubbliche con RLS e 8 tabelle private con RLS**, 17 tabelle applicative protette in totale. Le verifiche SQL confermano zero utenti, locali, visite, recensioni e lead persistenti. La home 1.0 usa Supabase. [Procedure operatori](docs/operator-moderation.md). Per provare i flussi con dati inventati nel browser, apri [la demo locale](demo.html). Consulta lo [stato delle verifiche prima del lancio](database/README.md). Non usare o modificare il database easygart.
 
 ---
 
