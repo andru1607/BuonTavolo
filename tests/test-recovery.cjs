@@ -12,7 +12,11 @@ async function testRecovery() {
   const recoveryEmails = [];
   let fail = true;
   let lastInsert = null;
+  let profileUpdateError = null;
   const query = {
+    update() {
+      return {eq: () => ({select: () => ({single: async () => ({error: profileUpdateError})})})};
+    },
     select() { return this; }, eq() { return this; }, order() { return this; },
     limit() { return this; }, single() { return {data: {id: 'demo', nickname: 'Ospite'}}; },
     insert(payload) { lastInsert=payload; return Promise.resolve({error:null}); }
@@ -94,6 +98,21 @@ async function testRecovery() {
   await setPassword('password-abbastanza-lunga','password-abbastanza-lunga');
   assert.equal(toast.textContent,'Password salvata. Ora puoi accedere con email e password.');
   assert.equal(resetCalled,true);
+
+  const saveNickname = value => events.submit({preventDefault() {}, target: {
+    id:'profile-form', elements:{nickname:{value}}
+  }});
+  await saveNickname(' ab ');
+  assert.match(toast.textContent, /tra 3 e 30/);
+  profileUpdateError = {code:'23505', message:'duplicate key'};
+  await saveNickname('Ospite');
+  assert.match(toast.textContent, /già in uso/);
+  profileUpdateError = {code:'PGRST116', message:'zero rows'};
+  await saveNickname('Ospite');
+  assert.match(toast.textContent, /Salvataggio del nickname non riuscito/);
+  profileUpdateError = null;
+  await saveNickname('Ospite');
+  assert.equal(toast.textContent, 'Nickname salvato.');
 
   // Server-issued token must be readable and selectable without BarcodeDetector.
   gd.state.section = 'pass';
