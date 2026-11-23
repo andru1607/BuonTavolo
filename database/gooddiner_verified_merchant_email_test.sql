@@ -13,6 +13,12 @@ begin
     values
       (unverified_id,'authenticated','authenticated','unverified-'||unverified_id||'@example.invalid','{"nickname":"EmailPending"}'::jsonb,null,false,now(),now()),
       (verified_id,'authenticated','authenticated','verified-'||verified_id||'@example.invalid','{"nickname":"EmailVerified"}'::jsonb,now(),false,now(),now());
+    -- Verified-email merchant test must also possess a trusted merchant invitation
+    -- now that free customer signup cannot apply to manage a restaurant.
+    insert into gd_private.signup_invites(secret_hash,purpose,expires_at,created_by,used_at,used_by)
+    values
+      (encode(sha256(convert_to(replace(gen_random_uuid()::text,'-',''),'UTF8')),'hex'),'merchant',now()+interval '1 hour','gooddiner-qa',now(),unverified_id),
+      (encode(sha256(convert_to(replace(gen_random_uuid()::text,'-',''),'UTF8')),'hex'),'merchant',now()+interval '1 hour','gooddiner-qa',now(),verified_id);
     perform set_config('request.jwt.claim.sub',unverified_id::text,true);
     perform set_config('request.jwt.claims',jsonb_build_object('sub',unverified_id::text,'is_anonymous',false)::text,true);
     execute 'SET LOCAL ROLE authenticated';
