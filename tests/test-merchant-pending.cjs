@@ -3,11 +3,12 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
 const vm=require('node:vm');
+const authFeedback=require('../auth-feedback.js');
 
 async function verifyMerchantPending(){
   const email='titolare@example.test';
   const saved=new Map([['gd_merchant_pending',JSON.stringify({name:'Trattoria Lago',city:'Garda',email})]]);
-  const user={id:'merchant-1',email:'un-altro@example.test',is_anonymous:false};
+  const user={id:'merchant-1',email:'un-altro@example.test',email_confirmed_at:'2026-11-22T12:00:00Z',is_anonymous:false};
   const events={};
   const app={innerHTML:'',classList:{toggle(){}}},toast={};
   const attempts=[];
@@ -23,7 +24,7 @@ async function verifyMerchantPending(){
     from:()=>query
   })};
   const context={
-    sdk,window:{GOODDINER_PUBLIC_CONFIG:{supabaseUrl:'https://ixczkhmvbjszgmlqznlk.supabase.co',supabasePublishableKey:'sb_publishable_local-test'},scrollTo(){}},
+    sdk,window:{GOODDINER_PUBLIC_CONFIG:{supabaseUrl:'https://ixczkhmvbjszgmlqznlk.supabase.co',supabasePublishableKey:'sb_publishable_local-test'},GoodDinerAuthUX:authFeedback,scrollTo(){}},
     document:{getElementById:id=>id==='app'?app:id==='toast'?toast:null,addEventListener:(k,fn)=>events[k]=fn},
     sessionStorage:{getItem:k=>saved.get(k)??null,setItem:(k,v)=>saved.set(k,v),removeItem:k=>saved.delete(k)},
     setTimeout(){},clearTimeout(){},location:{origin:'https://example.test'}
@@ -37,6 +38,11 @@ async function verifyMerchantPending(){
   const retry=()=>events.click({preventDefault(){},target:{closest:()=>({dataset:{action:'retry'}})}});
   saved.set('gd_merchant_pending',JSON.stringify({name:'Trattoria Lago',city:'Garda',email}));
   user.email=email;
+  user.email_confirmed_at=null;
+  await retry();
+  assert.equal(attempts.length,0,'unconfirmed email cannot submit a merchant application');
+  assert.equal(saved.has('gd_merchant_pending'),true,'pending merchant request remains until email confirmation');
+  user.email_confirmed_at='2026-11-22T12:00:00Z';
   await retry();
   assert.equal(attempts.length,1,'attempts only for the registered email');
   assert.equal(saved.has('gd_merchant_pending'),true,'a failed submission is recoverable');

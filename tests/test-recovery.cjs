@@ -36,7 +36,7 @@ async function testRecovery() {
   assert.match(app.innerHTML, /id="reset-form"/);
   await submit();
   assert.match(app.innerHTML, /id="reset-form"/);
-  assert.equal(toast.textContent, 'Errore di prova');
+  assert.equal(toast.textContent, 'Non è stato possibile completare l’operazione. Riprova più tardi.');
   fail = false;
   await submit();
   assert.doesNotMatch(app.innerHTML, /id="reset-form"/);
