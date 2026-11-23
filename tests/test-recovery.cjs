@@ -9,6 +9,7 @@ async function testRecovery() {
   const app = {innerHTML: '', classList: {toggle() {}}};
   const toast = {};
   const user = {id: 'demo'};
+  const recoveryEmails = [];
   let fail = true;
   let lastInsert = null;
   const query = {
@@ -21,6 +22,7 @@ async function testRecovery() {
       auth: {
         onAuthStateChange(fn) { fn('PASSWORD_RECOVERY'); },
         getUser: async () => ({data: {user}}),
+        resetPasswordForEmail: async email => { recoveryEmails.push(email); return {error:null}; },
         updateUser: async () => ({error: fail ? {message: 'Errore di prova'} : null})
       },
       from: () => query
@@ -28,6 +30,7 @@ async function testRecovery() {
     window: {scrollTo() {}, GOODDINER_PUBLIC_CONFIG: {supabaseUrl: 'https://ixczkhmvbjszgmlqznlk.supabase.co', supabasePublishableKey: 'sb_publishable_test'}},
     document: {getElementById: id => id === 'app' ? app : id === 'toast' ? toast : null,
       addEventListener: (name, handler) => { events[name] = handler; }},
+    location: {origin:'https://example.test'},
     sessionStorage: {getItem: () => null}, setTimeout() {}, clearTimeout() {}
   };
   const js = fs.readFileSync(path.join(__dirname, '../official.js'), 'utf8');
@@ -46,6 +49,21 @@ async function testRecovery() {
   // Account upgrade: the anonymous guest can attach an email, then set a password
   // only once the email is confirmed. No live account or real data is created.
   const gd = context.window.GD;
+  gd.state.user = null;
+  gd.setView('forgot');
+  const requestRecovery = () => events.submit({preventDefault() {}, target: {
+    id:'forgot-form', elements:{email:{value:'cliente@example.test'}}
+  }});
+  await requestRecovery();
+  assert.match(app.innerHTML, /data-action="forgot"/);
+  assert.match(app.innerHTML, /data-action="signin"/);
+  assert.doesNotMatch(app.innerHTML, /resend-confirm-form/);
+  gd.setView('forgot');
+  await requestRecovery();
+  assert.deepEqual(recoveryEmails, ['cliente@example.test', 'cliente@example.test']);
+  gd.setView('confirm');
+  assert.match(app.innerHTML, /resend-confirm-form/);
+
   gd.state.profile = {id:'demo', nickname:'Ospite', customer_code:'GD-TEST'};
   gd.state.user = {id:'demo', is_anonymous:true};
   gd.state.view = 'app';
