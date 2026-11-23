@@ -22,4 +22,4 @@ assert.match(cfg,/registrationEnabled:\s*true/);
 assert.match(cfg,/registrationMode:\s*"invite"/);
 assert.match(cfg,/turnstileSiteKey:\s*""/);
 assert.match(read('database/gooddiner_invite_only_beta.sql'),/invite_only_enabled boolean not null default false/);
-console.log('PASS: Supabase signup gate still fail-closed for public signups; invite-only beta explicitly enabled');
+console.log('PASS: Supabase still has registration gate; merchant invitation flag is enabled');
