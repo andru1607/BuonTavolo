@@ -1,0 +1,62 @@
+'use strict';
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const vm = require('node:vm');
+const path = require('node:path');
+const code = fs.readFileSync(path.join(__dirname,'..','turnstile.js'),'utf8');
+const official = fs.readFileSync(path.join(__dirname,'..','official.js'),'utf8');
+let current = Date.now();
+const statuses = {textContent:''};
+const input = {value:''};
+let form,slot;
+slot = {dataset:{gdCaptcha:'signup'},closest:()=>form};
+form = {querySelector:s=>s==='[data-gd-captcha]'?slot:s==='[name="captchaToken"]'?input:s==='[data-gd-captcha-status]'?statuses:null};
+let callbacks,renderCount=0,resetCount=0,removed=0;
+const fakeWindow = {GOODDINER_PUBLIC_CONFIG:{turnstileSiteKey:'test-public-key'},
+  turnstile:{render(node,opts){assert.equal(node,slot);callbacks=opts;renderCount++;return 'widget-id';},
+    reset(id){assert.equal(id,'widget-id');resetCount++;},
+    remove(id){assert.equal(id,'widget-id');removed++;}}
+};
+const document = {querySelectorAll:()=>[slot]};
+class Clock extends Date {static now(){return current;}}
+vm.runInNewContext(code,{window:fakeWindow,document,Date:Clock});
+const captcha = fakeWindow.GoodDinerCaptcha;
+assert.equal(captcha.enabled(),true);
+assert.throws(()=>captcha.token(form,true),/non pronta/);
+captcha.mount();
+assert.equal(renderCount,1);
+captcha.mount();
+assert.equal(renderCount,1,'one widget per DOM slot');
+assert.throws(()=>captcha.token(form,true),/Completa la verifica/);
+callbacks.callback('valid-once-token');
+assert.equal(captcha.token(form,true),'valid-once-token');
+assert.match(statuses.textContent,/completata/i);
+current+=4*60*1000;
+assert.throws(()=>captcha.token(form,true),/scaduta/);
+assert.equal(input.value,'');
+assert.equal(resetCount,1);
+callbacks.callback('second-token');
+callbacks['expired-callback']();
+assert.equal(input.value,'');
+assert.throws(()=>captcha.token(form,true),/Completa la verifica/);
+callbacks.callback('third-token');
+callbacks['error-callback']();
+assert.equal(input.value,'');
+assert.match(statuses.textContent,/non è riuscita/);
+callbacks.callback('fourth-token');
+captcha.resetFor(form);
+assert.equal(input.value,'');
+assert.equal(resetCount,2);
+captcha.cleanup();
+assert.equal(removed,1);
+const noWindow={GOODDINER_PUBLIC_CONFIG:{turnstileSiteKey:''}};
+vm.runInNewContext(code,{window:noWindow,document});
+assert.equal(noWindow.GoodDinerCaptcha.enabled(),false);
+assert.equal(noWindow.GoodDinerCaptcha.token(form,false),null);
+assert.throws(()=>noWindow.GoodDinerCaptcha.token(form,true),/non configurata/);
+assert.match(official,/data-gd-captcha-status/);
+for (const method of ['signUp','signInWithPassword','resetPasswordForEmail','resend']) assert.match(official,new RegExp('auth\\.'+method+'\\('));
+assert.match(official,/captchaToken:captcha/);
+assert.match(official,/captchaToken:captchaToken\(form\)/);
+assert.doesNotMatch(code,/sk_live_|service_role|turnstileSecret/);
+console.log('PASS: Turnstile fail-closed when configured, widget lifecycle, 4-minute token age, expired/error resets and auth wiring');
