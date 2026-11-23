@@ -9,7 +9,8 @@ assert.ok(!home.includes('Anteprima dimostrativa')&&!home.includes('buontavolo-p
 assert.ok(legacy.includes('GoodDiner')&&legacy.includes('v710-visits.js'),'old demo preserved for regression');
 assert.equal(manifest.name,'GoodDiner');assert.ok(!manifest.description.toLowerCase().includes('demo'));
 assert.equal(pkg.version,'1.0.0');
-assert.match(js,/signInAnonymously\(/,'optional email flow uses Supabase anonymous auth');
+assert.doesNotMatch(js,/signInAnonymously\(/,'new customer registrations require email and password');
+assert.match(js,/const answer=await sb\.auth\.signUp\(\{email,password/,'customer registration uses normal email Auth');
 assert.match(js,/auth\.signUp\(/);assert.match(js,/auth\.signInWithPassword\(/);
 assert.match(js,/rpc\('issue_guest_qr'/);assert.match(js,/rpc\('checkin_guest'/);assert.match(js,/rpc\('void_guest_visit'/);assert.match(js,/rpc\('publish_guest_review'/);
 assert.match(js,/from\('merchant_applications'\)\.insert/,'merchant verification requests are persisted');
