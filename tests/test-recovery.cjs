@@ -126,6 +126,22 @@ async function testRecovery() {
   gd.render();
   assert.doesNotMatch(app.innerHTML,/id="qr-manual-token"/);
 
+  // While refresh waits for Auth, both the QR and its manual fallback must disappear.
+  gd.state.qr.expires_at = new Date(Date.now()+90000).toISOString();
+  gd.render();
+  const auth = gd.client().auth;
+  const originalGetUser = auth.getUser;
+  let finishRefresh;
+  auth.getUser = () => new Promise(resolve => { finishRefresh = resolve; });
+  const refreshing = events.click({preventDefault() {}, target: {
+    closest: () => ({dataset: {action: 'retry'}})
+  }});
+  assert.equal(gd.state.qr, null);
+  assert.doesNotMatch(app.innerHTML, /id="qr-manual-token"|GD1:aaaaaaaa/);
+  finishRefresh({data:{user}});
+  await refreshing;
+  auth.getUser = originalGetUser;
+
   // Same account can act as a merchant and a customer. Never combine the
   // merchant's guests with this account's own DinerPass history or reviews.
   gd.state.qr=null;

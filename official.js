@@ -212,7 +212,14 @@ const GD = (() => {
       }
     }
   }
-  async function refresh(){state.qr=null;busy(true);try{await loadAccount();}catch(err){toast('Impossibile aggiornare i dati: '+err.message);}finally{busy(false);}}
+  async function refresh(){
+    if(state.qr){
+      clearTimeout(qrTimer);
+      qrTimer=null;
+      state.qr=null;
+      if(state.side==='customer'&&state.section==='pass')render();
+    }
+    busy(true);try{await loadAccount();}catch(err){toast('Impossibile aggiornare i dati: '+err.message);}finally{busy(false);}}
   function validateSignupPasswords(password,confirmation){
     if(password.length<10||password.length>128)throw Error('La password deve contenere da 10 a 128 caratteri.');
     if(password!==confirmation)throw Error('Le password non coincidono.');
