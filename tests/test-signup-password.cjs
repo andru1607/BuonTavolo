@@ -14,9 +14,11 @@ assert.doesNotThrow(()=>check('corretta-password123','corretta-password123'));
 assert.throws(()=>check('123456789','123456789'),/10 a 128/);
 assert.throws(()=>check('x'.repeat(129),'x'.repeat(129)),/10 a 128/);
 assert.throws(()=>check('corretta-password123','corretta-password321'),/non coincidono/);
-assert.match(js,/id="customer-confirm-password"/);
-assert.match(js,/id="merchant-confirm-password"/);
-assert.match(js,/id="customer-confirm-password"[^>]+required/);
+for (const id of ['customer-password', 'customer-confirm-password', 'merchant-password', 'merchant-confirm-password']) {
+  const input = js.match(new RegExp('<input id="' + id + '"[^>]*>'));
+  assert.ok(input, 'Missing signup field: ' + id);
+  assert.match(input[0], /\srequired(?=[\s>])/, id + ' must use native required validation');
+}
 assert.match(js,/validateSignupPasswords\(password,confirmation\);const answer=await sb\.auth\.signUp/);
 assert.match(js,/validateSignupPasswords\(password,confirmation\);if\(pilotInviteOnly/);
 console.log('PASS: customer/merchant password confirmation and length validation before signup');
