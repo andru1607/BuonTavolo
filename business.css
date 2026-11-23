@@ -64,3 +64,8 @@
 @media(max-width:800px){.business-hero-grid,.business-pricing-grid,.business-lead-grid{grid-template-columns:minmax(0,1fr);gap:30px}.business-hero-grid{padding-top:60px;padding-bottom:60px}.business-sample{transform:none;max-width:540px}.business-section{padding:58px 0}.business-features{grid-template-columns:1fr}.business-sample-stats strong{font-size:29px}}
 @media(max-width:430px){.business-head-inner{min-height:64px;flex-wrap:wrap;gap:6px;padding-top:8px;padding-bottom:8px}.business-head .brand strong{font-size:23px}.business-head .brand img{width:31px;height:31px}.business-tag{font-size:9px;padding:6px}.business-nav-link{font-size:12px}.business-hero h1{font-size:42px}.business-hero p{font-size:15px}.business-actions{display:grid;grid-template-columns:1fr}.business-actions .btn{width:100%;text-align:center}.business-sample{padding:18px}.business-price-card,.business-lead-panel{padding:23px}.business-price{font-size:50px}}
 @media(prefers-reduced-motion:reduce){.business-sample{transform:none}}
+
+#business-lead-form[hidden],
+#lead-disabled[hidden] {
+  display: none;
+}
