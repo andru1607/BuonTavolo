@@ -1,0 +1,6 @@
+# Recensioni e premi GoodDiner
+- Ogni 10 valutazioni positive (8–10/10) su visite confermate matura un premio. Voti inferiori non contano. Un solo voto per visita.
+- Il cliente sceglie un locale aderente e vede lo sconto prima di attivare il buono. Il locale decide la percentuale e sostiene lo sconto. Un buono per visita confermata in giornata; non cumulabile con altri buoni GoodDiner. Riscatto definitivo dal ristoratore; niente pagamento automatico.
+- Il codice è vincolato al cliente e al locale. Una contestazione accolta può sospendere un premio non utilizzato; una soglia nuovamente raggiunta lo riporta da attivare. Nessun rating pubblico.
+- Test SQL transazionale del 24 novembre: nessun premio prima del decimo positivo, un premio al decimo, scelta offerta, riscatto corretto al 10% usato soltanto come fixture, secondo riscatto respinto. Nessun dato di prova persistito.
+- Prima dell'attivazione reale: confermare condizioni del programma e adesione dei locali, informativa e revisione privacy/legale, collaudo iPhone e flusso contestazioni. Entrambi i gate restano disattivati. Configurazione ristoratore predisposta; nessun impegno commerciale automatico. Attivazione controllata richiede allineamento config.js e gd_private.business_features.

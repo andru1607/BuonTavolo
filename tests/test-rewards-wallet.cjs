@@ -1,0 +1,16 @@
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
+const read=p=>fs.readFileSync(path.join(__dirname,'..',p),'utf8');
+const app=read('official.js'),sql=read('database/gooddiner_reward_wallet.sql'),cfg=read('config.js');
+assert.match(app,/reward-stamps/);
+assert.match(app,/Array\.from\(\{length:10\}/);
+assert.match(app,/rewardRPC\('claim'/);
+assert.match(app,/rewardRPC\('redeem'/);
+assert.match(app,/rewardRPC\('cancel_claim'/);
+assert.match(sql,/rating>=8 and status='published'/);
+assert.match(sql,/gd_reward_one_per_visit unique\(redeemed_visit_id\)/);
+assert.match(sql,/customer_id=confirmed_visit.customer_id and reward_restaurant_id=venue/);
+assert.match(sql,/voucher.status<>'available'/);
+assert.match(sql,/rewards_enabled boolean not null default false/);
+assert.match(cfg,/rewardsEnabled: false/);
+console.log('PASS: reward wallet, participant offer, owner-bound claim and redemption, launch gate');
