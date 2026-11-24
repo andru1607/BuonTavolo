@@ -84,7 +84,7 @@ begin
    select x.id,x.restaurant_id,r.name as restaurant_name,x.booking_name,x.starts_at,x.party,x.status,x.discount_percent,
     case when x.voucher_id is null then null when x.status='completed' and v.status='redeemed' then true
     else coalesce(active,false) and v.status='available' and v.reward_restaurant_id=x.restaurant_id and v.discount_percent=x.discount_percent and gd_private.reward_positive_count(x.customer_id)>=v.milestone end as discount_valid,
-    x.created_at from gd_private.bookings x join public.restaurants r on r.id=x.restaurant_id left join public.vouchers v on v.id=x.voucher_id
+    case when mode='customer' then x.voucher_id else null end as voucher_id,x.created_at from gd_private.bookings x join public.restaurants r on r.id=x.restaurant_id left join public.vouchers v on v.id=x.voucher_id
    where (mode='customer' and x.customer_id=actor) or (mode='merchant' and x.restaurant_id=venue) order by x.starts_at desc limit 300) q);
  elsif p_action='create' then
   venue:=(p_payload->>'restaurant_id')::uuid; start_at:=(p_payload->>'starts_at')::timestamptz; size:=(p_payload->>'party')::integer; nm:=btrim(p_payload->>'name'); vid:=nullif(p_payload->>'voucher_id','')::uuid;
@@ -107,6 +107,16 @@ begin
   end if;
   insert into gd_private.bookings(restaurant_id,customer_id,booking_name,starts_at,party,voucher_id,discount_percent) values(venue,actor,nm,start_at,size,vid,pct) returning id into bid;
   return jsonb_build_object('id',bid,'status','pending','discount_percent',pct);
+ elsif p_action='redeem' then
+  bid:=(p_payload->>'id')::uuid;
+  select * into b from gd_private.bookings where id=bid;
+  if not found or b.status<>'confirmed' or b.voucher_id is null then raise exception 'BOOKING_INVALID_STATUS'; end if;
+  perform gd_private.assert_merchant_access(b.restaurant_id,actor);
+  select * into v from public.vouchers where id=b.voucher_id and customer_id=b.customer_id;
+  if not found or v.status<>'available' then raise exception 'BOOKING_VOUCHER_UNAVAILABLE'; end if;
+  select x.id into vid from public.visits x where x.customer_id=b.customer_id and x.restaurant_id=b.restaurant_id and x.status='confirmed' and x.visited_on=(b.starts_at at time zone 'Europe/Rome')::date and x.visited_on=(now() at time zone 'Europe/Rome')::date;
+  if not found then raise exception 'VISITA_NON_VALIDA'; end if;
+  return gd_private.reward_action('redeem',jsonb_build_object('restaurant_id',b.restaurant_id,'visit_id',vid,'code',v.voucher_code));
  elsif p_action in ('confirm','reject','cancel','complete','no_show') then
   bid:=(p_payload->>'id')::uuid;
   select * into b from gd_private.bookings where id=bid;
