@@ -82,9 +82,9 @@ begin
   update gd_private.bookings x set status='expired',updated_at=now() where x.status='pending' and x.starts_at<=now() and ((mode='customer' and x.customer_id=actor) or (mode='merchant' and x.restaurant_id=venue));
   return (select coalesce(jsonb_agg(to_jsonb(q) order by q.starts_at desc),'[]'::jsonb) from (
    select x.id,x.restaurant_id,r.name as restaurant_name,x.booking_name,x.starts_at,x.party,x.status,x.discount_percent,
-    case when x.voucher_id is null then null when x.status='completed' and v.status='redeemed' then true
-    else coalesce(active,false) and v.status='available' and v.reward_restaurant_id=x.restaurant_id and v.discount_percent=x.discount_percent and gd_private.reward_positive_count(x.customer_id)>=v.milestone end as discount_valid,
-    case when mode='customer' then x.voucher_id else null end as voucher_id,x.created_at from gd_private.bookings x join public.restaurants r on r.id=x.restaurant_id left join public.vouchers v on v.id=x.voucher_id
+    case when x.voucher_id is null then null when x.status='completed' and vv.status='redeemed' then true
+    else coalesce(active,false) and vv.status='available' and vv.reward_restaurant_id=x.restaurant_id and vv.discount_percent=x.discount_percent and gd_private.reward_positive_count(x.customer_id)>=vv.milestone end as discount_valid,
+    case when mode='customer' then x.voucher_id else null end as voucher_id,x.created_at from gd_private.bookings x join public.restaurants r on r.id=x.restaurant_id left join public.vouchers vv on vv.id=x.voucher_id
    where (mode='customer' and x.customer_id=actor) or (mode='merchant' and x.restaurant_id=venue) order by x.starts_at desc limit 300) q);
  elsif p_action='create' then
   venue:=(p_payload->>'restaurant_id')::uuid; start_at:=(p_payload->>'starts_at')::timestamptz; size:=(p_payload->>'party')::integer; nm:=btrim(p_payload->>'name'); vid:=nullif(p_payload->>'voucher_id','')::uuid;
@@ -114,8 +114,13 @@ begin
   perform gd_private.assert_merchant_access(b.restaurant_id,actor);
   select * into v from public.vouchers where id=b.voucher_id and customer_id=b.customer_id;
   if not found or v.status<>'available' then raise exception 'BOOKING_VOUCHER_UNAVAILABLE'; end if;
-  select x.id into vid from public.visits x where x.customer_id=b.customer_id and x.restaurant_id=b.restaurant_id and x.status='confirmed' and x.visited_on=(b.starts_at at time zone 'Europe/Rome')::date and x.visited_on=(now() at time zone 'Europe/Rome')::date;
+  select x.id into vid from public.visits x where x.customer_id=b.customer_id and x.restaurant_id=b.restaurant_id and x.status='confirmed' and x.visited_on=(b.starts_at at time zone 'Europe/Rome')::date and x.visited_on=(now() at time zone 'Europe/Rome')::date for update;
   if not found then raise exception 'VISITA_NON_VALIDA'; end if;
+  perform 1 from public.profiles where id=b.customer_id for update;
+  select * into v from public.vouchers where id=b.voucher_id and customer_id=b.customer_id for update;
+  if not found or v.status<>'available' then raise exception 'BOOKING_VOUCHER_UNAVAILABLE'; end if;
+  select * into b from gd_private.bookings where id=bid for update;
+  if b.status<>'confirmed' then raise exception 'BOOKING_INVALID_STATUS'; end if;
   return gd_private.reward_action('redeem',jsonb_build_object('restaurant_id',b.restaurant_id,'visit_id',vid,'code',v.voucher_code));
  elsif p_action in ('confirm','reject','cancel','complete','no_show') then
   bid:=(p_payload->>'id')::uuid;
@@ -131,7 +136,7 @@ begin
   if p_action='confirm' then
    perform gd_private.assert_merchant_access(b.restaurant_id,actor);
    if b.status<>'pending' or b.starts_at<=now() then raise exception 'BOOKING_INVALID_STATUS'; end if;
-   if b.voucher_id is not null and (not coalesce(active,false) or not exists(select 1 from public.vouchers v where v.id=b.voucher_id and v.status='available' and v.reward_restaurant_id=b.restaurant_id and v.discount_percent=b.discount_percent and gd_private.reward_positive_count(b.customer_id)>=v.milestone)) then raise exception 'BOOKING_VOUCHER_UNAVAILABLE'; end if;
+   if b.voucher_id is not null and (not coalesce(active,false) or not exists(select 1 from public.vouchers vv where vv.id=b.voucher_id and vv.status='available' and vv.reward_restaurant_id=b.restaurant_id and vv.discount_percent=b.discount_percent and gd_private.reward_positive_count(b.customer_id)>=vv.milestone)) then raise exception 'BOOKING_VOUCHER_UNAVAILABLE'; end if;
    next_status:='confirmed';
   elsif p_action='reject' and b.status='pending' then next_status:='rejected';
   elsif p_action='cancel' and b.status in ('pending','confirmed') and (b.starts_at>now() or b.status='pending') then next_status:='cancelled';
