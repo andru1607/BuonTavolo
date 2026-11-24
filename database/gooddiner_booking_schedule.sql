@@ -23,17 +23,18 @@ revoke all on gd_private.booking_notifications from public,anon,authenticated;
 -- Pending future requests temporarily hold capacity; external bookings are blocked covers.
 create or replace function gd_private.booking_remaining(p_venue uuid,p_start timestamptz,p_exclude uuid default null)
 returns integer language plpgsql stable security invoker set search_path='' as $$
-declare s gd_private.booking_settings%rowtype; local_start timestamp; local_end timestamp; d date; blocked integer; peak integer;
+declare s gd_private.booking_settings%rowtype; local_start timestamp; local_end timestamp; d date; blocked integer; peak integer; duration integer;
 begin
  select * into s from gd_private.booking_settings where restaurant_id=p_venue;
  if not found or not s.enabled or s.capacity=0 then return 0; end if;
- local_start:=p_start at time zone 'Europe/Rome';local_end:=(p_start+make_interval(mins=>s.duration_minutes)) at time zone 'Europe/Rome';d:=local_start::date;
+ duration:=coalesce((select seating_minutes from gd_private.bookings where id=p_exclude),s.duration_minutes);
+ local_start:=p_start at time zone 'Europe/Rome';local_end:=(p_start+make_interval(mins=>duration)) at time zone 'Europe/Rome';d:=local_start::date;
  if local_end::date<>d or extract(minute from local_start)::integer%30<>0 or extract(second from local_start)<>0 then return 0; end if;
  if not exists(select 1 from jsonb_array_elements(s.service_windows) w where (w->>'day')::integer=extract(isodow from d)::integer and local_start::time >= (w->>'from')::time and local_end::time <= (w->>'to')::time) then return 0; end if;
  if exists(select 1 from gd_private.booking_day_overrides x where x.restaurant_id=p_venue and x.day=d and x.closed) then return 0; end if;
  select coalesce((select blocked_covers from gd_private.booking_day_overrides where restaurant_id=p_venue and day=d),0) into blocked;
  select coalesce(max(used),0)::integer into peak from (
-  select coalesce(sum(b.party),0) as used from generate_series(p_start,p_start+make_interval(mins=>s.duration_minutes)-interval '30 minutes',interval '30 minutes') slot
+  select coalesce(sum(b.party),0) as used from generate_series(p_start,p_start+make_interval(mins=>duration)-interval '30 minutes',interval '30 minutes') slot
   left join gd_private.bookings b on b.restaurant_id=p_venue and b.id is distinct from p_exclude
   and (b.status='confirmed' or (b.status='pending' and b.starts_at>now()))
   and b.starts_at<slot+interval '30 minutes' and b.starts_at+make_interval(mins=>b.seating_minutes)>slot group by slot
