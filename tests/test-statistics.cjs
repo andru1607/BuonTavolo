@@ -48,6 +48,7 @@ async function run(){
      rpcCalls.push({name,args});
      if(name==='get_my_dinerpass_counts')return {data:[{confirmed_visits:307,published_reviews:286,positive_reviews:272,pending_rewards:5}],error:null};
      if(name==='get_my_restaurant_counts')return {data:[{confirmed_visits:920,published_reviews:600,todays_visits:37}],error:null};
+     if(name==='get_my_merchant_invite_status')return {data:true,error:null};
      if(name==='get_my_merchant_license')return {data:[{license_status:'trialing',active_until:'2026-12-08T10:00:00Z',is_usable:true}],error:null};
      return {error:{message:'unexpected RPC '+name}};
    }
@@ -62,7 +63,7 @@ async function run(){
  const gd=ctx.window.GD;
  assert.equal(gd.state.visits.length,251,'client and merchant histories initially separated');
  assert.equal(gd.state.totals.customer.confirmed_visits,307);
- assert.deepEqual(JSON.parse(JSON.stringify(rpcCalls.map(r=>r.name))),['get_my_dinerpass_counts','get_my_restaurant_counts','get_my_merchant_license']);
+ assert.deepEqual(JSON.parse(JSON.stringify(rpcCalls.map(r=>r.name))),['get_my_dinerpass_counts','get_my_restaurant_counts','get_my_merchant_license','get_my_merchant_invite_status']);
  gd.state.side='customer';gd.state.section='pass';gd.render();
  assert.match(app.innerHTML,/<small>Visite confermate<\/small><strong>307<\/strong>/,'personal totals do not cap at 250');
  assert.match(app.innerHTML,/<small>Valutazioni positive<\/small><strong>272<\/strong>/);
