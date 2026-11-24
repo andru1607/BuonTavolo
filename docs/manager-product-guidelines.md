@@ -7,7 +7,7 @@ Riferimento funzionale: TheFork Manager, non copia di brand, codice, contenuti o
 - https://www.theforkmanager.com/it/blog/gestione-del-ristorante/guida-allutilizzo-di-thefork-manager-i-nuovi-partner
 
 ## Architettura UX obiettivo
-Massimo quattro sezioni ristoratore: Agenda, Sala, Clienti, Gestione. Agenda prima delle configurazioni; azioni di servizio raggiungibili in pochi tocchi su iPhone. Non eliminare check-in DinerPass, storico, licenza o accessi attuali durante la transizione. Separare account cliente e merchant, Studio indipendente.
+Massimo quattro sezioni ristoratore: Agenda, Sala, Clienti, Gestione. Agenda prima delle configurazioni; azioni di servizio raggiungibili in pochi tocchi su iPhone e smartphone Android. Non eliminare check-in DinerPass, storico, licenza o accessi attuali durante la transizione. Separare account cliente e merchant, Studio indipendente.
 
 ## Priorità in ordine
 1. Agenda di servizio: vista oggi/domani, ricerca nominativo, stati, coperti, evidenza sconto; configurazione separata. Prima iterazione implementata.
@@ -20,4 +20,7 @@ Massimo quattro sezioni ristoratore: Agenda, Sala, Clienti, Gestione. Agenda pri
 8. Widget prenotazioni per sito locale, eventuali integrazioni esterne solo con API e autorizzazioni reali.
 
 ## Identità e regole
-GoodDiner Rewards: un premio per dieci valutazioni 8–10 su visite confermate, buono monouso riservabile con prenotazione, sconto visibile al ristoratore. I gate delle valutazioni personali e degli sconti rimangono off finché non sono soddisfatti i requisiti privacy/legali e commerciali già documentati. Non inventare offerte, notifiche consegnate, integrazioni o test su iPhone. Non intervenire su altri progetti. Prima di ogni release: test autorizzazioni, dati reali, regressioni e mobile; verificare deploy.
+GoodDiner Rewards: un premio per dieci valutazioni 8–10 su visite confermate, buono monouso riservabile con prenotazione, sconto visibile al ristoratore. I gate delle valutazioni personali e degli sconti rimangono off finché non sono soddisfatti i requisiti privacy/legali e commerciali già documentati. Non inventare offerte, notifiche consegnate, integrazioni o test su iPhone e Android. Non intervenire su altri progetti. Prima di ogni release: test autorizzazioni, dati reali, regressioni e mobile; verificare deploy.
+
+## Compatibilità mobile obbligatoria (24/11/2026)
+GoodDiner cliente, GoodDiner Manager e GoodDiner Studio devono supportare iOS e Android con parità funzionale, come PWA installabili dalla schermata Home tramite Safari su iPhone e Chrome su Android. Nessuna funzione essenziale deve dipendere esclusivamente da API Apple. Verificare layout responsive, safe area, installazione manifest/service worker, sessioni, navigazione indietro, touch e trascinamento, fotocamera/QR con inserimento manuale alternativo, geolocalizzazione opzionale, mappe, prenotazioni, buoni, esportazioni, calendario e notifiche (con alternative quando una API non è disponibile). Collaudo di accettazione su entrambe le piattaforme prima di dichiarare la compatibilità verificata; distinguere test automatici, emulatori e dispositivi reali. Non dichiarare pubblicazione negli store nativi senza effettiva distribuzione.
