@@ -32,7 +32,10 @@ async function verifyMerchantPending(){
   const js=fs.readFileSync(path.join(__dirname,'../official.js'),'utf8');
   assert.ok(js.includes("JSON.stringify({name,city,email})"),'merchant signup stores the email it belongs to');
   await vm.runInNewContext(js.replace(/import\('https:\/\/cdn\.jsdelivr\.net\/npm\/@supabase[^']+'\)/,'Promise.resolve(globalThis.sdk)'),context);
-  assert.equal(attempts.length,0,'a pending registration must not be submitted for another signed-in user');
+  assert.doesNotMatch(app.innerHTML,/data-action="switch-side"/,'ordinary customer never sees role switch');
+ await events.click({preventDefault(){},target:{closest:()=>({dataset:{action:'switch-side'}})}});
+ assert.equal(context.window.GD.state.side,'customer','direct role switch is blocked for ordinary customer');
+ assert.equal(attempts.length,0,'a pending registration must not be submitted for another signed-in user');
   assert.equal(saved.has('gd_merchant_pending'),false,'wrong-owner pending request is discarded');
 
   const retry=()=>events.click({preventDefault(){},target:{closest:()=>({dataset:{action:'retry'}})}});
