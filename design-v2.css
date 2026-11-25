@@ -550,3 +550,68 @@ body{
 .gooddiner-app .pilot-ack input{width:20px;height:20px;min-width:20px;margin:2px 0 0;accent-color:var(--teal)}
 .gooddiner-app #gd-invite-code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.045em;font-size:16px!important}
 .gooddiner-app #gd-invite-code::placeholder{font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:normal;font-size:14px}
+
+/* GoodDiner Signature · hospitality-inspired canvas, not a generic gray UI.
+   Keep the QR surface white and all navigation/action semantics unchanged. */
+.gooddiner-app{
+  --cream:#eee2cd;--paper:#fffaf0;--ink:#1b3028;--muted:#526052;
+  --teal:#153f32;--teal-2:#28644e;--teal-light:#e3ecdc;
+  --gold:#d2a965;--coral-deep:#a34f37;--line:#d9c9ac;
+  --shadow:0 10px 24px #48361712,0 1px 2px #4836170c;
+  min-height:100dvh;
+  background-color:var(--cream);
+  background-image:
+    radial-gradient(ellipse at 0 0,#fff4dc 0%,transparent 56%),
+    radial-gradient(ellipse at 100% 28%,#d4a76738 0%,transparent 47%),
+    radial-gradient(circle at 100% 0,transparent 0 100px,#8c653513 101px 102px,transparent 103px 124px,#8c653511 125px 126px,transparent 127px),
+    radial-gradient(circle at 1px 1px,#6c583014 .75px,transparent 1px);
+  background-size:auto,auto,330px 330px,9px 9px;
+  background-attachment:scroll;
+}
+.gooddiner-app .site{min-height:100dvh}
+.gooddiner-app .topbar{
+  background:#153f32;border-bottom:2px solid #d2a965;
+  box-shadow:0 4px 18px #153f321e;backdrop-filter:none;-webkit-backdrop-filter:none;
+}
+.gooddiner-app .topbar .brand{color:#fff5e3}
+.gooddiner-app .topbar .brand img{background:#f6ead3;border-radius:12px;padding:3px;filter:none}
+.gooddiner-app .topbar .brand i{color:#d2a965}
+.gooddiner-app .topbar .nav-link,.gooddiner-app .topbar .account-pill{color:#f3ebd9}
+.gooddiner-app .topbar .nav-link.active,.gooddiner-app .topbar .nav-link:hover{background:#e9d7b6;color:#153f32;box-shadow:none}
+.gooddiner-app .topbar .btn-outline,.gooddiner-app .topbar .btn-ghost{color:#fff5e3;background:#ffffff0a;border:1px solid #bfa66d;box-shadow:none}
+.gooddiner-app .topbar .avatar{background:#e9d7b6;color:#153f32;box-shadow:none}
+.gooddiner-app .page-head{position:relative;padding-bottom:16px;border-bottom:1px solid #bca27b75}
+.gooddiner-app .page-head .label{color:#805134}
+.gooddiner-app .page-head h1,.gooddiner-app .form-card h1{color:#153f32}
+.gooddiner-app .card,.gooddiner-app .stat,.gooddiner-app .item,.gooddiner-app .feature{
+  background:var(--paper);border-color:#d9c9ac;box-shadow:var(--shadow)
+}
+.gooddiner-app .empty{background:#fffaf0;border-color:#b7a586}
+.gooddiner-app .field input,.gooddiner-app .field textarea,.gooddiner-app .field select{background:#fffdf7;border-color:#cdbfa5}
+.gooddiner-app .stat::before{background:#ad713a}
+.gooddiner-app .stat:nth-child(2)::before{background:#397755}
+.gooddiner-app .stat:nth-child(3)::before{background:#a34f37}
+.gooddiner-app .client-banner{
+  background:radial-gradient(circle at 98% 0,#f2c89a 0%,transparent 56%),linear-gradient(115deg,#e9b27d,#e8c695);
+  border-color:#c4915d;color:#3d2b1d;box-shadow:0 8px 22px #83572a18
+}
+.gooddiner-app .client-banner p{color:#4e3927}
+.gooddiner-app .pass-card,.gooddiner-app .merchant-hero{
+  background-image:radial-gradient(circle at 93% 6%,#bba46b33,transparent 45%),url('/icons/mark-light.svg'),linear-gradient(140deg,#265a45,#153f32 60%,#102d26);
+  background-position:center,right -85px bottom -78px,center;
+  background-size:auto,210px 210px,auto;
+  background-repeat:no-repeat;
+  background-blend-mode:normal,soft-light,normal;
+  border:1px solid #a98a50;box-shadow:0 14px 28px #153f3233
+}
+.gooddiner-app .qr-space,.gooddiner-app .qr-space>svg:not(.icon){background:#fff}
+.gooddiner-app .foot{border-top-color:#cdbb98}
+@media(max-width:850px){
+  .gooddiner-app .mobile-nav{background:#153f32;border:1px solid #a98a50;box-shadow:0 10px 32px #153f323d;backdrop-filter:none;-webkit-backdrop-filter:none}
+  .gooddiner-app .mobile-nav button{color:#e5e8d9}
+  .gooddiner-app .mobile-nav button.active{background:#ecd9b7;color:#153f32;box-shadow:none}
+  .gooddiner-app .mobile-nav button.active::after{background:#985838}
+}
+@media(display-mode:standalone){
+  .gooddiner-app .topbar{padding-top:env(safe-area-inset-top)}
+}
