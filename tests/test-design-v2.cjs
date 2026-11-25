@@ -57,3 +57,7 @@ for(const [a,b] of [['ink','paper'],['teal','paper'],['muted','paper'],['paper',
 assert.equal(css.split('{').length-1,css.split('}').length-1,'main design CSS braces unbalanced');
 assert.equal(demoCss.split('{').length-1,demoCss.split('}').length-1,'demo design CSS braces unbalanced');
 console.log('PASS: design 2.0 pages, iPhone tabs, QR/dashboard styles, cache and readable palette');
+
+const approved=css.split('/* GoodDiner 2.0')[1];assert.ok(approved,'approved unified design missing');assert.doesNotMatch(approved,/gradient\(/,'approved design must not use decorative gradients');assert.match(approved,/--plum:#421C39/);assert.match(approved,/min-height:48px/);assert.match(approved,/min-height:60px/);assert.match(approved,/prefers-reduced-motion/);assert.match(approved,/background-image:none/);
+for(const bg of ['#E5D6EF','#F8DECF','#F0D6E2','#FAF7F5','#FFFFFF']){const a=luminance('#421C39'),b=luminance(bg);assert.ok((b+.05)/(a+.05)>=4.5,'plum contrast on '+bg);}
+console.log('PASS: approved Plum & Pastel identity, flat surfaces, contrast and control sizing rules');

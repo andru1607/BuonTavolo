@@ -1,17 +1,17 @@
 /* GoodDiner Design 2.0 · visual system only. The authenticated flows,
    eligibility, pricing, privacy gates and server records are unchanged. */
 :root{
-  --teal:#103d37;
-  --teal-2:#1b5a50;
-  --teal-light:#e6f0eb;
-  --coral:#dd8063;
-  --coral-deep:#b95b43;
-  --cream:#f5f4ee;
-  --paper:#fffefa;
-  --ink:#1b2925;
-  --muted:#68766f;
-  --gold:#d9b878;
-  --line:#e0e6df;
+  --teal:#421C39;
+  --teal-2:#633653;
+  --teal-light:#E5D6EF;
+  --coral:#F8DECF;
+  --coral-deep:#8C3F61;
+  --cream:#FAF7F5;
+  --paper:#FFFFFF;
+  --ink:#281E29;
+  --muted:#625361;
+  --gold:#F0D6E2;
+  --line:#E1D5E0;
   --shadow:0 17px 48px rgba(22,55,45,.065),0 2px 8px rgba(22,55,45,.03);
   --radius:22px;
   --ease:cubic-bezier(.2,.7,.15,1);
@@ -551,67 +551,105 @@ body{
 .gooddiner-app #gd-invite-code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.045em;font-size:16px!important}
 .gooddiner-app #gd-invite-code::placeholder{font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:normal;font-size:14px}
 
-/* GoodDiner Signature · hospitality-inspired canvas, not a generic gray UI.
-   Keep the QR surface white and all navigation/action semantics unchanged. */
-.gooddiner-app{
-  --cream:#eee2cd;--paper:#fffaf0;--ink:#1b3028;--muted:#526052;
-  --teal:#153f32;--teal-2:#28644e;--teal-light:#e3ecdc;
-  --gold:#d2a965;--coral-deep:#a34f37;--line:#d9c9ac;
-  --shadow:0 10px 24px #48361712,0 1px 2px #4836170c;
-  min-height:100dvh;
-  background-color:var(--cream);
-  background-image:
-    radial-gradient(ellipse at 0 0,#fff4dc 0%,transparent 56%),
-    radial-gradient(ellipse at 100% 28%,#d4a76738 0%,transparent 47%),
-    radial-gradient(circle at 100% 0,transparent 0 100px,#8c653513 101px 102px,transparent 103px 124px,#8c653511 125px 126px,transparent 127px),
-    radial-gradient(circle at 1px 1px,#6c583014 .75px,transparent 1px);
-  background-size:auto,auto,330px 330px,9px 9px;
-  background-attachment:scroll;
-}
+
+/* GoodDiner 2.0 — approved single Plum & Pastel identity.
+   Flat surfaces; no ornamental patterns, waves, photos or gradients.
+   Color is supplementary to text; all controls retain existing actions. */
+:root{--plum:#421C39;--lavender:#E5D6EF;--peach:#F8DECF;--rose:#F0D6E2;
+ --shadow:0 2px 8px #421c390a;--radius:18px;font-size:100%}
+body.gooddiner-app,body.business-body{background:var(--cream);background-image:none;color:var(--ink);min-height:100dvh;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:1rem;line-height:1.55}
 .gooddiner-app .site{min-height:100dvh}
-.gooddiner-app .topbar{
-  background:#153f32;border-bottom:2px solid #d2a965;
-  box-shadow:0 4px 18px #153f321e;backdrop-filter:none;-webkit-backdrop-filter:none;
-}
-.gooddiner-app .topbar .brand{color:#fff5e3}
-.gooddiner-app .topbar .brand img{background:#f6ead3;border-radius:12px;padding:3px;filter:none}
-.gooddiner-app .topbar .brand i{color:#d2a965}
-.gooddiner-app .topbar .nav-link,.gooddiner-app .topbar .account-pill{color:#f3ebd9}
-.gooddiner-app .topbar .nav-link.active,.gooddiner-app .topbar .nav-link:hover{background:#e9d7b6;color:#153f32;box-shadow:none}
-.gooddiner-app .topbar .btn-outline,.gooddiner-app .topbar .btn-ghost{color:#fff5e3;background:#ffffff0a;border:1px solid #bfa66d;box-shadow:none}
-.gooddiner-app .topbar .avatar{background:#e9d7b6;color:#153f32;box-shadow:none}
-.gooddiner-app .page-head{position:relative;padding-bottom:16px;border-bottom:1px solid #bca27b75}
-.gooddiner-app .page-head .label{color:#805134}
-.gooddiner-app .page-head h1,.gooddiner-app .form-card h1{color:#153f32}
-.gooddiner-app .card,.gooddiner-app .stat,.gooddiner-app .item,.gooddiner-app .feature{
-  background:var(--paper);border-color:#d9c9ac;box-shadow:var(--shadow)
-}
-.gooddiner-app .empty{background:#fffaf0;border-color:#b7a586}
-.gooddiner-app .field input,.gooddiner-app .field textarea,.gooddiner-app .field select{background:#fffdf7;border-color:#cdbfa5}
-.gooddiner-app .stat::before{background:#ad713a}
-.gooddiner-app .stat:nth-child(2)::before{background:#397755}
-.gooddiner-app .stat:nth-child(3)::before{background:#a34f37}
-.gooddiner-app .client-banner{
-  background:radial-gradient(circle at 98% 0,#f2c89a 0%,transparent 56%),linear-gradient(115deg,#e9b27d,#e8c695);
-  border-color:#c4915d;color:#3d2b1d;box-shadow:0 8px 22px #83572a18
-}
-.gooddiner-app .client-banner p{color:#4e3927}
-.gooddiner-app .pass-card,.gooddiner-app .merchant-hero{
-  background-image:radial-gradient(circle at 93% 6%,#bba46b33,transparent 45%),url('/icons/mark-light.svg'),linear-gradient(140deg,#265a45,#153f32 60%,#102d26);
-  background-position:center,right -85px bottom -78px,center;
-  background-size:auto,210px 210px,auto;
-  background-repeat:no-repeat;
-  background-blend-mode:normal,soft-light,normal;
-  border:1px solid #a98a50;box-shadow:0 14px 28px #153f3233
-}
-.gooddiner-app .qr-space,.gooddiner-app .qr-space>svg:not(.icon){background:#fff}
-.gooddiner-app .foot{border-top-color:#cdbb98}
+.gooddiner-app .topbar,.business-body .business-head{background:var(--plum);border:0;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;color:#fff}
+.gooddiner-app .topbar .brand,.business-body .business-head .brand{color:#fff}
+.gooddiner-app .brand strong,.business-body .brand strong{font:750 1.55rem/1.2 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:-.055em}
+.gooddiner-app .topbar .brand img,.business-body .brand img{background:var(--lavender);border-radius:10px;padding:2px;filter:none}
+.gooddiner-app .brand strong i,.business-body .brand strong i{color:var(--peach)}
+.gooddiner-app .topbar .nav-link,.gooddiner-app .topbar .account-pill{color:#fff}
+.gooddiner-app .topbar .nav-link.active,.gooddiner-app .topbar .nav-link:hover{background:var(--lavender);color:var(--plum);box-shadow:none}
+.gooddiner-app .topbar .btn-outline,.gooddiner-app .topbar .btn-ghost{background:transparent;color:#fff;border:1px solid #c8a8c2;box-shadow:none}
+.gooddiner-app .avatar{background:var(--rose);color:var(--plum);box-shadow:none}
+.gooddiner-app .page{padding-top:26px}
+.gooddiner-app .page-head{margin-bottom:22px}
+.gooddiner-app :is(h1,h2,h3,.section-label,.pass-nick,.stat strong),.business-body :is(h1,h2,h3,.business-price){font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:-.035em}
+.gooddiner-app .page-head h1,.gooddiner-app .form-card h1{font-size:clamp(1.85rem,4vw,2.65rem);line-height:1.15;font-weight:750;color:var(--plum)}
+.gooddiner-app :is(.card h2,.section-label){font-size:1.35rem;line-height:1.3;font-weight:700}
+.gooddiner-app .card h3{font-size:1.125rem;font-weight:700}
+.gooddiner-app :is(.page-head p,.lead,.muted,.feature p,.item strong,.notice,.qr-disclosure,.qr-label,.scanner-content,.qr-manual p,.privacy-page p,.privacy-page li){font-size:1rem;line-height:1.55;color:var(--muted)}
+.gooddiner-app .item strong{color:var(--ink)}
+.gooddiner-app :is(.small,.item small,.stat small,.field small,.label,.eyebrow){font-size:.875rem;line-height:1.45;letter-spacing:normal}
+.gooddiner-app .label{color:#69465F;font-weight:700}
+.gooddiner-app :is(.card,.feature,.item,.stat,.empty,.choice,.qr-space){background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow)}
+.gooddiner-app .card{padding:20px}
+.gooddiner-app .btn,.business-body .btn{font-size:1rem;min-height:48px;line-height:1.35;white-space:normal;border-radius:14px;box-shadow:none}
+.gooddiner-app .btn-small,.gooddiner-app .item .btn{min-height:44px;font-size:.875rem}
+.gooddiner-app .btn-dark,.business-body .btn-dark{background:var(--plum);color:#fff;border-color:var(--plum)}
+.gooddiner-app .btn-dark:hover{background:var(--teal-2)}
+.gooddiner-app .btn-outline,.business-body .btn-outline{background:#fff;border-color:#BDA9BA;color:var(--plum)}
+.gooddiner-app .field label{font-size:1rem;color:var(--ink)}
+.gooddiner-app .field :is(input,select,textarea){background:#fff;border-color:#BDA9BA;min-height:50px}
+.gooddiner-app .field :is(input,select,textarea):focus{outline:2px solid var(--plum);outline-offset:2px;box-shadow:none}
+.gooddiner-app :focus-visible,.business-body :focus-visible{outline:3px solid #8C3F61;outline-offset:3px}
+.gooddiner-app .topbar :focus-visible{outline-color:#fff}
+.gooddiner-app .client-banner{padding:0 0 4px;margin-bottom:16px;background:transparent;box-shadow:none;border:0;color:var(--plum);border-radius:0}
+.gooddiner-app .client-banner::after,.gooddiner-app .client-banner .round-mark{display:none}
+.gooddiner-app .client-banner h2{font-size:clamp(1.9rem,5vw,2.5rem);font-weight:750;line-height:1.15;margin:.35rem 0}
+.gooddiner-app .client-banner p{font-size:1rem;color:var(--muted)}
+.gooddiner-app .client-banner .label{color:#69465F}
+.gooddiner-app .pass-card{min-height:200px;padding:24px;background:var(--lavender);color:var(--plum);border:1px solid #D4C0E3;border-radius:20px;box-shadow:none;gap:18px}
+.gooddiner-app .pass-card::before,.gooddiner-app .pass-card::after,.gooddiner-app .merchant-hero::before,.gooddiner-app .hero::before,.gooddiner-app .hero::after,.landing-pass::after,.business-body .business-hero::before{display:none}
+.gooddiner-app .pass-head,.gooddiner-app .pass-detail,.gooddiner-app .pass-code{color:var(--plum);font-size:.875rem;letter-spacing:normal}
+.gooddiner-app .pass-nick{font-size:2.15rem;font-weight:750;line-height:1.15;overflow-wrap:anywhere}
+.gooddiner-app .pass-head img{width:40px;height:40px}
+.gooddiner-app .pass-code{border-color:#BDA9BA;padding-top:12px}
+.gooddiner-app .qr-space{min-height:0;padding:20px;gap:14px;text-align:center}
+.gooddiner-app .qr-space .label{font-size:.875rem}
+.gooddiner-app .qr-space>svg:not(.icon){width:min(100%,252px);height:auto;aspect-ratio:1;max-height:none;padding:8px;background:#fff;border-radius:8px;box-shadow:none}
+.gooddiner-app .qr-space>svg.icon{color:var(--plum);width:36px;height:36px}
+.gooddiner-app .qr-disclosure{font-size:.9375rem;background:#F4EBF6;border-color:var(--line);color:var(--ink);padding:12px;max-width:none;margin:0}
+.gooddiner-app .qr-label{color:var(--ink)}
+.gooddiner-app .qr-manual,.gooddiner-app .qr-manual code{background:#FAF7F5;border-color:var(--line)}
+.gooddiner-app .qr-manual summary{font-size:1rem;min-height:44px}
+.gooddiner-app .stats{gap:8px;grid-template-columns:repeat(3,minmax(0,1fr))}
+.gooddiner-app .stat{padding:16px 12px;box-shadow:none;background:var(--lavender);border:0;min-width:0}
+.gooddiner-app .stat:nth-child(2){background:var(--peach)}
+.gooddiner-app .stat:nth-child(3){background:var(--rose)}
+.gooddiner-app .stat::before{display:none}
+.gooddiner-app .stat small{color:var(--plum);font-size:.875rem;min-height:0;overflow-wrap:anywhere}
+.gooddiner-app .stat strong{font-size:1.8rem;color:var(--plum);font-weight:750}
+.gooddiner-app .reward-map-shortcut{background:#fff}
+.gooddiner-app .empty{padding:24px 18px;border-style:solid}
+.gooddiner-app .pill:not(.pill-warm):not(.pill-gray){background:var(--lavender);color:var(--plum)}
+.gooddiner-app .pill-warm{background:var(--peach);color:#6D352C}
+.gooddiner-app .pill-gray{background:#F0EBEF;color:#594C56}
+.gooddiner-app .merchant-hero,.gooddiner-app .hero,.business-body .business-hero{background:var(--plum);color:#fff;box-shadow:none}
+.gooddiner-app .merchant-hero p,.gooddiner-app .hero p,.gooddiner-app .hero-note,.business-body .business-hero .business-honesty{color:#F4E8F3}
+.gooddiner-app .merchant-hero .eyebrow,.gooddiner-app .hero .eyebrow,.business-body .business-hero .eyebrow,.gooddiner-app .hero h1 em,.business-body .business-hero h1 em{color:var(--peach)}
+.gooddiner-app .hero .btn-coral{background:var(--peach);color:var(--plum);border-color:var(--peach)}
+.gooddiner-app .hero .btn-outline{color:#fff;border-color:#C9B3C9;background:transparent}
+.landing-pass{background:var(--lavender);color:var(--plum);transform:none;box-shadow:none;border:1px solid #D4C0E3}
+.landing-pass:hover{transform:none}.landing-pass .lp-sun{color:var(--plum)}.landing-pass .lp-bottom{border-color:#BDA9BA}
+.gooddiner-app .toast{background:var(--plum);font-size:1rem}
+.gooddiner-app .foot{border-color:var(--line)}
+.business-body .business-sample,.business-body .business-feature,.business-body .business-price-card,.business-body .business-lead-panel{background:#fff;border-color:var(--line);box-shadow:var(--shadow);transform:none}
+.business-body .business-sample-stats div,.business-body .business-feature>span,.business-body .business-tag{background:var(--lavender);color:var(--plum);border-color:var(--line)}
+.business-body .business-pricing-section{background:#F3EAF5}
 @media(max-width:850px){
-  .gooddiner-app .mobile-nav{background:#153f32;border:1px solid #a98a50;box-shadow:0 10px 32px #153f323d;backdrop-filter:none;-webkit-backdrop-filter:none}
-  .gooddiner-app .mobile-nav button{color:#e5e8d9}
-  .gooddiner-app .mobile-nav button.active{background:#ecd9b7;color:#153f32;box-shadow:none}
-  .gooddiner-app .mobile-nav button.active::after{background:#985838}
+ .gooddiner-app .top-in{min-height:68px}
+ .gooddiner-app .mobile-nav{background:#fff;border:1px solid var(--line);box-shadow:0 4px 18px #421c3914;backdrop-filter:none;-webkit-backdrop-filter:none}
+ .gooddiner-app .mobile-nav button{color:#69465F;min-height:60px;min-width:0;font-size:.8125rem;line-height:1.15;overflow-wrap:anywhere;padding:7px 2px}
+ .gooddiner-app .mobile-nav button.active{background:var(--plum);color:#fff;box-shadow:none}
+ .gooddiner-app .mobile-nav button.active::after{display:none}
+ .gooddiner-app .mobile-nav .icon{width:22px;height:22px}
+ .gooddiner-app .mobile-spacer{height:calc(98px + env(safe-area-inset-bottom))}
+ .gooddiner-app .page{padding-bottom:32px}
+ .gooddiner-app .pass-card{min-height:200px}
+ .gooddiner-app .top-in>.nav-end .btn{min-width:0;font-size:.875rem;padding-inline:10px}
 }
-@media(display-mode:standalone){
-  .gooddiner-app .topbar{padding-top:env(safe-area-inset-top)}
+@media(max-width:380px){
+ .gooddiner-app .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .gooddiner-app .stat:last-child:nth-child(3){grid-column:1/-1}
+ .gooddiner-app .mobile-nav button{font-size:.75rem}
+ .gooddiner-app .brand strong{font-size:1.25rem}
 }
+@media(display-mode:standalone){.gooddiner-app .topbar{padding-top:env(safe-area-inset-top)}}
+@media(prefers-reduced-motion:reduce){.gooddiner-app .site-view{animation:none}}

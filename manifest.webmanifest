@@ -4,8 +4,8 @@
   "description": "Il tuo DinerPass e le esperienze registrate nei ristoranti.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#eee2cd",
-  "theme_color": "#153f32",
+  "background_color": "#FAF7F5",
+  "theme_color": "#421C39",
   "lang": "it",
   "icons": [
     {

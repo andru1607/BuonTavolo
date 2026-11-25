@@ -3,8 +3,8 @@
   "short_name": "GD Studio",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#153f32",
-  "theme_color": "#153f32",
+  "background_color": "#421C39",
+  "theme_color": "#421C39",
   "icons": [
     {
       "src": "/icon.svg",
