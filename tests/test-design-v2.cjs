@@ -34,7 +34,7 @@ assert.match(app,/const navIcons=\{merchant:'store',pass:'scan',visits:'clock',r
 assert.match(app,/\$\{navIcon\(s\)\}<span>\$\{label\}<\/span>/);
 assert.match(app,/Il tuo pass personale per registrare una presenza al ristorante/);
 assert.match(app,/Le valutazioni personali non sono attive durante il pilota/);
-assert.match(sw,/const CACHE='gooddiner-real-v106'/);
+const cacheVersion=sw.match(/const CACHE='gooddiner-real-v(\d+)'/);assert.ok(cacheVersion&&Number(cacheVersion[1])>=106,'production cache version must not regress');
 assert.match(sw,/'\/design-v2\.css'/);
 assert.match(sw,/'\/demo-design-v2\.css'/);
 const lines=css.split('\n').filter(x=>!x.trim().startsWith('/*'));
