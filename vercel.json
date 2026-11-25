@@ -124,5 +124,17 @@
         }
       ]
     }
+  ],
+  "redirects": [
+    {
+      "source": "/demo.html",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/account.html",
+      "destination": "/",
+      "permanent": false
+    }
   ]
 }

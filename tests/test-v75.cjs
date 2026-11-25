@@ -2,9 +2,9 @@ const fs=require('fs'),assert=require('node:assert/strict'),path=require('path')
 const root=path.resolve(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const icon=read('icons/icon.svg'),mark=read('icons/mark.svg'),h=read('demo.html');
 assert.ok(icon.includes('GoodDiner')&&icon.includes('simbolo GD intrecciato'));
-assert.ok(mark.includes('fill="#153F32"')&&mark.includes('#D2A965'));
+assert.ok(mark.includes('fill="#421C39"')&&mark.includes('#D6BCEB'));
 assert.ok(icon.includes('viewBox="0 0 512 512"')&&!icon.includes('gradient'));
-assert.ok(read('icons/mark-light.svg').includes('fill="#F6EFE2"'));
+assert.ok(read('icons/mark-light.svg').includes('fill="#FAF7F5"'));
 assert.ok(h.includes('name===\'logo\'?`<svg')&&h.includes('viewBox="0 0 512 512"'));
 assert.ok(h.includes('apple-touch-icon" href="/icons/icon-180.png"'));
 for(const n of [180,192,512]){
