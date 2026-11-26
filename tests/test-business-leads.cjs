@@ -13,7 +13,7 @@ assert.match(html,/GoodDiner Business/);
 assert.match(html,/39 €/);
 assert.match(html,/14 giorni di prova/);
 assert.match(html,/Non rappresenta clienti o visite effettivi/);
-assert.match(html,/Non nella prima versione Business/);
+assert.match(html,/per una visita confermata e con accesso Business valido/);
 assert.match(html,/Le registrazioni generali sono ancora chiuse/);
 assert.match(html,/id="lead-disabled"/);
 assert.match(html,/id="business-lead-form" class="stack" hidden/);
