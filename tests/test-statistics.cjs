@@ -16,10 +16,15 @@ assert.ok(schema.includes("r.verified_at is not null and r.suspended_at is null"
 
 async function run(){
  const account='operator-1';
- const app={innerHTML:'',classList:{toggle(){}}},toast={},events={};
+ const app={innerHTML:'',classList:{toggle(){}}},toast={},events={},nodes={};
+ const getNode=k=>{
+   if(k==='app')return app;if(k==='toast')return toast;
+   if(!app.innerHTML.includes('id="'+k+'"'))return null;
+   return nodes[k]||(nodes[k]={value:'',innerHTML:'',textContent:'',handlers:{},addEventListener(n,fn){this.handlers[n]=fn;},focus(){}});
+ };
  const firstCustomer={id:'mine-1',customer_id:account,restaurant_id:'restaurant-elsewhere',checked_in_at:'2026-11-19T10:00:00Z',status:'confirmed',guest_nickname:'Io'};
- const venueRows=Array.from({length:250},(_,i)=>({id:'venue-'+i,customer_id:'guest-'+i,restaurant_id:'venue-owned',checked_in_at:'2026-11-20T10:00:00Z',guest_nickname:'Cliente '+i,status:'confirmed'}));
- const nextVenue=[{id:'venue-250',customer_id:'guest-new',restaurant_id:'venue-owned',guest_nickname:'Nuovo cliente 250',checked_in_at:'2026-11-01T10:00:00Z',status:'confirmed'}];
+ const venueRows=Array.from({length:250},(_,i)=>({id:'venue-'+i,customer_id:'guest-'+i,restaurant_id:'venue-owned',checked_in_at:'2026-11-20T10:00:00Z',guest_nickname:'Cliente '+i,guest_code:'GD-'+i,visited_on:'2026-11-20',status:'confirmed'}));
+ const nextVenue=[{id:'venue-250',customer_id:'guest-new',restaurant_id:'venue-owned',guest_nickname:'Nuovo cliente 250',guest_code:'GD-250',visited_on:'2026-11-01',checked_in_at:'2026-11-01T10:00:00Z',status:'confirmed'}];
  const queryCalls=[],rpcCalls=[];
  const client={
    auth:{onAuthStateChange(){},getUser:async()=>({data:{user:{id:account,email:'person@example.test',email_confirmed_at:'2026-11-22T12:00:00Z',is_anonymous:false}},error:null})},
@@ -56,7 +61,7 @@ async function run(){
  const ctx={
    sdk:{createClient:()=>client},
    window:{GOODDINER_PUBLIC_CONFIG:{supabaseUrl:'https://ixczkhmvbjszgmlqznlk.supabase.co',supabasePublishableKey:'sb_publishable_test'},GoodDinerAuthUX:authFeedback,scrollTo(){}},
-   document:{getElementById:k=>k==='app'?app:k==='toast'?toast:null,addEventListener:(k,v)=>events[k]=v},
+   document:{getElementById:getNode,addEventListener:(k,v)=>events[k]=v},
    sessionStorage:{getItem(){return null;}},setTimeout(){},clearTimeout(){}
  };
  await vm.runInNewContext(read('official.js').replace(/import\('https:\/\/cdn\.jsdelivr\.net\/npm\/@supabase[^']+'\)/,'Promise.resolve(globalThis.sdk)'),ctx);
@@ -73,11 +78,27 @@ async function run(){
  assert.match(app.innerHTML,/<small>Recensioni pubblicate<\/small><strong>600<\/strong>/);
  gd.state.section='visits';gd.render();
  assert.match(app.innerHTML,/data-action="more-merchantVisits"/);
+ assert.match(app.innerHTML,/id="gd-visit-search"/);
+ const search=nodes['gd-visit-search'],results=nodes['gd-visit-results'],count=nodes['gd-visit-count'];
+ search.value='GD-249';search.handlers.input();
+ assert.match(results.innerHTML,/Cliente 249/);
+ assert.doesNotMatch(results.innerHTML,/Cliente 248/);
+ assert.doesNotMatch(results.innerHTML,/Locale visitato/);
+ assert.equal(count.textContent,'1 di 250 visite caricate');
+ const day=nodes['gd-visit-day'];day.value='2026-11-01';day.handlers.change();
+ assert.match(results.innerHTML,/Nessuna visita trovata/);
+ nodes['gd-visit-clear'].handlers.click();
+ assert.equal(count.textContent,'250 di 250 visite caricate');
+ search.value='GD-250';search.handlers.input();
+ assert.equal(count.textContent,'0 di 250 visite caricate');
  await events.click({preventDefault(){},target:{closest:()=>({dataset:{action:'more-merchantVisits'}})}});
  assert.equal(gd.state.visits.length,252,'next page appended without duplicating customer data');
  assert.equal(gd.state.hasMore.merchantVisits,false,'short last page hides button');
  assert.ok(queryCalls.some(q=>q.table==='visits'&&q.filter.field==='scanned_by'&&q.start===250&&q.end===499));
  assert.match(app.innerHTML,/Nuovo cliente 250/);
+ assert.equal(search.value,'GD-250','filter persists across pagination');
+ assert.match(results.innerHTML,/Nuovo cliente 250/);
+ assert.equal(count.textContent,'1 di 251 visite caricate');
  console.log('PASS: exact server totals over 250 and paginated merchant history');
 }
 run().catch(e=>{console.error(e);process.exitCode=1;});
