@@ -441,7 +441,31 @@ const GD = (() => {
         case 'privacy-request-form':{if(!state.user)throw Error('Accesso richiesto.');const kind=form.elements.kind.value,details=form.elements.details.value.trim();if(!['access','rectification','erasure','restriction','objection'].includes(kind)||details.length>500)throw Error('Richiesta non valida.');if(state.privacyRequests.some(r=>r.requester_id===state.user.id&&r.request_kind===kind&&['received','in_review'].includes(r.status)))throw Error('Hai già una richiesta di questo tipo in valutazione.');const {error}=await sb.from('privacy_requests').insert({requester_id:state.user.id,request_kind:kind,details:details||null});if(error)throw Error(error.message);await refresh();toast('Richiesta ricevuta e registrata.');break;}
       }}catch(error){toast(error.message||'Operazione non riuscita.');}finally{window.GoodDinerCaptcha?.resetFor(form);busy(false);}});
   }
-  async function init(){events();if(marketingAdminRoute())state.view='signin';else if(merchantReferralEntry())state.view='signup-merchant';else if(marketingEntry())state.view='signup-customer';const url=String(cfg.supabaseUrl||''),key=String(cfg.supabasePublishableKey||'');if(url!==`https://${PROJECT_REF}.supabase.co`||!key.startsWith('sb_publishable_')){sdkError='Configurazione dell’app incompleta.';dom.app.innerHTML=layout(`<div class="container"><div class="interstitial"><h2>Connessione non disponibile</h2><p>${e(sdkError)}</p></div></div>`);return;}
+  // Isolated read-only UI preview. Never initializes Supabase or touches auth/session storage.
+  function startUIPreview(side){
+    const merchant=side==='merchant',uid='preview-only-user',venue={id:'preview-only-venue',owner_id:uid,name:'Ristorante dimostrativo',city:'Città demo',verified_at:'2026-01-01T00:00:00Z'};
+    state.user={id:uid,email:'demo@example.invalid',email_confirmed_at:'2026-01-01T00:00:00Z',is_anonymous:false};
+    state.profile={id:uid,nickname:merchant?'Ristoratore demo':'Cliente demo',customer_code:'GD-DEMO'};
+    state.side=side;state.section=merchant?'merchant':'pass';state.view='app';
+    state.restaurants=merchant?[venue]:[];state.merchantLicense=merchant?{is_usable:true,license_status:'trialing'}:null;
+    state.bookingNotices={unread:0,items:[],reminders:[]};
+    state.dinerpassCollection={selected:'original',progress:0,cards:[{code:'original',name:'Original',theme:'original',threshold:0,unlocked:true},{code:'explorer',name:'Explorer',theme:'explorer',threshold:10,unlocked:false},{code:'connoisseur',name:'Connoisseur',theme:'connoisseur',threshold:20,unlocked:false},{code:'icon',name:'Icon',theme:'icon',threshold:50,unlocked:false}]};
+    const sections=merchant?['merchant','visits','profile']:['pass','visits','reviews','profile'];
+    const views=merchant?{'booking-merchant':'booking-merchant','booking-notices':'booking-notices','marketing-open':'marketing'}:{'collection-open':'dinerpass-collection','booking-open':'booking-customer','booking-notices':'booking-notices','reward-map':'reward-map','partner-directory-open':'partner-directory'};
+    function draw(){dom.app.innerHTML='<aside class="container" role="status" style="padding:12px 16px;background:#fff0dd;color:#421c39"><strong>ANTEPRIMA · '+(merchant?'RISTORATORE':'CLIENTE')+'</strong><p style="margin:4px 0">Dati fittizi, sola consultazione. Nessun account o operazione reale.</p><a href="/">Torna all’app ufficiale</a></aside>'+app();}
+    document.addEventListener('submit',ev=>{ev.preventDefault();toast('Anteprima: nessun dato viene inviato o salvato.');},true);
+    document.addEventListener('click',ev=>{const btn=ev.target.closest('[data-action],[data-section]');if(!btn){const link=ev.target.closest('a');if(link&&link.getAttribute('href')!=='/'){ev.preventDefault();toast('Link non attivo in anteprima.');}return;}ev.preventDefault();const name=btn.dataset.action||btn.dataset.section;
+      if(sections.includes(name)||name==='home'){state.view='app';state.section=sections.includes(name)?name:sections[0];}
+      else if(Object.prototype.hasOwnProperty.call(views,name)){state.view=views[name];}
+      else if(name==='privacy'||name==='help'){state.view=name;}
+      else if(name==='booking-agenda-panel'||name==='room-open'||name==='register-wait-panel'||name==='booking-settings-panel'){if(!merchant)return;state.view='booking-merchant';state.bookingAgendaPanel=({'booking-agenda-panel':'service','room-open':'room','register-wait-panel':'waitlist','booking-settings-panel':'settings'})[name];}
+      else if(name==='signout'){location.assign('/');return;}
+      else{toast('Funzione disponibile soltanto con un account reale.');return;}
+      try{draw();window.scrollTo(0,0);}catch{state.view='app';state.section=sections[0];draw();toast('Questa schermata richiede dati reali.');}
+    },true);
+    draw();
+  }
+  async function init(){const preview=new URLSearchParams(window.location?.search||'').get('gd_preview');if(preview==='customer'||preview==='merchant'){startUIPreview(preview);return;}events();if(marketingAdminRoute())state.view='signin';else if(merchantReferralEntry())state.view='signup-merchant';else if(marketingEntry())state.view='signup-customer';const url=String(cfg.supabaseUrl||''),key=String(cfg.supabasePublishableKey||'');if(url!==`https://${PROJECT_REF}.supabase.co`||!key.startsWith('sb_publishable_')){sdkError='Configurazione dell’app incompleta.';dom.app.innerHTML=layout(`<div class="container"><div class="interstitial"><h2>Connessione non disponibile</h2><p>${e(sdkError)}</p></div></div>`);return;}
     try{const sdk=await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.1/+esm');sb=sdk.createClient(url,key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true},global:{headers:{'X-Client-Info':'gooddiner-web/1.0'}}});sb.auth.onAuthStateChange((event)=>{if(event==='PASSWORD_RECOVERY'){state.view='reset';render();}else if(event==='SIGNED_OUT'){if(!starting)setTimeout(()=>{if(state.view!=='reset')refresh();},40);}else if(event==='SIGNED_IN'&&!starting)setTimeout(()=>{if(state.view!=='reset'&&!state.user)refresh();},40);});await loadAccount();}
     catch(error){sdkError=error.message;dom.app.innerHTML=layout(`<div class="container"><div class="interstitial"><h2>Connessione a GoodDiner non riuscita.</h2><p>Verifica Internet e riprova. Nessun dato è stato salvato in locale come sostituto del server.</p>${button('Riprova','reload','btn-dark')}</div></div>`);}finally{starting=false;}
   }
