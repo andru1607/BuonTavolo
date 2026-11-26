@@ -43,11 +43,11 @@ async function roleQueries(){
  assert.equal(gd.state.visits.length,252,'250 restaurant records plus 2 personal visits, overlap deduplicated');
  assert.equal(gd.state.reviews.length,2);
  assert.equal(gd.state.side,'merchant','merchant opens professional area by default');
- assert.match(app.innerHTML,/Passa al cliente/);
+ assert.doesNotMatch(app.innerHTML,/Passa al cliente|Area ristoratore|data-action="switch-side"/);
  await events.click({preventDefault(){},target:{closest:()=>({dataset:{action:'switch-side'}})}});
- assert.equal(gd.state.side,'customer');
- assert.match(app.innerHTML,/Locale visitato/);
- assert.doesNotMatch(app.innerHTML,/Cliente esterno 249/);
+ assert.equal(gd.state.side,'merchant','legacy switch action must no longer change roles');
+ await events.click({preventDefault(){},target:{closest:()=>({dataset:{section:'pass'}})}});
+ assert.equal(gd.state.section,'merchant','professional account cannot open personal pass via nav');
  gd.state.side='merchant';gd.state.section='visits';gd.render();
  assert.match(app.innerHTML,/Cliente esterno 249/);
  assert.doesNotMatch(app.innerHTML,/Locale visitato/);

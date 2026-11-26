@@ -27,6 +27,6 @@ assert.match(js,/get_my_merchant_license/);
 assert.match(js,/state\.merchantLicense\?\.is_usable/);
 assert.match(js,/if\(!personalReviewsEnabled\)throw Error/);
 assert.match(js,/href="\/business\.html"/);
-assert.match(config,/personalReviewsEnabled:\s*false/);
+assert.match(config,/personalReviewsEnabled:\s*true/); // explicitly authorized release; DB RPC gate remains revocable
 assert.match(config,/businessLeadIntakeEnabled:\s*false/);
-console.log('PASS: private commercial licenses, trial/expiry, human-rating freeze and B2B entry');
+console.log('PASS: private commercial licenses, trial/expiry, private review authorization and B2B entry');

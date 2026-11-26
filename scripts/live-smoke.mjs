@@ -62,8 +62,8 @@ try{
     throw Error('public signup opened without a public Turnstile site key');
   if(shouldBeOpen&&invitationMode&&!script.includes('gd_invite_purpose'))
     throw Error('invite-only UI enabled without invitation token forwarding');
-  if(!deployedConfig.includes('personalReviewsEnabled: false'))
-    throw Error('personal ratings enabled before explicit legal release');
+  if(!deployedConfig.includes('personalReviewsEnabled: true'))
+    throw Error('authorized private review feature not enabled');
   const expectedLeadIntake=process.env.GOODDINER_EXPECT_LEADS_OPEN==='true';
   if(!new RegExp('businessLeadIntakeEnabled:\\s*'+String(expectedLeadIntake)).test(deployedConfig))
     throw Error('business lead intake differs from approved release mode');
