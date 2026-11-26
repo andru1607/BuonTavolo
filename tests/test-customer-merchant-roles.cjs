@@ -16,7 +16,7 @@ assert.ok(merchant.includes('inviteField()'),'merchant signup must still render 
 const signup=app.slice(app.indexOf('async function signupCustomer(form)'),app.indexOf('async function signupMerchant(form)'));
 assert.ok(!signup.includes('gd_invite_purpose'),'customer signup must not send merchant metadata');
 assert.ok(!signup.includes('signInAnonymously'),'customer registration requires email/password');
-assert.match(signup,/data:\{nickname:nick\}/);
+assert.match(signup,/data:\{nickname:nick,gd_privacy_choices:/);assert.match(signup,/termsAck\?\.checked/);assert.match(signup,/privacyAck\?\.checked/);assert.match(signup,/sharingRequested\?\.checked===true/);
 assert.match(merchant,/codice invito personale/);
 assert.match(sql,/create or replace function gd_private\.enforce_registration_gate\(\)/);
 assert.match(sql,/supplied_purpose='merchant' or supplied_code<>''/);

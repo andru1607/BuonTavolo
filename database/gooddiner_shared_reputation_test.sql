@@ -6,7 +6,7 @@ begin
  begin
   perform set_config('gooddiner.test_fixture','enabled',true);
   update gd_private.business_features set personal_reviews_enabled=true where singleton;
-  update gd_private.reputation_release set enabled=true,approved_at=now()-interval '1 second' where singleton;
+  update gd_private.reputation_release set enabled=true,approved_at=now()-interval '1 second',approved_notice_version='synthetic-qa-only' where singleton;
   insert into auth.users(id,aud,role,email,raw_user_meta_data,email_confirmed_at,is_anonymous,created_at,updated_at)
   select u,'authenticated','authenticated','reputation-test-'||u||'@example.invalid',jsonb_build_object('nickname','Test reputation'),now(),false,now(),now() from unnest(array[g,other_g,a,b,c]) u;
   insert into public.restaurants(owner_id,name,city,verified_at) values(a,'QA legacy','Garda',now()) returning id into va;
