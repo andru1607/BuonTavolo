@@ -8,6 +8,8 @@ on:
       - database/gooddiner_booking_reputation_draft.sql
       - tests/test-booking-reputation-multiuser.cjs
       - tests/test-booking-resilience.cjs
+      - tests/test-ux-five-improvements.cjs
+      - design-v2.css
       - .github/workflows/gooddiner-reputation-monitor.yml
   schedule:
     - cron: '23 * * * *'
@@ -30,6 +32,8 @@ jobs:
         run: node tests/test-booking-reputation-multiuser.cjs
       - name: Booking resilience (mock RPC)
         run: node tests/test-booking-resilience.cjs
+      - name: UX five improvements (isolated preview)
+        run: node tests/test-ux-five-improvements.cjs
       - name: Syntax
         run: node --check official.js
   public-availability:
