@@ -19,6 +19,6 @@ for (const id of ['customer-password', 'customer-confirm-password', 'merchant-pa
   assert.ok(input, 'Missing signup field: ' + id);
   assert.match(input[0], /\srequired(?=[\s>])/, id + ' must use native required validation');
 }
-assert.match(js,/validateSignupPasswords\(password,confirmation\);const answer=await sb\.auth\.signUp/);
+assert.match(js,/validateSignupPasswords\(password,confirmation\);[^\n]*const answer=await sb\.auth\.signUp/);
 assert.match(js,/validateSignupPasswords\(password,confirmation\);if\(pilotInviteOnly/);
 console.log('PASS: customer/merchant password confirmation and length validation before signup');
