@@ -1,6 +1,6 @@
 // GoodDiner v1: production shell. Supabase API/auth data is NEVER cached.
 // Legacy regression marker: gooddiner-demo-v710.
-const CACHE='gooddiner-real-v111'; // upgraded from gooddiner-real-v100
+const CACHE='gooddiner-real-v112'; // upgraded from gooddiner-real-v100
 const STATIC=['/','/index.html','/official.css','/design-v2.css','/official.js','/config.js','/manifest.webmanifest','/icons/icon.svg','/icons/mark.svg','/icons/mark-light.svg','/qr-core.js','/turnstile.js','/client-export.js','/auth-feedback.js'];
 // Old UI assets remain available on /demo.html only, for regression testing.
 const LEGACY=['/demo.html','/demo-design-v2.css','/v76-onboarding.css','/theme-v77.css','/ux-v78.css','/v79-boot.js','/personalize-v79.css','/v79-customize.js','/visit-core-v710.js','/v710-visits.js','/visits-v710.css','/v76-onboarding.js'];
