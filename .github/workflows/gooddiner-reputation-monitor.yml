@@ -1,0 +1,47 @@
+name: GoodDiner reputation monitor
+on:
+  push:
+    branches: [main]
+    paths:
+      - official.js
+      - config.js
+      - database/gooddiner_booking_reputation_draft.sql
+      - tests/test-booking-reputation-multiuser.cjs
+      - .github/workflows/gooddiner-reputation-monitor.yml
+  schedule:
+    - cron: '23 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: gooddiner-reputation-monitor
+  cancel-in-progress: true
+jobs:
+  isolated-controller:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Multi-user reputation controller (no real data)
+        run: node tests/test-booking-reputation-multiuser.cjs
+      - name: Syntax
+        run: node --check official.js
+  public-availability:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: github.event_name != 'push'
+    steps:
+      - name: Public read-only availability
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --location --max-time 20 --retry 2 https://buontavolo.vercel.app/ -o /tmp/gd-home.html
+          grep -q 'GoodDiner' /tmp/gd-home.html
+          curl --fail --silent --show-error --location --max-time 20 --retry 2 'https://buontavolo.vercel.app/official.js' -o /tmp/gd-official.js
+          grep -q 'read_booking_reputation' /tmp/gd-official.js
+          curl --fail --silent --show-error --location --max-time 20 --retry 2 'https://buontavolo.vercel.app/business.html' -o /tmp/gd-business.html
+          grep -q 'GoodDiner Business' /tmp/gd-business.html
+          echo 'PASS public HTTP assets only; authentication and database not tested'
