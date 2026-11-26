@@ -239,7 +239,7 @@ const GD = (() => {
       }catch{state.totals={customer:null,merchant:null};state.merchantLicense=null;}
     }
     if(generation!==accountLoadGeneration)return;
-    const assignedSide=canAccessMerchant()?'merchant':'customer';if(state.side!==assignedSide){state.qr=null;state.reviewVisit=null;state.disputeReview=null;state.voidVisitId=null;state.view='app';state.section=assignedSide==='merchant'?'merchant':'pass';}state.side=assignedSide;const allowedSections=state.side==='merchant'?['merchant','visits','profile']:['pass','visits','reviews','profile'];if(!allowedSections.includes(state.section))state.section=state.side==='merchant'?'merchant':'pass';
+    const assignedSide=canAccessMerchant()?'merchant':'customer';if(state.side!==assignedSide){state.qr=null;state.reviewVisit=null;state.disputeReview=null;state.voidVisitId=null;if(state.view!=='reset')state.view='app';state.section=assignedSide==='merchant'?'merchant':'pass';}state.side=assignedSide;const allowedSections=state.side==='merchant'?['merchant','visits','profile']:['pass','visits','reviews','profile'];if(!allowedSections.includes(state.section))state.section=state.side==='merchant'?'merchant':'pass';
     if(state.view!=='reset'&&state.view!=='reward-map'&&state.view!=='booking-customer'&&state.view!=='booking-merchant'&&state.view!=='booking-notices'){state.view='app';state.section=state.section||'pass';}render();
     if(!isAnon()&&sessionStorage.getItem('gd_merchant_pending')){
       const pendingKey='gd_merchant_pending',raw=sessionStorage.getItem(pendingKey);
