@@ -7,6 +7,7 @@ on:
       - config.js
       - database/gooddiner_booking_reputation_draft.sql
       - tests/test-booking-reputation-multiuser.cjs
+      - tests/test-booking-resilience.cjs
       - .github/workflows/gooddiner-reputation-monitor.yml
   schedule:
     - cron: '23 * * * *'
@@ -27,6 +28,8 @@ jobs:
           node-version: '22'
       - name: Multi-user reputation controller (no real data)
         run: node tests/test-booking-reputation-multiuser.cjs
+      - name: Booking resilience (mock RPC)
+        run: node tests/test-booking-resilience.cjs
       - name: Syntax
         run: node --check official.js
   public-availability:
