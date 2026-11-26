@@ -7,7 +7,7 @@ permissions:
   contents: read
 jobs:
   mobile:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
@@ -16,7 +16,7 @@ jobs:
           node-version: '22'
       - name: Install pinned browser test harness
         run: |
-          npm install --no-save --package-lock=false playwright@1.51.1
+          npm install --no-save --package-lock=false playwright@1.56.1
           npx playwright install --with-deps chromium webkit
       - name: Render isolated previews
         shell: bash
@@ -28,7 +28,7 @@ jobs:
           const fs=require('node:fs');
           const profiles=[
             ['iphone-se',webkit,{...devices['iPhone 13'],viewport:{width:320,height:568},screen:{width:320,height:568}}],
-            ['iphone-13',webkit,devices['iPhone 13']],
+            ['iphone-13',webkit,{...devices['iPhone 13'],viewport:{width:390,height:844},screen:{width:390,height:844}}],
             ['android-small',chromium,{...devices['Pixel 7'],viewport:{width:360,height:800},screen:{width:360,height:800}}],
             ['android-pixel',chromium,devices['Pixel 7']]
           ];
@@ -46,7 +46,7 @@ jobs:
                 const steps=role==='customer'?[['home',null],['bookings','booking-open'],['booking-form','booking-select'],['notices','booking-notices'],['profile','section:profile'],['guide','guide-open'],['reviews','section:reviews']]:[['overview',null],['agenda','booking-merchant'],['room','room-open'],['room-list','room-view-mode:list'],['table','room-table:t1'],['notices','booking-notices'],['profile','section:profile'],['guide','guide-open']];
                 for(const [screen,action] of steps){
                   try{
-                    if(action){let selector;if(action.startsWith('section:'))selector='.mobile-nav [data-section="'+action.split(':')[1]+'"]';else{const [a,id]=action.split(':');selector='[data-action="'+a+'"]'+(id?'[data-id="'+id+'"]':'');}await page.locator(selector+':visible').first().click({timeout:3500});}
+                    if(action==='booking-notices'){await page.locator('.mobile-nav [data-section="'+(role==='merchant'?'merchant':'pass')+'"]').click({timeout:3500});}if(action){let selector;if(action.startsWith('section:'))selector='.mobile-nav [data-section="'+action.split(':')[1]+'"]';else{const [a,id]=action.split(':');selector='[data-action="'+a+'"]'+(id?'[data-id="'+id+'"]':'');}await page.locator(selector+':visible').first().click({timeout:3500});}
                     await page.waitForTimeout(150);
                     const report=await page.evaluate(()=>{
                       const root=document.documentElement,w=root.clientWidth;
