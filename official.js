@@ -601,6 +601,8 @@ const GD = (() => {
     document.addEventListener('click',ev=>{const btn=ev.target.closest('[data-action],[data-section]');if(!btn){const link=ev.target.closest('a');if(link&&link.getAttribute('href')!=='/'){ev.preventDefault();toast('Link non attivo in anteprima.');}return;}ev.preventDefault();const name=btn.dataset.action||btn.dataset.section;
       if(name!=='booking-profile'&&state.sharedReputation)clearSharedReputation();
       if(sections.includes(name)||name==='home'){state.view='app';state.section=sections.includes(name)?name:sections[0];}
+      else if(name==='booking-select'&&!merchant){state.bookingVenue=state.bookingCatalog.find(x=>x.id===btn.dataset.id)||null;state.bookingSlots=null;state.bookingDraft=null;state.view='booking-customer';}
+      else if(name==='booking-open'&&!merchant){state.bookingVenue=null;state.bookingSlots=null;state.bookingDraft=null;state.view='booking-customer';}
       else if(name==='guide-open'){state.view='guide';}
       else if(name==='guide-done'){state.view='app';state.section=sections[0];}
       else if(name==='notice-filter'){if(['all','unread'].includes(btn.dataset.id))state.noticeFilter=btn.dataset.id;state.view='booking-notices';}
