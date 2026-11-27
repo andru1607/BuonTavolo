@@ -275,7 +275,7 @@ const GD = (() => {
     const uid=state.user.id,generation=accountLoadGeneration,side=state.side,venue=verifiedRestaurant();
     if(merchant&&(!venue||side!=='merchant')||!merchant&&side!=='customer')return;
     const current=()=>uid===state.user?.id&&generation===accountLoadGeneration&&side===state.side&&(!merchant||verifiedRestaurant()?.id===venue.id);
-    const licensed=merchant&&state.merchantLicense?.is_usable;
+    const licensed=merchant&&state.merchantLicense?.is_usable,previousView=state.view;
     busy(true);
     try{
       const rows=await bookingRPC('list',{mode:merchant?'merchant':'customer',...(merchant?{restaurant_id:venue.id}:{})});
@@ -300,7 +300,7 @@ const GD = (() => {
         state.bookingCatalogUnavailable=!results[0].ok||!Array.isArray(results[0].data);state.bookingCatalog=Array.isArray(results[0].data)?results[0].data:[];state.onlineWait=results[1].data||[];
         state.bookingVenue=venueId?state.bookingCatalog.find(x=>x.id===venueId)||null:null;if(venueId||state.view!=='booking-customer')state.customerBookingTab='discover';state.bookingDraft=null;state.bookingSlots=null;state.section='visits';state.view='booking-customer';
       }
-      render();
+      render();if(previousView!==state.view||venueId)window.scrollTo({top:0,behavior:'instant'});
     }finally{if(current())busy(false);}
   }
   function bookingRomeISO(day,time){if(!/^\d{4}-\d{2}-\d{2}$/.test(day)||!/^\d{2}:\d{2}$/.test(time))throw Error('Data e orario non validi.');const target=day+'T'+time;const guess=Date.parse(target+':00Z');if(!Number.isFinite(guess))throw Error('Data non valida.');const fmt=new Intl.DateTimeFormat('sv-SE',{timeZone:'Europe/Rome',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'});for(const offset of [1,2]){const d=new Date(guess-offset*3600000);if(fmt.format(d).replace(' ','T')===target)return d.toISOString();}throw Error('Orario non valido in Italia.');}
