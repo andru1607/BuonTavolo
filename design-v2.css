@@ -730,3 +730,34 @@ body.gooddiner-app,body.business-body{background:var(--cream);background-image:n
 .gooddiner-app #gd-booking-results .item{padding:14px 0;border-bottom:1px solid #e8e1e7;border-radius:0;box-shadow:none}
 .gooddiner-app #gd-booking-results .item:last-child{border-bottom:0}
 @media(max-width:380px){.gooddiner-app .gd-manager-tabs .btn{font-size:11px}.gooddiner-app .gd-booking-card{padding:14px}.gooddiner-app .gd-booking-fields{grid-template-columns:1fr}.gooddiner-app .gd-booking-tabs .btn{font-size:12px}}
+
+/* GoodDiner reservations: compact, hospitality-first controls. */
+.gooddiner-app .gd-booking-tabs{background:transparent;padding:0;gap:8px;border-bottom:1px solid #e2d9e0;border-radius:0}
+.gooddiner-app .gd-booking-tabs .btn{border-radius:0;background:transparent;color:#786575;border:0;border-bottom:2px solid transparent;font-weight:600;padding:10px 3px}
+.gooddiner-app .gd-booking-tabs .btn-dark{color:#421c39;border-bottom-color:#421c39;background:transparent}
+.gooddiner-app .gd-manager-tabs.gd-no-room{grid-template-columns:repeat(3,minmax(0,1fr))}
+.gooddiner-app .gd-venue-booking{border:1px solid #e2d9e0;box-shadow:none;gap:16px}
+.gooddiner-app .gd-venue-title{padding-bottom:12px;border-bottom:1px solid #eee8ec}
+.gooddiner-app .gd-reservation-caption{font-size:18px;font-weight:650;color:#421c39}
+.gooddiner-app .gd-booking-fields{gap:12px}
+.gooddiner-app .gd-booking-fields label{min-width:0;display:grid;gap:6px}
+.gooddiner-app .gd-field-label{font-size:13px;color:#72636e;font-weight:600}
+.gooddiner-app .gd-booking-fields input[type=date],.gooddiner-app .gd-booking-fields select{appearance:none;-webkit-appearance:none;display:block;box-sizing:border-box;min-width:0;width:100%;max-width:100%;min-height:48px;padding:10px 12px;border:1px solid #ddd2da;border-radius:10px;background:#fff;color:#392135;text-align:left}
+.gooddiner-app .gd-booking-fields select{appearance:auto;-webkit-appearance:auto}
+.gooddiner-app .gd-booking-card .btn,.gooddiner-app .gd-booking-list .btn,.gooddiner-app .gd-control-btn{border-radius:10px;font-weight:600;font-size:15px;min-height:44px;padding:10px 14px;box-shadow:none}
+.gooddiner-app .gd-booking-card .btn-ghost{color:#421c39;text-decoration:underline}
+.gooddiner-app .gd-slot span{border-radius:8px;min-height:46px;font-weight:600}
+.gooddiner-app .gd-reception{display:flex;align-items:center;justify-content:space-between;gap:14px;background:#f6f0f4;border:1px solid #e4d9e1;border-radius:12px;padding:14px;margin-bottom:14px}
+.gooddiner-app .gd-reception>div{min-width:0;display:grid;gap:4px}
+.gooddiner-app .gd-kicker{font-size:10px;letter-spacing:.08em;color:#786575;font-weight:700}
+.gooddiner-app .gd-reception strong{font-size:20px;color:#421c39}
+.gooddiner-app .gd-reception small,.gooddiner-app .gd-state{font-size:12px;color:#6e5d6b}
+.gooddiner-app .gd-booking-head{gap:8px}
+.gooddiner-app .gd-booking-head .btn{border-radius:9px;font-size:13px;font-weight:600}
+@media(max-width:380px){.gooddiner-app .gd-booking-fields{grid-template-columns:1fr}.gooddiner-app .gd-reception{align-items:flex-start}}
+
+.gooddiner-app main .btn{border-radius:10px;font-weight:600;letter-spacing:0;min-height:44px}
+.gooddiner-app main .gd-booking-tabs .btn{border-radius:0}
+.gooddiner-app main .btn-outline{border-color:#d7cbd4}
+.gooddiner-app main .gd-booking-tabs .btn-outline{border-color:transparent}
+@media(max-width:600px){.gooddiner-app .topbar .top-in{min-height:58px}.gooddiner-app .gd-booking-head{padding-top:4px}}

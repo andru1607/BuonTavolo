@@ -15,7 +15,7 @@ async function run(source){
  await gd.openBookings(false,'v1');check(st.bookingVenue?.id==='v1','venue selection');
  const form={elements:{day:{value:'2026-11-29'},party:{value:'4'},name:{value:'Cliente A'},voucher:{value:''}}};
  st.bookingDraft={day:'2026-11-28',party:2,name:'Cliente A',voucher:''};st.bookingSlots=[{starts_at:b.starts_at,label:'20:00'}];
- gd.invalidateBookingSlots(form);check(st.bookingSlots===null&&st.bookingDraft.party===4&&st.bookingDraft.day==='2026-11-29'&&app.innerHTML.includes('Seleziona data e persone'),'changed date and party clear stale slots');
+ gd.invalidateBookingSlots(form);check(st.bookingSlots===null&&st.bookingDraft.party===4&&st.bookingDraft.day==='2026-11-29'&&app.innerHTML.includes('Vedi disponibilità'),'changed date and party clear stale slots');
  Object.assign(st,{user:{id:'m1',email:'m1@example.invalid',email_confirmed_at:'2026-01-01'},profile:{id:'m1',nickname:'Gestore',customer_code:'GD-M'},side:'merchant',restaurants:[venue],merchantLicense:{is_usable:true},view:'app',bookingAgendaPanel:'service'});
  gd.setMock({rpc:async(n,p)=>p.p_action==='list'&&n==='gooddiner_bookings'?{data:[b]}:p.p_action==='settings_get'?{data:{enabled:true,max_party:6}}:{error:{message:'OFFLINE'}}});
  await gd.openBookings(true);check(st.bookings.length===1&&st.bookingPartial&&app.innerHTML.includes('L’agenda caricata resta consultabile'),'merchant agenda survives optional failures');

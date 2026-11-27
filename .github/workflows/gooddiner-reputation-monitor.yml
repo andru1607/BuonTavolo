@@ -12,6 +12,8 @@ on:
       - tests/test-venue-location.cjs
       - tests/test-weekly-schedule.cjs
       - tests/test-instant-confirmation.cjs
+      - tests/test-booking-controls.cjs
+      - database/gooddiner_optional_room_pause.sql
       - database/gooddiner_booking_instant_confirmation.sql
       - vercel.json
       - design-v2.css
@@ -45,6 +47,8 @@ jobs:
         run: node tests/test-weekly-schedule.cjs
       - name: Instant confirmation boundaries
         run: node tests/test-instant-confirmation.cjs
+      - name: Booking controls and optional room
+        run: node tests/test-booking-controls.cjs
       - name: Syntax
         run: node --check official.js
   public-availability:
