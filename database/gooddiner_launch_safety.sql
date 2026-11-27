@@ -142,7 +142,7 @@ create table gd_private.support_requests (
  message text not null check(char_length(btrim(message)) between 10 and 1200),
  status text not null default 'received' check(status in ('received','in_review','resolved')),
  created_at timestamptz not null default now(), updated_at timestamptz not null default now(),
- reply text check(char_length(reply)<=1200)
+ reply text check(char_length(reply)<=1200), resolved_by uuid references public.profiles(id) on delete set null
 );
 create index gd_support_requester_idx on gd_private.support_requests(requester_id,created_at desc);
 alter table gd_private.support_requests enable row level security;
@@ -152,6 +152,16 @@ returns jsonb language plpgsql security definer set search_path='' as $$
 declare uid uuid:=auth.uid(); msg text; cat text;
 begin
  if uid is null or not gd_private.current_user_email_confirmed() or not exists(select 1 from public.profiles where id=uid) then raise exception 'SUPPORT_LOGIN_REQUIRED';end if;
+ if p_action in ('operator_list','operator_resolve') then
+  if not exists(select 1 from gd_studio_private.operators where user_id=uid) then raise exception 'SUPPORT_OPERATOR_FORBIDDEN';end if;
+  if p_action='operator_resolve' then
+   msg:=btrim(coalesce(p_payload->>'reply',''));
+   if char_length(msg) not between 10 and 1200 then raise exception 'SUPPORT_INVALID';end if;
+   update gd_private.support_requests set status='resolved',reply=msg,updated_at=now(),resolved_by=uid where id=(p_payload->>'id')::uuid and status<>'resolved';
+   if not found then raise exception 'SUPPORT_INVALID';end if;
+  end if;
+  return coalesce((select jsonb_agg(to_jsonb(q) order by (q.status='resolved'),q.created_at desc) from (select id,category,message,status,created_at,reply from gd_private.support_requests order by (status='resolved'),created_at desc limit 100) q),'[]'::jsonb);
+ end if;
  if p_action='create' then
   msg:=btrim(coalesce(p_payload->>'message',''));cat:=p_payload->>'category';
   if cat is null or cat not in ('account','booking','visit','technical','other') or char_length(msg) not between 10 and 1200 then raise exception 'SUPPORT_INVALID';end if;
