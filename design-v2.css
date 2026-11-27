@@ -755,3 +755,9 @@ body.gooddiner-app,body.business-body{background:var(--cream);background-image:n
 .gooddiner-app .gd-booking-head{gap:8px}
 .gooddiner-app .gd-booking-head .btn{border-radius:9px;font-size:13px;font-weight:600}
 @media(max-width:380px){.gooddiner-app .gd-booking-fields{grid-template-columns:1fr}.gooddiner-app .gd-reception{align-items:flex-start}}
+
+.gooddiner-app main .btn{border-radius:10px;font-weight:600;letter-spacing:0;min-height:44px}
+.gooddiner-app main .gd-booking-tabs .btn{border-radius:0}
+.gooddiner-app main .btn-outline{border-color:#d7cbd4}
+.gooddiner-app main .gd-booking-tabs .btn-outline{border-color:transparent}
+@media(max-width:600px){.gooddiner-app .topbar .top-in{min-height:58px}.gooddiner-app .gd-booking-head{padding-top:4px}}
