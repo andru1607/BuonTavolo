@@ -357,3 +357,14 @@ begin
  from gd_private.bookings bk where bk.restaurant_id=venue and ((bk.starts_at at time zone 'Europe/Rome')::date=d or (bk.status='confirmed' and bk.arrived_at is not null)) and bk.status in ('pending','confirmed','completed','no_show','cancelled','rejected','expired')
  ) q));
 end $function$;
+
+CREATE OR REPLACE FUNCTION public.marketing_directory(p_query text DEFAULT ''::text)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ STABLE SECURITY DEFINER
+ SET search_path TO ''
+AS $function$
+begin
+ if auth.uid() is null then raise exception 'LOGIN_RICHIESTO';end if;
+ return coalesce((select jsonb_agg(jsonb_build_object('id',x.id,'name',x.name,'city',x.city,'booking_available',exists(select 1 from gd_private.booking_settings s join gd_private.merchant_licenses l on l.restaurant_id=s.restaurant_id where s.restaurant_id=x.id and s.enabled and not s.online_paused and s.capacity>0 and jsonb_array_length(s.service_windows)>0 and l.status in ('trialing','active') and l.active_until>now()),'level',gd_private.marketing_level(gd_private.marketing_qualified(x.id)),'founder_number',(select founder_number from gd_private.marketing_founders where restaurant_id=x.id)) order by x.name,x.id) from (select r.id,r.name,r.city from public.restaurants r join gd_private.marketing_public_cards c on c.restaurant_id=r.id and c.published where r.verified_at is not null and r.suspended_at is null and (position(lower(left(coalesce(p_query,''),100)) in lower(r.name||' '||r.city))>0 or coalesce(p_query,'')='') order by r.name,r.id limit 100) x),'[]'::jsonb);
+end $function$;
