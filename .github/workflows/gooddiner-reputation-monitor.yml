@@ -9,6 +9,8 @@ on:
       - tests/test-booking-reputation-multiuser.cjs
       - tests/test-booking-resilience.cjs
       - tests/test-ux-five-improvements.cjs
+      - tests/test-venue-location.cjs
+      - vercel.json
       - design-v2.css
       - .github/workflows/gooddiner-reputation-monitor.yml
   schedule:
@@ -34,6 +36,8 @@ jobs:
         run: node tests/test-booking-resilience.cjs
       - name: UX five improvements (isolated preview)
         run: node tests/test-ux-five-improvements.cjs
+      - name: Venue address selection and GPS (mock RPC)
+        run: node tests/test-venue-location.cjs
       - name: Syntax
         run: node --check official.js
   public-availability:
