@@ -52,7 +52,7 @@ jobs:
                       const root=document.documentElement,w=root.clientWidth;
                       const nav=document.querySelector('.mobile-nav'),nr=nav?.getBoundingClientRect();
                       const visible=[...document.querySelectorAll('main button,main input,main select,.mobile-nav button')].filter(el=>{const r=el.getBoundingClientRect();return r.width>0&&r.height>0&&getComputedStyle(el).visibility!=='hidden'});
-                      return {viewport:w,documentWidth:root.scrollWidth,overflow:root.scrollWidth>w+2,navOutside:!!nr&&(nr.left< -2||nr.right>w+2),tinyTargets:visible.filter(el=>{const r=el.getBoundingClientRect();return r.height<40&&el.type!=='checkbox'&&el.type!=='radio'}).map(el=>(el.textContent||el.name||el.id).trim().slice(0,60)).slice(0,15),heading:document.querySelector('main h1,main h2')?.textContent||''};
+                      return {viewport:w,documentWidth:root.scrollWidth,overflow:root.scrollWidth>w+2,navOutside:!!nr&&(nr.left< -2||nr.right>w+2),tinyTargets:visible.filter(el=>{const r=el.getBoundingClientRect();return r.height<43.5&&el.type!=='checkbox'&&el.type!=='radio'}).map(el=>(el.textContent||el.name||el.id).trim().slice(0,60)).slice(0,15),heading:document.querySelector('main h1,main h2')?.textContent||''};
                     });
                     await page.screenshot({path:'mobile-audit/'+name+'-'+role+'-'+screen+'.png',fullPage:true,animations:'disabled'});
                     results.push({name,role,screen,...report,errors:[...errors]});
@@ -66,7 +66,7 @@ jobs:
             console.log('MOBILE_REPORT '+JSON.stringify(results));
             const failures=results.filter(r=>r.error||r.overflow||r.navOutside||r.errors?.length||!r.heading);
             console.log('MOBILE_SUMMARY '+JSON.stringify({screens:results.length,failures:failures.length,touchWarnings:results.filter(r=>r.tinyTargets?.length).length}));
-            if(failures.length)process.exitCode=1;
+            if(failures.length||results.some(r=>r.tinyTargets?.length))process.exitCode=1;
           })().catch(e=>{console.error(e);process.exitCode=1});
           JS
       - name: Preserve screenshots and report
