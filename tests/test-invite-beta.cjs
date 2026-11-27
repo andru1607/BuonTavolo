@@ -33,7 +33,7 @@ assert.match(test,/FAIL: merchant invitation secret retained in Auth metadata/);
 assert.match(test,/FAIL: test data persisted/);
 assert.match(app,/registrationMode==='invite'/);
 assert.doesNotMatch(app,/gd_invite:inviteCode,gd_invite_purpose:'customer'/);
-assert.match(app,/data:\{nickname:nick,gd_privacy_choices:/);
+assert.match(app,/data:\{nickname:nick,\.\.\.\(marketingEntry\(\)\?\{gd_marketing_restaurant:marketingEntry\(\)\.id,gd_marketing_channel:marketingEntry\(\)\.channel\}:\{\}\),gd_privacy_choices:/);
 assert.match(app,/Nessun codice invito richiesto/);
 assert.match(app,/gd_invite:inviteCode,gd_invite_purpose:'merchant'/);
 assert.match(roleMigration,/and \(select gd_private\.current_user_has_merchant_invite\(\)\)/);

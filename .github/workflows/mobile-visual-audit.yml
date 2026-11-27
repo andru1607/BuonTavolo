@@ -1,0 +1,78 @@
+name: GoodDiner mobile visual audit
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  mobile:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install pinned browser test harness
+        run: |
+          npm install --no-save --package-lock=false playwright@1.56.1
+          npx playwright install --with-deps chromium webkit
+      - name: Render isolated previews
+        shell: bash
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/gd-http.log 2>&1 &
+          mkdir -p mobile-audit
+          node <<'JS'
+          const {chromium,webkit,devices}=require('playwright');
+          const fs=require('node:fs');
+          const profiles=[
+            ['iphone-se',webkit,{...devices['iPhone 13'],viewport:{width:320,height:568},screen:{width:320,height:568}}],
+            ['iphone-13',webkit,{...devices['iPhone 13'],viewport:{width:390,height:844},screen:{width:390,height:844}}],
+            ['android-small',chromium,{...devices['Pixel 7'],viewport:{width:360,height:800},screen:{width:360,height:800}}],
+            ['android-pixel',chromium,devices['Pixel 7']]
+          ];
+          const results=[];
+          (async()=>{
+            for(const [name,engine,profile] of profiles){
+              const browser=await engine.launch({headless:true});
+              for(const role of ['customer','merchant']){
+                const context=await browser.newContext(profile);
+                await context.route('**/*',route=>route.request().url().startsWith('http://127.0.0.1:8765/')?route.continue():route.abort());
+                const page=await context.newPage();const errors=[];
+                page.on('pageerror',e=>errors.push(e.message));
+                await page.goto('http://127.0.0.1:8765/?gd_preview='+role,{waitUntil:'load'});
+                await page.locator('main.page').waitFor({timeout:10000});
+                const steps=role==='customer'?[['home',null],['bookings','booking-open'],['booking-form','booking-select'],['notices','booking-notices'],['profile','section:profile'],['guide','guide-open'],['reviews','section:reviews']]:[['overview',null],['agenda','booking-merchant'],['room','room-open'],['room-list','room-view-mode:list'],['table','room-table:t1'],['notices','booking-notices'],['profile','section:profile'],['guide','guide-open']];
+                for(const [screen,action] of steps){
+                  try{
+                    if(action==='booking-notices'){await page.locator('.mobile-nav [data-section="'+(role==='merchant'?'merchant':'pass')+'"]').click({timeout:3500});}if(action){let selector;if(action.startsWith('section:'))selector='.mobile-nav [data-section="'+action.split(':')[1]+'"]';else{const [a,id]=action.split(':');selector='[data-action="'+a+'"]'+(id?'[data-id="'+id+'"]':'');}await page.locator(selector+':visible').first().click({timeout:3500});}
+                    await page.waitForTimeout(150);
+                    const report=await page.evaluate(()=>{
+                      const root=document.documentElement,w=root.clientWidth;
+                      const nav=document.querySelector('.mobile-nav'),nr=nav?.getBoundingClientRect();
+                      const visible=[...document.querySelectorAll('main button,main input,main select,.mobile-nav button')].filter(el=>{const r=el.getBoundingClientRect();return r.width>0&&r.height>0&&getComputedStyle(el).visibility!=='hidden'});
+                      return {viewport:w,documentWidth:root.scrollWidth,overflow:root.scrollWidth>w+2,navOutside:!!nr&&(nr.left< -2||nr.right>w+2),tinyTargets:visible.filter(el=>{const r=el.getBoundingClientRect();return r.height<43.5&&el.type!=='checkbox'&&el.type!=='radio'}).map(el=>(el.textContent||el.name||el.id).trim().slice(0,60)).slice(0,15),heading:document.querySelector('main h1,main h2')?.textContent||''};
+                    });
+                    await page.screenshot({path:'mobile-audit/'+name+'-'+role+'-'+screen+'.png',fullPage:true,animations:'disabled'});
+                    results.push({name,role,screen,...report,errors:[...errors]});
+                  }catch(e){results.push({name,role,screen,error:String(e).slice(0,350)});}
+                }
+                await context.close();
+              }
+              await browser.close();
+            }
+            fs.writeFileSync('mobile-audit/report.json',JSON.stringify(results,null,2));
+            console.log('MOBILE_REPORT '+JSON.stringify(results));
+            const failures=results.filter(r=>r.error||r.overflow||r.navOutside||r.errors?.length||!r.heading);
+            console.log('MOBILE_SUMMARY '+JSON.stringify({screens:results.length,failures:failures.length,touchWarnings:results.filter(r=>r.tinyTargets?.length).length}));
+            if(failures.length||results.some(r=>r.tinyTargets?.length))process.exitCode=1;
+          })().catch(e=>{console.error(e);process.exitCode=1});
+          JS
+      - name: Preserve screenshots and report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gooddiner-mobile-visual-audit
+          path: mobile-audit/
+          retention-days: 3
