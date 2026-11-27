@@ -1,0 +1,32 @@
+'use strict';
+const fs=require('node:fs'),path=require('node:path');
+async function run(source){
+ const anchor="return {init,render,state,client:()=>sb,setView,resetScanner,version:'1.0'};";
+ if(!source.includes(anchor))throw Error('Controller export changed');
+ const h=source.replace(anchor,"return {init,render,state,client:()=>sb,setView,resetScanner,version:'1.0',merchantLocation,searchVenueLocation,saveVenueLocation,locateRewardUser,action,events,setMock:x=>{sb=x},bump:()=>{accountLoadGeneration++}};").replace(/GD\.init\(\);\s*$/,'');
+ const app={innerHTML:'',classList:{toggle(){}}},toast={textContent:''},handlers={},calls=[],passed=[];
+ const form={id:'reward-location-form',elements:{address:{value:'Via Roma 1'},city:{value:'Garda'}},querySelector:()=>null,querySelectorAll:()=>[]};
+ const doc={getElementById:id=>id==='app'?app:id==='toast'?toast:id==='reward-location-form'?form:null,addEventListener:(n,fn)=>handlers[n]=fn};
+ const win={location:{search:'',origin:'https://buontavolo.vercel.app'},GOODDINER_PUBLIC_CONFIG:{personalReviewsEnabled:true},GoodDinerAuthUX:{emailConfirmed:()=>true},scrollTo(){},confirm:()=>true};
+ const response={features:[{geometry:{type:'Point',coordinates:[10.7,45.5]},properties:{street:'Via Roma',housenumber:'1',city:'Garda',countrycode:'IT'}},{geometry:{type:'Point',coordinates:[5,50]},properties:{name:'Wrong country',countrycode:'FR'}}]};
+ let fetcher=async url=>{calls.push({url});return {ok:true,json:async()=>response}};
+ const nav={geolocation:{getCurrentPosition(success){success({coords:{latitude:45.51,longitude:10.71}})}}};
+ new Function('window','document','setTimeout','clearTimeout','fetch','navigator',h)(win,doc,()=>0,()=>{},(...args)=>fetcher(...args),nav);
+ const gd=win.GD,st=gd.state,check=(v,msg)=>{if(!v)throw Error(msg);passed.push(msg)};
+ Object.assign(st,{user:{id:'m1',email:'m1@example.invalid',email_confirmed_at:'2026-01-01'},profile:{id:'m1',nickname:'Gestore',customer_code:'GD-M'},side:'merchant',section:'merchant',view:'app',restaurants:[{id:'v1',name:'Locale demo',city:'Garda',owner_id:'m1',verified_at:'2026-01-01'}],merchantLicense:{is_usable:true},venueLocation:{}});
+ gd.events();gd.setMock({rpc:async(n,p)=>{calls.push({n,p});return {data:p.p_payload}}});
+ check(!gd.merchantLocation().includes('name="latitude"')&&!gd.merchantLocation().includes('name="longitude"'),'No manual coordinate fields');
+ check(gd.merchantLocation().includes('value="Garda"'),'Comune prefilled');
+ await gd.searchVenueLocation(form);check(st.locationResults.length===1&&st.locationSelected===null,'Results filtered to Italy; no auto selection');
+ check(decodeURIComponent(calls[0].url).includes('q=Via Roma 1, Garda, Italia&'),'Only public address sent');
+ await gd.action('reward-location-pick',{dataset:{id:'0'}});check(gd.merchantLocation().includes('Verifica sulla mappa'),'Map confirmation link');
+ await gd.saveVenueLocation(form);check(calls.at(-1).p.p_payload.latitude===45.5&&calls.at(-1).p.p_payload.address==='Via Roma 1, Garda','Save selected point');
+ await gd.searchVenueLocation(form);await gd.action('reward-location-pick',{dataset:{id:'0'}});form.elements.address.value='Via Milano 2';handlers.input({target:{name:'address',form}});let rejected=false;try{await gd.saveVenueLocation(form)}catch{rejected=true}check(rejected,'Edited address invalidates selection');
+ fetcher=async()=>({ok:false});await gd.searchVenueLocation(form);check(!st.locationSelected&&st.locationResults.length===0,'Lookup failure does not invent location');
+ gd.locateRewardUser(true);check(st.locationSelected?.source==='gps','GPS selects location without manual coordinates');
+ win.confirm=()=>false;const before=calls.length;await gd.saveVenueLocation(form);check(calls.length===before,'Cancelled confirmation makes no write');
+ win.confirm=()=>true;let resolve;fetcher=()=>new Promise(r=>resolve=r);const pending=gd.searchVenueLocation(form);st.user={id:'other'};gd.bump();resolve({ok:true,json:async()=>response});await pending;check(st.locationResults.length===0,'Stale account response discarded');
+ return passed;
+}
+module.exports=run;
+if(require.main===module)run(fs.readFileSync(path.join(__dirname,'..','official.js'),'utf8')).then(rows=>{for(const r of rows)console.log('PASS '+r);}).catch(e=>{console.error(e);process.exitCode=1;});

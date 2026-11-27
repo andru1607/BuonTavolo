@@ -1,4 +1,4 @@
--- DRAFT: do not apply until the GoodDiner database schema and final notice are verified.
+-- DRAFT: production schema inspected 27/11/2026. Do not apply or enable before final privacy review, global withdrawal integration and authorization tests.
 -- Separate from QR sharing. Disabled by default; no changes to existing accounts or RLS.
 begin;
 create table gd_private.booking_reputation_release (
@@ -89,7 +89,9 @@ begin
  select coalesce(jsonb_agg(jsonb_build_object('restaurant',q.name,'rating',q.rating,'date',q.day) order by q.created_at desc),'[]'::jsonb) into items
  from (select r.name,rv.rating,(rv.created_at at time zone 'Europe/Rome')::date as day,rv.created_at
  from public.reviews rv join public.visits v on v.id=rv.visit_id and v.status='confirmed' and v.customer_id=rv.customer_id and v.restaurant_id=rv.restaurant_id
- join gd_private.reputation_token_choices c on c.token_id=v.token_id
+ join gd_private.reputation_token_choices c on c.token_id=v.token_id and c.revoked_at is null
+ join gd_private.visit_tokens t on t.id=c.token_id and t.customer_id=v.customer_id and t.consumed_by=v.restaurant_id and t.consumed_at is not null and t.consumed_at<=t.expires_at
+ join gd_private.reputation_release qr on qr.singleton and qr.enabled and qr.approved_at<=now() and qr.approved_notice_version=c.notice_version and c.chosen_at>=qr.approved_at
  join public.restaurants r on r.id=rv.restaurant_id
  where rv.customer_id=b.customer_id and rv.status='published'
  and rv.created_at>=greatest(g.approved_at,now()-interval '12 months') and c.chosen_at>=g.approved_at
