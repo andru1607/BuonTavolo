@@ -14,6 +14,8 @@ on:
       - tests/test-instant-confirmation.cjs
       - tests/test-booking-controls.cjs
       - tests/test-navigation-launch.cjs
+      - tests/test-launch-support.cjs
+      - database/gooddiner_launch_safety.sql
       - database/gooddiner_optional_room_pause.sql
       - database/gooddiner_booking_instant_confirmation.sql
       - vercel.json
@@ -52,6 +54,8 @@ jobs:
         run: node tests/test-booking-controls.cjs
       - name: Launch navigation and branded flyer
         run: node tests/test-navigation-launch.cjs
+      - name: Help and privacy navigation
+        run: node tests/test-launch-support.cjs
       - name: Syntax
         run: node --check official.js
   public-availability:
