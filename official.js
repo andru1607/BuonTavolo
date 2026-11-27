@@ -172,8 +172,8 @@ const GD = (() => {
     const draft=locationFormDraft(form),current=locationContext(),request=(state.locationRequest||0)+1;
     state.locationRequest=request;state.locationDraft=draft;state.locationResults=[];state.locationSelected=null;render();
     try{
-      const u=new URL('https://photon.komoot.io/api/');u.searchParams.set('q',locationAddress(draft)+', Italia');u.searchParams.set('limit','5');u.searchParams.set('lang','it');
-      const response=await fetch(u.href,{credentials:'omit',referrerPolicy:'origin',signal:AbortSignal.timeout(12000)});
+      const url='https://photon.komoot.io/api/?q='+encodeURIComponent(locationAddress(draft)+', Italia')+'&limit=5&lang=it';
+      const response=await fetch(url,{credentials:'omit',referrerPolicy:'origin',...(typeof AbortSignal!=='undefined'&&AbortSignal.timeout?{signal:AbortSignal.timeout(12000)}:{})});
       if(!response.ok)throw Error('Geocodifica non disponibile');
       const data=await response.json();
       if(!current()||state.locationRequest!==request)return;
