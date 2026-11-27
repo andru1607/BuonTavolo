@@ -72,6 +72,7 @@ async function exercise(){
  await new Promise(resolve=>setImmediate(resolve)); // finish async Supabase init before rendering signed-in profile
  gd.state.user=user;gd.state.profile={id:user.id,nickname:'Cliente',customer_code:'GD-OWN'};
  gd.state.section='profile';gd.state.view='app';gd.render();
+ await events.click({preventDefault(){},target:{closest:()=>({dataset:{action:'profile-panel',id:'privacy'}})}});
  assert.match(app.innerHTML,/id="privacy-request-form"/);
  assert.match(app.innerHTML,/data-action="export-data"/);
  const send=(kind,details)=>events.submit({preventDefault(){},target:{id:'privacy-request-form',elements:{kind:{value:kind},details:{value:details}}}});

@@ -30,7 +30,7 @@ assert.match(css,/@media\(max-width:360px\)/);
 assert.match(css,/@media\(prefers-reduced-motion:reduce\)/);
 assert.match(demoCss,/\.v73-app \.mobile-bottom/);
 assert.match(demoCss,/\.v73-app \.sidebar/);
-assert.match(app,/const navIcons=\{merchant:'store',pass:'scan',visits:'clock',reviews:'star',profile:'user'\}/);
+assert.match(app,/const navIcons=\{merchant:'store',pass:'scan',bookings:'calendar',visits:'clock',reviews:'star',profile:'user'\}/);
 assert.match(app,/\$\{navIcon\(s\)\}<span>\$\{label\}<\/span>/);
 assert.match(app,/Il tuo pass personale per registrare una presenza al ristorante/);
 assert.match(app,/Le valutazioni personali non sono attive durante il pilota/);

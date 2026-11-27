@@ -761,3 +761,13 @@ body.gooddiner-app,body.business-body{background:var(--cream);background-image:n
 .gooddiner-app main .btn-outline{border-color:#d7cbd4}
 .gooddiner-app main .gd-booking-tabs .btn-outline{border-color:transparent}
 @media(max-width:600px){.gooddiner-app .topbar .top-in{min-height:58px}.gooddiner-app .gd-booking-head{padding-top:4px}}
+
+/* Four-destination navigation, identical on desktop and mobile. */
+.gooddiner-app .gd-activity-tabs{display:flex;gap:8px;border-bottom:1px solid #e4dbe1;margin:0 0 16px;padding:0}
+.gooddiner-app .gd-activity-tabs .btn{flex:1 1 0;min-width:0;background:transparent;color:#756372;border:0;border-bottom:2px solid transparent;border-radius:0;min-height:44px;font-size:14px;padding:10px 5px;white-space:normal}
+.gooddiner-app .gd-activity-tabs .btn-dark{color:#421c39;border-bottom-color:#421c39;font-weight:700}
+.gooddiner-app .gd-quick-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:20px}
+.gooddiner-app .gd-quick-grid .btn{min-height:58px;min-width:0;white-space:normal;line-height:1.25;padding:10px;font-size:14px}
+.gooddiner-app .gd-back-row{margin:0 0 8px}
+.gooddiner-app .gd-back{min-height:44px;padding:6px 0!important;color:#421c39;justify-content:flex-start;text-decoration:none}
+@media(max-width:600px){.gooddiner-app .mobile-nav{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:2px;padding:6px}.gooddiner-app .mobile-nav button{min-width:0;min-height:54px;gap:3px;font-size:11px;line-height:1.15;white-space:normal;padding:7px 2px;border-radius:12px}.gooddiner-app .mobile-nav button .icon{width:21px;height:21px;flex-shrink:0}.gooddiner-app .mobile-nav button.active{background:#421c39;color:white}.gooddiner-app .gd-quick-grid .btn{font-size:13px}}
