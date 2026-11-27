@@ -5,6 +5,6 @@ const main=read('official.js'),studio=read('studio/studio.js'),html=read('studio
 assert.doesNotThrow(()=>new vm.Script(main));assert.doesNotThrow(()=>new vm.Script(studio));
 assert.match(main,/async function init\(\)\{[^\n]*startUIPreview\(preview\);return;\}events\(\);/);
 assert.ok(main.indexOf('startUIPreview(preview);return;')<main.indexOf('const sdk=await import'), 'preview must bypass real auth');assert.match(main,/await loadAccount\(\);\}/);assert.match(read('index.html'),/class="boot" role="status"/);
-assert.match(html,/id="login" class="login" hidden/);assert.match(html,/id="launch"/);assert.match(studio,/grant_type=refresh_token/);assert.match(studio,/await ensureSession\(\);await openWorkspace\(\)/);assert.match(studio,/function reset\(\)\{forgetSession\(\)/);assert.match(studio,/await loadDashboard\(\)/);
+assert.match(html,/id="login" class="login" hidden/);assert.match(html,/id="launch"/);assert.match(studio,/grant_type=refresh_token/);assert.match(studio,/await ensureSession\(\);await openWorkspace\(\)/);assert.match(studio,/function reset\(\)\{editionLoad\+\+;editionRows=null;editionEdit=null;editionJPEG=null;forgetSession\(\)/);assert.match(studio,/await loadDashboard\(\)/);
 assert.ok(!studio.includes('localStorage.setItem(SESSION_KEY,JSON.stringify({password'));
 console.log('PASS: native startup syntax, initial splash and session lifecycle');
