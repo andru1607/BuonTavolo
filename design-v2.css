@@ -682,3 +682,11 @@ body.gooddiner-app,body.business-body{background:var(--cream);background-image:n
  .gooddiner-app .room-scroll{max-width:100%;overflow-x:auto}
  .gooddiner-app .gd-room-list{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+
+/* Touch dimensions measured in WebKit and Chromium mobile audits. */
+@media(max-width:600px){
+ .gooddiner-app main input:not([type=checkbox]):not([type=radio]):not([type=hidden]),.gooddiner-app main select,.gooddiner-app main textarea{box-sizing:border-box;min-height:44px;font-size:16px;max-width:100%;min-width:0}
+ .gooddiner-app main .btn{min-height:44px;white-space:normal}
+ .gooddiner-app main .row>label{min-width:0;max-width:100%}
+ .gooddiner-app main input[type=date],.gooddiner-app main input[type=time]{width:100%;appearance:auto;-webkit-appearance:auto}
+}
