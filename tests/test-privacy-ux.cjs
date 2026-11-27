@@ -8,7 +8,7 @@ assert.match(js,/Mostrare il QR permette al ristorante verificato di registrare 
 assert.match(js,/Le valutazioni personali non sono attive durante il pilota/);
 assert.match(js,/Il locale può assegnare una valutazione da 1 a 10, visibile a te e contestabile/);
 assert.match(js,/Se non vuoi registrare la visita, non generare il codice/);
-assert.match(js,/Visibile a te e al ristoratore/);
+assert.match(js,/Visibile a te e al locale autore; condivisione tramite prenotazione non ancora attiva/);
 assert.match(js,/Salva valutazione della visita/);
 assert.ok(!js.includes('Invia recensione verificata'),'do not claim the content is verified');
 assert.match(css,/\.qr-disclosure\{/);
