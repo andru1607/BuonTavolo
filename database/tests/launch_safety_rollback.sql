@@ -30,6 +30,16 @@ begin
  r:=public.gooddiner_support('create','{"category":"technical","message":"QA synthetic support request"}');select id into x from gd_private.support_requests where requester_id=u and message='QA synthetic support request';if x is null or not exists(select 1 from jsonb_array_elements(r) a where a->>'id'=x::text) then raise exception 'QA support creation';end if;
  perform set_config('request.jwt.claim.sub',m::text,true);perform set_config('request.jwt.claims',jsonb_build_object('sub',m,'role','authenticated')::text,true);
  r:=public.gooddiner_support('list','{}');if exists(select 1 from jsonb_array_elements(r) a where a->>'id'=x::text) then raise exception 'QA support cross-account leakage';end if;
+ select user_id into strict m from gd_studio_private.operators limit 1;
+ perform set_config('request.jwt.claim.sub',u::text,true);perform set_config('request.jwt.claims',jsonb_build_object('sub',u,'role','authenticated')::text,true);
+ if not exists(select 1 from gd_studio_private.operators where user_id=u) then
+ rejected:=false;begin perform public.gooddiner_support('operator_list','{}');exception when others then rejected:=sqlerrm='SUPPORT_OPERATOR_FORBIDDEN';end;if not rejected then raise exception 'QA operator authorization failed';end if;
+ end if;
+ perform set_config('request.jwt.claim.sub',m::text,true);perform set_config('request.jwt.claims',jsonb_build_object('sub',m,'role','authenticated')::text,true);
+ r:=public.gooddiner_support('operator_list','{}');if not exists(select 1 from jsonb_array_elements(r) a where a->>'id'=x::text) then raise exception 'QA operator missing ticket';end if;
+ perform public.gooddiner_support('operator_resolve',jsonb_build_object('id',x,'reply','QA operator response'));
+ perform set_config('request.jwt.claim.sub',u::text,true);perform set_config('request.jwt.claims',jsonb_build_object('sub',u,'role','authenticated')::text,true);
+ r:=public.gooddiner_support('list','{}');if not exists(select 1 from jsonb_array_elements(r) a where a->>'id'=x::text and a->>'status'='resolved' and a->>'reply'='QA operator response') then raise exception 'QA reply not visible';end if;
  if has_table_privilege('authenticated','gd_private.booking_reputation_grants','SELECT') or has_table_privilege('authenticated','gd_private.support_requests','SELECT') or has_function_privilege('anon','public.read_booking_reputation(uuid)','EXECUTE') then raise exception 'QA exposed private data';end if;
 end $qa$;
 rollback;
