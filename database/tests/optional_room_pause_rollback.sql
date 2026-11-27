@@ -1,0 +1,33 @@
+begin;
+do $qa$
+declare v uuid; own uuid; cust uuid; d date; result jsonb; bid uuid; t timestamptz; before_count int;
+begin
+ select id,owner_id into strict v,own from public.restaurants where id='2c497189-d566-4d5c-83df-c325e85aae75';
+ select p.id into strict cust from public.profiles p join auth.users a on a.id=p.id where a.email_confirmed_at is not null and not exists(select 1 from public.restaurants r where r.owner_id=p.id) limit 1;
+ d:=(now() at time zone 'Europe/Rome')::date+20;
+ t:=(d+time '12:00') at time zone 'Europe/Rome';
+ update gd_private.booking_settings set enabled=true,online_paused=false,room_enabled=false,auto_confirm=false,capacity=180,duration_minutes=60,max_party=30,service_windows=jsonb_build_array(jsonb_build_object('day',extract(isodow from d)::int,'from','11:00','to','15:00')) where restaurant_id=v;
+ perform set_config('request.jwt.claim.sub',cust::text,true);perform set_config('request.jwt.claims',jsonb_build_object('sub',cust,'role','authenticated')::text,true);
+ result:=public.gooddiner_bookings('create',jsonb_build_object('restaurant_id',v,'name','QA optional room rollback','starts_at',t,'party',4));
+ bid:=(result->>'id')::uuid;
+ if result->>'status'<>'confirmed' or exists(select 1 from gd_private.room_assignments where booking_id=bid) then raise exception 'QA instant without room failed';end if;
+ begin perform public.gooddiner_bookings('pause_set',jsonb_build_object('restaurant_id',v,'enabled',true));raise exception using errcode='P0003',message='QA unauthorized pause';exception when others then if sqlstate='P0003' then raise;end if;end;
+ perform set_config('request.jwt.claim.sub',own::text,true);perform set_config('request.jwt.claims',jsonb_build_object('sub',own,'role','authenticated')::text,true);
+ result:=public.gooddiner_bookings('pause_set',jsonb_build_object('restaurant_id',v,'enabled',true));
+ if result->>'online_paused'<>'true' or result->>'enabled'<>'true' then raise exception 'QA pause not independent';end if;
+ if not exists(select 1 from gd_private.bookings where id=bid and status='confirmed') then raise exception 'QA existing booking changed';end if;
+ result:=public.gooddiner_bookings('room_set',jsonb_build_object('restaurant_id',v,'enabled',true));
+ if result->>'room_enabled'<>'true' then raise exception 'QA room enable';end if;
+ result:=public.gooddiner_bookings('room_set',jsonb_build_object('restaurant_id',v,'enabled',false));
+ if result->>'room_enabled'<>'false' then raise exception 'QA room disable';end if;
+ perform set_config('request.jwt.claim.sub',cust::text,true);perform set_config('request.jwt.claims',jsonb_build_object('sub',cust,'role','authenticated')::text,true);
+ result:=public.gooddiner_bookings('catalog','{}');if exists(select 1 from jsonb_array_elements(result) x where x->>'id'=v::text) then raise exception 'QA paused listed';end if;
+ result:=public.gooddiner_booking_schedule('slots',jsonb_build_object('restaurant_id',v,'day',d,'party',2));if jsonb_array_length(result)<>0 then raise exception 'QA paused slots';end if;
+ begin perform public.gooddiner_bookings('create',jsonb_build_object('restaurant_id',v,'name','QA optional room rollback','starts_at',t+interval '1 hour','party',2));raise exception using errcode='P0003',message='QA paused creation accepted';exception when others then if sqlerrm<>'BOOKING_UNAVAILABLE' then raise;end if;end;
+ perform set_config('request.jwt.claim.sub',own::text,true);perform set_config('request.jwt.claims',jsonb_build_object('sub',own,'role','authenticated')::text,true);
+ result:=public.gooddiner_bookings('pause_set',jsonb_build_object('restaurant_id',v,'enabled',false));
+ if result->>'online_paused'<>'false' then raise exception 'QA resume failed';end if;
+ perform set_config('request.jwt.claim.sub',cust::text,true);perform set_config('request.jwt.claims',jsonb_build_object('sub',cust,'role','authenticated')::text,true);
+ result:=public.gooddiner_bookings('catalog','{}');if not exists(select 1 from jsonb_array_elements(result) x where x->>'id'=v::text) then raise exception 'QA resume not visible';end if;
+end $qa$;
+rollback;
