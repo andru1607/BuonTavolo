@@ -11,6 +11,8 @@ on:
       - tests/test-ux-five-improvements.cjs
       - tests/test-venue-location.cjs
       - tests/test-weekly-schedule.cjs
+      - tests/test-instant-confirmation.cjs
+      - database/gooddiner_booking_instant_confirmation.sql
       - vercel.json
       - design-v2.css
       - .github/workflows/gooddiner-reputation-monitor.yml
@@ -41,6 +43,8 @@ jobs:
         run: node tests/test-venue-location.cjs
       - name: Weekly schedule and catalog visibility
         run: node tests/test-weekly-schedule.cjs
+      - name: Instant confirmation boundaries
+        run: node tests/test-instant-confirmation.cjs
       - name: Syntax
         run: node --check official.js
   public-availability:
